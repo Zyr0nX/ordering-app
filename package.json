@@ -18,6 +18,8 @@
     "@trpc/next": "^10.0.0",
     "@trpc/react-query": "^10.0.0",
     "@trpc/server": "^10.0.0",
+    "flowbite": "^1.5.5",
+    "flowbite-react": "^0.3.7",
     "next": "13.0.2",
     "next-auth": "^4.18.3",
     "react": "18.2.0",
