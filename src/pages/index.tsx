@@ -1,10 +1,11 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { signIn, signOut, useSession } from "next-auth/react";
-
 import { trpc } from "../utils/trpc";
-import Header from "../components/ui/Navbar/Header";
+
+import Button from "../components/common/Button/Button";
+import { MdShoppingCart } from "react-icons/md";
+
 
 const Home: NextPage = () => {
   return (
@@ -14,7 +15,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <Button type="button" backgroundColor="black" textColor="white" name="Cart" Icon={<MdShoppingCart className="w-4 h-4 mt-0.5" />} />
     </>
   );
 };
