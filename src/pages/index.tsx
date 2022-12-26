@@ -3,7 +3,7 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
-import Anchor from "../components/common/Anchor/Anchor";
+import Input from "../components/common/Input/Input";
 import { MdShoppingCart } from "react-icons/md";
 
 const Home: NextPage = () => {
@@ -14,12 +14,11 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Anchor
+      <Input
         backgroundColor="gray"
         textColor="black"
         name="Cart"
         Icon={<MdShoppingCart className="h-4 w-4" />}
-        href="https://www.google.com"
       />
     </>
   );

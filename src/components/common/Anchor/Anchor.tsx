@@ -15,16 +15,19 @@ const Button: React.FC<AnchorProps> = ({
   Icon,
   href,
   name,
-  ...rest
 }) => {
   return (
     <a
       type={type}
-      className={`flex h-9 items-center whitespace-nowrap rounded-full px-3 py-3 text-sm font-medium leading-4 ${
-        backgroundColor === "black" ? "bg-black" : ""
+      className={`flex h-9 w-fit items-center whitespace-nowrap rounded-full px-3 py-3 text-sm font-medium leading-4 ${
+        backgroundColor === "black"
+          ? "bg-black hover:bg-neutral-600 active:bg-neutral-500"
+          : ""
       }${
-        backgroundColor === "gray" ? "bg-gray-300" : ""
-      } text-${textColor} w-fit`}
+        backgroundColor === "gray"
+          ? "bg-neutral-200 hover:bg-neutral-300 active:bg-neutral-400"
+          : ""
+      } text-${textColor}`}
       href={href}
     >
       {Icon}
