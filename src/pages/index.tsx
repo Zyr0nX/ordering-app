@@ -3,9 +3,8 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
-import Button from "../components/common/Button/Button";
+import Anchor from "../components/common/Anchor/Anchor";
 import { MdShoppingCart } from "react-icons/md";
-
 
 const Home: NextPage = () => {
   return (
@@ -15,7 +14,13 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Button type="button" backgroundColor="black" textColor="white" name="Cart" Icon={<MdShoppingCart className="w-4 h-4 mt-0.5" />} />
+      <Anchor
+        backgroundColor="gray"
+        textColor="black"
+        name="Cart"
+        Icon={<MdShoppingCart className="h-4 w-4" />}
+        href="https://www.google.com"
+      />
     </>
   );
 };

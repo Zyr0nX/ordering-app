@@ -1,37 +1,31 @@
 import type { ButtonHTMLAttributes, ReactElement } from "react";
-import type { IconType } from "react-icons";
 import React from "react";
-import type {  } from "next";
-
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   backgroundColor?: "white" | "black";
   textColor?: "white" | "black";
-  width?: string | number;
-  variant?: "flat" | "slim" | "ghost" | "naked";
   Icon?: ReactElement;
 }
 
 const Button: React.FC<ButtonProps> = ({
   backgroundColor = "black",
   textColor = "white",
-  type,
-  width,
+  type = "button",
   disabled = false,
-  variant,
   Icon,
   name,
+  ...rest
 }) => {
   return (
     <button
       type={type}
-      className={`align-center flex h-9 rounded-full px-3 py-2 text-sm font-medium ${backgroundColor === "black" ? "bg-black" : ""}${backgroundColor === "white" ? "bg-white" : ""} text-${textColor} w-${
-        width ? `[${width}]` : "auto"
-      }`}
+      className={`flex h-9 items-center whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium leading-4 text-${textColor} ${
+        backgroundColor === "black" ? "bg-black" : ""
+      }${backgroundColor === "white" ? "bg-white" : ""} `}
       disabled={disabled}
     >
       {Icon}
-      <div className={`whitespace-nowrap ${Icon ? "ml-2" : ""}`}>{name}</div>
+      <div className={`${Icon ? "ml-2" : ""}`}>{name}</div>
     </button>
   );
 };
