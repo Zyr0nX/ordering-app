@@ -1,40 +1,39 @@
 import type { InputHTMLAttributes, ReactElement } from "react";
 import React from "react";
 
-export interface AnchorProps extends InputHTMLAttributes<HTMLButtonElement> {
-  backgroundColor?: "gray" | "black";
-  textColor?: "white" | "black";
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  backgroundColor: "gray" | "black";
   placeholderColor?: "gray" | "black";
   Icon?: ReactElement;
 }
 
-const Button: React.FC<AnchorProps> = ({
+const Button: React.FC<InputProps> = ({
   backgroundColor = "gray",
-  textColor = "black",
-  placeholderColor = "gray",
   Icon,
-  name,
   type = "text",
   placeholder,
 }) => {
   return (
     <div
-      className={`absolute flex h-12 w-96 min-w-[11rem] max-w-[65rem] items-center rounded-full px-4 leading-5 transition-all duration-500 ease-in-out ${
-        backgroundColor === "black" ? "bg-black" : ""
+      className={`flex h-12 w-full min-w-[10rem] max-w-[65rem] items-center rounded-full px-4 leading-5 transition-all duration-500 ease-in-out ${
+        backgroundColor === "black"
+          ? "bg-black text-white placeholder:text-neutral-200 hover:bg-neutral-800 active:bg-neutral-700"
+          : ""
       }${
-        backgroundColor === "gray" ? "bg-gray-300" : ""
-      } text-${textColor} w-fit`}
+        backgroundColor === "gray"
+          ? "bg-neutral-200 text-black placeholder:text-neutral-600 hover:bg-neutral-300 active:bg-neutral-400"
+          : ""
+      }`}
     >
       {Icon}
-      <div className={`${Icon ? "ml-4" : ""}`}>
-        <input
-          type={type}
-          placeholder={placeholder}
-          className={`appearance-none overflow-hidden text-ellipsis outline-none ${
-            backgroundColor === "black" ? "bg-black" : ""
-          }${backgroundColor === "gray" ? "bg-gray-300" : ""}`}
-        />
-      </div>
+      <div className={`block ${Icon ? "ml-4" : ""}`}></div>
+      <input
+        type={type}
+        placeholder={placeholder}
+        className={`w-full appearance-none overflow-hidden text-ellipsis bg-inherit outline-none ${
+          backgroundColor === "black" ? "placeholder:text-neutral-400" : ""
+        }${backgroundColor === "gray" ? "placeholder:text-neutral-700" : ""}`}
+      />
     </div>
   );
 };

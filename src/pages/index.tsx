@@ -3,7 +3,7 @@ import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
-import Logo from "../components/common/Logo/Logo";
+import Header from "../components/ui/Header/Header";
 import { MdShoppingCart } from "react-icons/md";
 
 const Home: NextPage = () => {
@@ -14,7 +14,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Logo />
+      <Header />
     </>
   );
 };
