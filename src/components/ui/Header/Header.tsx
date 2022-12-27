@@ -13,10 +13,10 @@ import Anchor from "../../common/Anchor";
 
 const Header = () => {
   return (
-    <div className="relative flex h-24 min-w-[64rem] max-w-[120rem] items-center px-10">
+    <div className="relative flex h-24 min-w-[65rem] max-w-[120rem] items-center px-10">
       <MdMenu className="shrink-0 cursor-pointer" size="1.5rem" />
       <div className="w-2 md:w-6"></div>
-      <Logo />
+      <Logo name="Virparyas"/>
       <div className="w-2 md:w-6"></div>
       <Button
         backgroundColor="gray"
@@ -24,12 +24,14 @@ const Header = () => {
         name="Nam Tu Liem · Now"
       />
       <div className="w-2 md:w-6"></div>
+
       <Input
         backgroundColor="gray"
         placeholder="Food, groceries, drinks, etc"
         Icon={<MdSearch size="1rem" />}
       />
       <div className="w-3"></div>
+
       <div className="ml-auto flex grow-0 items-center justify-end">
         <div className="max-w-[19rem]">
           <Button

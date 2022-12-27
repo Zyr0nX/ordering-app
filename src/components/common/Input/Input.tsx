@@ -15,7 +15,7 @@ const Button: React.FC<InputProps> = ({
 }) => {
   return (
     <div
-      className={`flex h-12 w-full min-w-[10rem] max-w-[65rem] items-center rounded-full px-4 leading-5 transition-all duration-500 ease-in-out ${
+      className={`flex h-12 w-full min-w-[40rem] max-w-[90rem] items-center rounded-full px-4 leading-5 transition-all duration-500 ease-in-out ${
         backgroundColor === "black"
           ? "bg-black text-white placeholder:text-neutral-200 hover:bg-neutral-800 active:bg-neutral-700"
           : ""
@@ -26,7 +26,7 @@ const Button: React.FC<InputProps> = ({
       }`}
     >
       {Icon}
-      <div className={`block ${Icon ? "ml-4" : ""}`}></div>
+      <div className={`${Icon ? "ml-4" : ""}`}></div>
       <input
         type={type}
         placeholder={placeholder}

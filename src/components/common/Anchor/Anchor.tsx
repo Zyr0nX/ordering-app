@@ -1,5 +1,6 @@
-import Link, { LinkProps } from "next/link";
-import type { AnchorHTMLAttributes, ReactElement } from "react";
+import type { LinkProps } from "next/link";
+import Link from "next/link";
+import type { ReactElement } from "react";
 import React from "react";
 
 export interface AnchorProps extends LinkProps {

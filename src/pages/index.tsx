@@ -4,7 +4,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
 import Header from "../components/ui/Header/Header";
-import { MdShoppingCart } from "react-icons/md";
 
 const Home: NextPage = () => {
   return (
