@@ -4,6 +4,8 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
 import Header from "../components/ui/Header/Header";
+import Anchor from "../components/common/Anchor";
+import Sidebar from "../components/ui/Sidebar";
 
 const Home: NextPage = () => {
   return (
@@ -13,7 +15,8 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      {/* <Header /> */}
+      <Sidebar />
     </>
   );
 };

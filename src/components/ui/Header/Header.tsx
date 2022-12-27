@@ -16,7 +16,7 @@ const Header = () => {
     <div className="relative flex h-24 min-w-[65rem] max-w-[120rem] items-center px-10">
       <MdMenu className="shrink-0 cursor-pointer" size="1.5rem" />
       <div className="w-2 md:w-6"></div>
-      <Logo name="Virparyas"/>
+      <Logo name="Virparyas" />
       <div className="w-2 md:w-6"></div>
       <Button
         backgroundColor="gray"
