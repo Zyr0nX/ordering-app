@@ -1,27 +1,49 @@
 import React from "react";
+import { motion } from "framer-motion";
 import Anchor from "../../common/Anchor";
+import Backdrop from "../../common/Backdrop/Backdrop";
 
-const Sidebar = () => {
+export interface SidebarProps {
+    setSideBar: (state: boolean) => void
+}
+
+const Sidebar : React.FC<SidebarProps> = (sidebar, setSideBar) => {
+
+const onBackdropClick = (sidebar: boolean) => {
+    setSideBar(sidebar);
+  };
+
   return (
-    <aside className="box-border w-[18.75rem] max-w-[80%] overflow-y-auto overflow-x-hidden p-6 shadow-xl transition-all duration-500 ease-in-out">
-      <div className="flex min-h-[calc(100vh-3rem)] flex-col justify-between">
-        <div>
-          <Anchor
-            backgroundColor="black"
-            name="Sign Up"
-            variant="large"
-            href="./signin"
-          />
-          <div className="h-2"></div>
-          <Anchor
-            backgroundColor="gray"
-            name="Log In"
-            variant="large"
-            href="./login"
-          />
+    <Backdrop onClick={() => onBackdropClick(false)}>
+      <motion.aside
+        className="bg-white box-border w-[18.75rem] max-w-[80%] overflow-y-auto overflow-x-hidden p-6 shadow-xl transition-all duration-500 ease-in-out"
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{
+          x: 0,
+          opacity: 1,
+          transition: { duration: 0.5, damping: 25, stiffness: 500 },
+        }}
+        exit={{ x: "-100%", opacity: 0 }}
+      >
+        <div className="flex min-h-[calc(100vh-3rem)] flex-col justify-between">
+          <div>
+            <Anchor
+              backgroundColor="black"
+              name="Sign Up"
+              variant="large"
+              href="./signin"
+            />
+            <div className="h-2"></div>
+            <Anchor
+              backgroundColor="gray"
+              name="Log In"
+              variant="large"
+              href="./login"
+            />
+          </div>
         </div>
-      </div>
-    </aside>
+      </motion.aside>
+    </Backdrop>
   );
 };
 

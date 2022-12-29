@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   MdLocationPin,
   MdMenu,
@@ -10,11 +10,16 @@ import Logo from "../../common/Logo";
 import Button from "../../common/Button";
 import Input from "../../common/Input";
 import Anchor from "../../common/Anchor";
+import Sidebar from "../Sidebar";
 
 const Header = () => {
+const [sidebar, setSidebar] = useState<boolean>(false)
+
   return (
+    <>
+    {sidebar && <Sidebar setSidebar={setSidebar} />}
     <div className="relative flex h-24 min-w-[65rem] max-w-[120rem] items-center px-10">
-      <MdMenu className="shrink-0 cursor-pointer" size="1.5rem" />
+      <MdMenu className="shrink-0 cursor-pointer" size="1.5rem" onClick={() => {setSidebar(true)}} />
       <div className="w-2 md:w-6"></div>
       <Logo name="Virparyas" />
       <div className="w-2 md:w-6"></div>
@@ -50,7 +55,8 @@ const Header = () => {
         <div className="w-3"></div>
         <Anchor backgroundColor="gray" href="/signin" name="Sign up" />
       </div>
-    </div>
+    </div></>
+    
   );
 };
 

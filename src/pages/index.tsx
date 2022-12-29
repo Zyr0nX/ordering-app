@@ -15,8 +15,8 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* <Header /> */}
-      <Sidebar />
+      <Header />
+      {/* <Sidebar close={() => {console.log("1")}} /> */}
     </>
   );
 };
