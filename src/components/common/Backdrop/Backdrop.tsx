@@ -10,7 +10,7 @@ export interface BackdropProps {
 const Backdrop: React.FC<BackdropProps> = ({ children, onClick }) => {
   return (
     <motion.div
-      className="bg-neutral-800/80 z-50 fixed left-0 top-0 w-screen h-screen"
+      className="fixed left-0 top-0 z-50 h-screen w-screen bg-neutral-800/80"
       onClick={onClick}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}

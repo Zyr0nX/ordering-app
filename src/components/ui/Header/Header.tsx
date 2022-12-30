@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   MdLocationPin,
   MdMenu,
@@ -13,50 +13,56 @@ import Anchor from "../../common/Anchor";
 import Sidebar from "../Sidebar";
 
 const Header = () => {
-const [sidebar, setSidebar] = useState<boolean>(false)
+  const [sidebar, setSidebar] = useState<boolean>(false);
 
   return (
     <>
-    {sidebar && <Sidebar setSidebar={setSidebar} />}
-    <div className="relative flex h-24 min-w-[65rem] max-w-[120rem] items-center px-10">
-      <MdMenu className="shrink-0 cursor-pointer" size="1.5rem" onClick={() => {setSidebar(true)}} />
-      <div className="w-2 md:w-6"></div>
-      <Logo name="Virparyas" />
-      <div className="w-2 md:w-6"></div>
-      <Button
-        backgroundColor="gray"
-        Icon={<MdLocationPin size="1rem" />}
-        name="Nam Tu Liem · Now"
-      />
-      <div className="w-2 md:w-6"></div>
-
-      <Input
-        backgroundColor="gray"
-        placeholder="Food, groceries, drinks, etc"
-        Icon={<MdSearch size="1rem" />}
-      />
-      <div className="w-3"></div>
-
-      <div className="ml-auto flex grow-0 items-center justify-end">
-        <div className="max-w-[19rem]">
-          <Button
-            backgroundColor="black"
-            Icon={<MdShoppingCart size="1rem" />}
-            name="Cart · 0"
-          />
-        </div>
-        <div className="w-3"></div>
-        <Anchor
+      {sidebar && <Sidebar setSidebar={setSidebar} sidebar={false} />}
+      <div className="relative flex h-24 min-w-[65rem] max-w-[120rem] items-center px-10">
+        <MdMenu
+          className="shrink-0 cursor-pointer"
+          size="1.5rem"
+          onClick={() => {
+            setSidebar(true);
+          }}
+        />
+        <div className="w-2 md:w-6"></div>
+        <Logo name="Virparyas" />
+        <div className="w-2 md:w-6"></div>
+        <Button
           backgroundColor="gray"
-          Icon={<MdPerson size="1rem" />}
-          href="/login"
-          name="Log in"
+          Icon={<MdLocationPin size="1rem" />}
+          name="Nam Tu Liem · Now"
+        />
+        <div className="w-2 md:w-6"></div>
+
+        <Input
+          backgroundColor="gray"
+          placeholder="Food, groceries, drinks, etc"
+          Icon={<MdSearch size="1rem" />}
         />
         <div className="w-3"></div>
-        <Anchor backgroundColor="gray" href="/signin" name="Sign up" />
+
+        <div className="ml-auto flex grow-0 items-center justify-end">
+          <div className="max-w-[19rem]">
+            <Button
+              backgroundColor="black"
+              Icon={<MdShoppingCart size="1rem" />}
+              name="Cart · 0"
+            />
+          </div>
+          <div className="w-3"></div>
+          <Anchor
+            backgroundColor="gray"
+            Icon={<MdPerson size="1rem" />}
+            href="/login"
+            name="Log in"
+          />
+          <div className="w-3"></div>
+          <Anchor backgroundColor="gray" href="/signin" name="Sign up" />
+        </div>
       </div>
-    </div></>
-    
+    </>
   );
 };
 

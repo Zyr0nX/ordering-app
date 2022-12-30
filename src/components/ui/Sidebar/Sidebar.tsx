@@ -4,19 +4,20 @@ import Anchor from "../../common/Anchor";
 import Backdrop from "../../common/Backdrop/Backdrop";
 
 export interface SidebarProps {
-    setSideBar: (state: boolean) => void
+  sidebar: boolean;
+  setSideBar: unknown;
 }
 
-const Sidebar : React.FC<SidebarProps> = (sidebar, setSideBar) => {
-
-const onBackdropClick = (sidebar: boolean) => {
+const Sidebar: React.FC<SidebarProps> = (sidebar, setSideBar) => {
+  console.log(setSideBar)
+  const onBackdropClick = (sidebar: boolean) => {
     setSideBar(sidebar);
   };
 
   return (
-    <Backdrop onClick={() => onBackdropClick(false)}>
+    <Backdrop onClick={() => onBackdropClick(sidebar)}>
       <motion.aside
-        className="bg-white box-border w-[18.75rem] max-w-[80%] overflow-y-auto overflow-x-hidden p-6 shadow-xl transition-all duration-500 ease-in-out"
+        className="box-border w-[18.75rem] max-w-[80%] overflow-y-auto overflow-x-hidden bg-white p-6 shadow-xl transition-all duration-500 ease-in-out"
         initial={{ x: "-100%", opacity: 0 }}
         animate={{
           x: 0,
