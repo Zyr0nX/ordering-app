@@ -1,44 +1,40 @@
 import React from "react";
-import { motion } from "framer-motion";
 import Anchor from "../../common/Anchor";
 import Backdrop from "../../common/Backdrop/Backdrop";
 
 export interface SidebarProps {
   sidebar: boolean;
-  setSideBar: unknown;
+  toggleSidebar?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = () => {
+const Sidebar: React.FC<SidebarProps> = ({ sidebar, toggleSidebar }) => {
   return (
-    <Backdrop>
-      <motion.aside
-        className="box-border w-[18.75rem] max-w-[80%] overflow-y-auto overflow-x-hidden bg-white p-6 shadow-xl transition-all duration-500 ease-in-out"
-        initial={{ x: "-100%", opacity: 0 }}
-        animate={{
-          x: 0,
-          opacity: 1,
-          transition: { duration: 0.5, damping: 25, stiffness: 500 },
-        }}
-        exit={{ x: "-100%", opacity: 0 }}
+    <Backdrop visible={sidebar} onClick={toggleSidebar}>
+      <aside
+        className={`box-border w-75 max-w-4/5 overflow-y-auto overflow-x-hidden bg-white p-6 shadow-[0px_0px_25px_rgba(0_0_0_0.1)] transition-all duration-400 ease-in-out ${
+          sidebar ? "translate-x-0 opacity-100" : "-translate-x-75 opacity-0"
+        }`}
       >
-        <div className="flex min-h-[calc(100vh-3rem)] flex-col justify-between">
-          <div>
-            <Anchor
-              backgroundColor="black"
-              name="Sign Up"
-              variant="large"
-              href="./signin"
-            />
-            <div className="h-2"></div>
-            <Anchor
-              backgroundColor="gray"
-              name="Log In"
-              variant="large"
-              href="./login"
-            />
+        {sidebar && (
+          <div className="flex min-h-[calc(100vh-3rem)] flex-col justify-between">
+            <div>
+              <Anchor
+                backgroundColor="black"
+                name="Sign Up"
+                variant="large"
+                href="./signin"
+              />
+              <div className="h-2"></div>
+              <Anchor
+                backgroundColor="gray"
+                name="Log In"
+                variant="large"
+                href="./login"
+              />
+            </div>
           </div>
-        </div>
-      </motion.aside>
+        )}
+      </aside>
     </Backdrop>
   );
 };

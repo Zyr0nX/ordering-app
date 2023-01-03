@@ -4,9 +4,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
 import Header from "../components/ui/Header/Header";
-import Anchor from "../components/common/Anchor";
-import Sidebar from "../components/ui/Sidebar";
-import Backdrop from "../components/common/Backdrop";
 
 const Home: NextPage = () => {
   return (
@@ -17,8 +14,8 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="h-full">
-        <div className="min-w-full relative flex h-full flex-col">
-          <Backdrop />
+        <div className="relative flex h-full min-w-full flex-col">
+          <Header />
         </div>
       </div>
 

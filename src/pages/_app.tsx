@@ -6,17 +6,13 @@ import { trpc } from "../utils/trpc";
 
 import "../styles/globals.css";
 
-import { AnimatePresence } from "framer-motion";
-
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
   return (
     <SessionProvider session={session}>
-      <AnimatePresence>
-        <Component {...pageProps} />
-      </AnimatePresence>
+      <Component {...pageProps} />
     </SessionProvider>
   );
 };

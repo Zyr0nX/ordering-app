@@ -13,15 +13,20 @@ import IconPerson from "../../common/Icon/IconPerson";
 const Header = () => {
   const [sidebar, setSidebar] = useState<boolean>(false);
 
+  const toggleSidebar = () => {
+    setSidebar((sidebar) => !sidebar);
+  };
+
   return (
     <>
-      {sidebar && <Sidebar setSidebar={setSidebar} sidebar={false} />}
+      <Sidebar sidebar={sidebar} toggleSidebar={toggleSidebar} />
       <header>
         <div className="mx-auto my-0 w-full bg-white">
           <div className="relative my-0 mx-auto box-border flex h-24 min-w-[64rem] max-w-[120rem] flex-row items-center py-0 px-10 text-black">
             <button
               aria-label="Main navigation menu"
               className="flex h-6 w-6 cursor-pointer items-center"
+              onClick={toggleSidebar}
             >
               <IconMenu
                 aria-hidden="true"
