@@ -6,6 +6,7 @@ import { trpc } from "../utils/trpc";
 import Header from "../components/ui/Header/Header";
 import Anchor from "../components/common/Anchor";
 import Sidebar from "../components/ui/Sidebar";
+import Backdrop from "../components/common/Backdrop";
 
 const Home: NextPage = () => {
   return (
@@ -15,7 +16,12 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+      <div className="h-full">
+        <div className="min-w-full relative flex h-full flex-col">
+          <Backdrop />
+        </div>
+      </div>
+
       {/* <Sidebar close={() => {console.log("1")}} /> */}
     </>
   );

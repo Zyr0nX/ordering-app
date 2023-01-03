@@ -15,7 +15,7 @@ const Button: React.FC<InputProps> = ({
 }) => {
   return (
     <div
-      className={`flex h-12 w-full min-w-[40rem] max-w-[90rem] items-center rounded-full px-4 leading-5 transition-all duration-500 ease-in-out ${
+      className={`absolute right-0 flex h-12 w-full min-w-45 max-w-259 -translate-y-1/2 items-center rounded-full px-4 text-base leading-5 transition-min-max-width duration-400 ease-normal ${
         backgroundColor === "black"
           ? "bg-black text-white placeholder:text-neutral-200 hover:bg-neutral-800 active:bg-neutral-700"
           : ""
@@ -30,7 +30,7 @@ const Button: React.FC<InputProps> = ({
       <input
         type={type}
         placeholder={placeholder}
-        className={`w-full appearance-none overflow-hidden text-ellipsis bg-inherit outline-none ${
+        className={`w-full appearance-none overflow-hidden text-ellipsis bg-inherit outline-none placeholder:font-semibold ${
           backgroundColor === "black" ? "placeholder:text-neutral-400" : ""
         }${backgroundColor === "gray" ? "placeholder:text-neutral-700" : ""}`}
       />

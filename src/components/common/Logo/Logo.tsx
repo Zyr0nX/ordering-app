@@ -5,15 +5,12 @@ export interface LogoProps {
   name: string;
 }
 
-const Button: React.FC<LogoProps> = ({ name }) => {
+const Logo: React.FC<LogoProps> = ({ name }) => {
   return (
-    <Link
-      className="hidden select-none text-2xl font-semibold lg:block"
-      href="/"
-    >
-      {name}
+    <Link href="/">
+      <div className="block w-auto select-none text-2xl font-bold">{name}</div>
     </Link>
   );
 };
 
-export default Button;
+export default Logo;

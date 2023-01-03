@@ -21,7 +21,7 @@ const Anchor: React.FC<AnchorProps> = ({
     case "small":
       return (
         <Link
-          className={`flex h-9 w-fit items-center whitespace-nowrap rounded-full px-3 py-3 text-sm font-medium leading-4 ${
+          className={`box-border flex h-9 w-fit items-center whitespace-nowrap rounded-full px-3 py-3 text-sm font-medium leading-4 no-underline ${
             backgroundColor === "black"
               ? "bg-black text-white hover:bg-neutral-600 active:bg-neutral-500"
               : ""
@@ -33,7 +33,8 @@ const Anchor: React.FC<AnchorProps> = ({
           href={href}
         >
           {Icon}
-          <div className={`${Icon ? "ml-1" : ""}`}>{name}</div>
+          {Icon && <div className="m-0 h-px w-1 shrink-0 p-0"></div>}
+          {name}
         </Link>
       );
     case "large":
