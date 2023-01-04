@@ -12,6 +12,7 @@ module.exports = {
       minWidth: {
         160: "40rem",
         45: "11.25rem",
+        26: "6.5rem"
       },
       maxWidth: {
         360: "90rem",
@@ -19,6 +20,9 @@ module.exports = {
         75: "18.75rem",
         "4/5": "80%",
         90: "22.5rem"
+      },
+      minHeight: {
+        12: "3rem"
       },
       transitionProperty: {
         "min-max-width": "min-width, max-width",
