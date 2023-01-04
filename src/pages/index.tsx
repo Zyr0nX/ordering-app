@@ -18,8 +18,6 @@ const Home: NextPage = () => {
           <Header />
         </div>
       </div>
-
-      {/* <Sidebar close={() => {console.log("1")}} /> */}
     </>
   );
 };

@@ -4,11 +4,10 @@ import React from "react";
 export interface BackdropProps {
   children?: ReactElement;
   onClick?: MouseEventHandler<HTMLDivElement>;
-  visible?: any;
+  visible?: boolean;
 }
 
 const Backdrop: React.FC<BackdropProps> = ({ children, onClick, visible }) => {
-  console.log(visible);
   return (
     <div
       className={`fixed left-0 top-0 z-[6] flex overflow-y-hidden bg-neutral-800/80 ${

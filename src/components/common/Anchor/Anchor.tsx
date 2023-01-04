@@ -8,6 +8,7 @@ export interface AnchorProps extends LinkProps {
   Icon?: ReactElement;
   name?: string;
   variant?: "small" | "large";
+  onclick?: () => void;
 }
 
 const Anchor: React.FC<AnchorProps> = ({
@@ -16,6 +17,7 @@ const Anchor: React.FC<AnchorProps> = ({
   href,
   name,
   variant = "small",
+  onClick,
 }) => {
   switch (variant) {
     case "small":
@@ -31,6 +33,7 @@ const Anchor: React.FC<AnchorProps> = ({
               : ""
           }`}
           href={href}
+          onClick={onClick}
         >
           {Icon}
           {Icon && <div className="m-0 h-px w-1 shrink-0 p-0"></div>}
@@ -40,7 +43,7 @@ const Anchor: React.FC<AnchorProps> = ({
     case "large":
       return (
         <Link
-          className={`flex min-h-[3.5rem] w-auto items-center justify-center whitespace-nowrap rounded-lg px-4 py-3 text-lg font-medium leading-4 ${
+          className={`flex min-h-[3rem] w-auto items-center justify-center whitespace-nowrap rounded-lg px-4 py-3.5 text-lg font-medium leading-4 ${
             backgroundColor === "black"
               ? "bg-black text-white hover:bg-neutral-800 active:bg-neutral-700"
               : ""
@@ -50,6 +53,7 @@ const Anchor: React.FC<AnchorProps> = ({
               : ""
           }`}
           href={href}
+          onClick={onClick}
         >
           {Icon}
           <div className={`${Icon ? "ml-1" : ""}`}>{name}</div>

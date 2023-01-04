@@ -18,6 +18,7 @@ module.exports = {
         259: "64.75rem",
         75: "18.75rem",
         "4/5": "80%",
+        90: "22.5rem"
       },
       transitionProperty: {
         "min-max-width": "min-width, max-width",
@@ -32,6 +33,9 @@ module.exports = {
       },
       spacing: {
         75: "18.75rem",
+      },
+      lineHeight: {
+        7.5: "30px"
       },
     },
   },
