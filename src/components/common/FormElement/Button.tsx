@@ -1,5 +1,4 @@
 import type { ButtonHTMLAttributes, ReactElement } from "react";
-import Link from "next/link";
 import React from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

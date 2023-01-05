@@ -3,13 +3,11 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', ...defaultTheme.fontFamily.sans],
+        sans: ["var(--font-poppins)", ...defaultTheme.fontFamily.sans],
       },
       width: {
         75: "18.75rem",
@@ -17,17 +15,17 @@ module.exports = {
       minWidth: {
         160: "40rem",
         45: "11.25rem",
-        26: "6.5rem"
+        26: "6.5rem",
       },
       maxWidth: {
         360: "90rem",
         259: "64.75rem",
         75: "18.75rem",
         "4/5": "80%",
-        90: "22.5rem"
+        90: "22.5rem",
       },
       minHeight: {
-        12: "3rem"
+        12: "3rem",
       },
       transitionProperty: {
         "min-max-width": "min-width, max-width",
@@ -44,7 +42,7 @@ module.exports = {
         75: "18.75rem",
       },
       lineHeight: {
-        7.5: "30px"
+        7.5: "30px",
       },
     },
   },

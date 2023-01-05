@@ -1,5 +1,5 @@
 import { signIn } from "next-auth/react";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import IconGoogle from "../../common/Icon/IconGoogle";
 import Textbox from "../../common/FormElement/Textbox";
 import Button from "../../common/FormElement/Button";
