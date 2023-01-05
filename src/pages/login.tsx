@@ -1,7 +1,5 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { trpc } from "../utils/trpc";
 
 import Header from "../components/ui/Header/Header";
 import SignIn from "../components/ui/Auth/SignIn";

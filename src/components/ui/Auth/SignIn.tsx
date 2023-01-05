@@ -6,7 +6,7 @@ import Textbox from "../../common/FormElement/Textbox";
 import Button from "../../common/FormElement/Button";
 
 const SignIn = () => {
-  const email = useRef();
+  const email = useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex h-full">
@@ -17,20 +17,21 @@ const SignIn = () => {
               What&apos;s your phone number or email?
             </h1>
             <div className="h-2"></div>
-            <form
-              action="post"
-              onSubmit={() => {
-                signIn("email");
-              }}
-            >
-              <div className="flex shrink-0 grow basis-auto flex-col">
-                <div className="flex flex-row items-center leading-6">
-                  <Textbox placeholder="Email address" ref={email} />
-                </div>
+            <div className="flex shrink-0 grow basis-auto flex-col">
+              <div className="flex flex-row items-center leading-6">
+                <Textbox placeholder="Email address" ref={email} />
               </div>
-              <div className="h-4"></div>
-              <Button type="submit" backgroundColor="black" name="Continue" />
-            </form>
+            </div>
+            <div className="h-4"></div>
+            <Button
+              type="submit"
+              backgroundColor="black"
+              name="Continue"
+              onClick={() => {
+                const currentEmail = email.current?.value;
+                signIn("email", { currentEmail });
+              }}
+            />
 
             <div className="h-4"></div>
             <div className="h-4"></div>
