@@ -11,11 +11,11 @@ const Textbox = (
 ) => {
   return (
     <div className="flex w-full flex-row rounded-lg border-2 border-solid border-transparent bg-neutral-200 py-2.5 pl-3 active:border-black">
-      <div className="w-full pl-4">
+      <div className="w-full px-4">
         <input
           placeholder={placeholder}
           type="text"
-          className="m-0 w-full border-none bg-neutral-200 p-0 text-left text-base leading-6 outline-none"
+          className="m-0 w-full text-ellipsis border-none bg-neutral-200 p-0 text-left text-base leading-6 outline-none"
           ref={ref}
         />
       </div>
