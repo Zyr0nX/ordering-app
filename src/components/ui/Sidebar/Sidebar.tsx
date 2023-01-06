@@ -16,16 +16,19 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebar, toggleSidebar }) => {
   return (
     <Backdrop visible={sidebar} onClick={toggleSidebar}>
       <aside
-        className={`box-border w-75 max-w-4/5 overflow-y-auto overflow-x-hidden bg-white p-6 shadow-[0px_0px_25px_rgba(0_0_0_0.1)] transition-all duration-400 ease-in-out ${
+        className={`relative z-10 box-border w-75 max-w-4/5 overflow-y-auto overflow-x-hidden bg-white p-6 shadow-[0px_0px_25px_rgba(0_0_0_0.1)] transition-all duration-400 ease-in-out ${
           sidebar ? "translate-x-0 opacity-100" : "-translate-x-75 opacity-0"
         }`}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
         {sidebar &&
           (sessionData?.user ? (
             <>
               <div className="flex items-center">
                 <Image
-                  src={user?.image ?? ""}
+                  src={user?.image ?? "/default.jpeg"}
                   width={48}
                   height={48}
                   alt="avatar"
@@ -34,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebar, toggleSidebar }) => {
                 <div className="m-0 h-1 w-4 shrink-0 p-0"></div>
                 <div>
                   <div className="text-base font-medium leading-6">
-                    {user?.name}
+                    {user?.name ?? user?.email}
                   </div>
                   <a
                     href="#"
