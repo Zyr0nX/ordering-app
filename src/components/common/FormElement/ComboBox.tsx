@@ -33,7 +33,11 @@ const Textbox = (
         </div>
         {isExpand && (
           <>
-            <div className="absolute h-12 translate-y-full">aaaa</div>
+            <div className="translate-y-1/2` absolute h-12">
+              <div className="w-full border bg-red-500">
+                <div className="h-12">aaaaa</div>
+              </div>
+            </div>
             <div
               className="fixed top-0 left-0 h-full w-full"
               onClick={() => {
