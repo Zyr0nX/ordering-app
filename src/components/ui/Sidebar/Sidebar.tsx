@@ -4,6 +4,7 @@ import Backdrop from "../../common/Backdrop/Backdrop";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 export interface SidebarProps {
   sidebar: boolean;
@@ -33,6 +34,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebar, toggleSidebar }) => {
                   height={48}
                   alt="avatar"
                   className="rounded-full"
+                  placeholder="blur"
+                  blurDataURL="/default.jpeg"
                 />
                 <div className="m-0 h-1 w-4 shrink-0 p-0"></div>
                 <div>
@@ -56,6 +59,18 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebar, toggleSidebar }) => {
                 >
                   Sign out
                 </button>
+              </div>
+              <div className="my-3 -mx-6 h-px bg-neutral-200"></div>
+              <div>
+                <div className="my-6 flex flex-col">
+                  <ul>
+                    <li className="mb-4">
+                      <Link className="m-3 text-sm" href="/restaurant/signup">
+                        Add your restaurant
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </>
           ) : (

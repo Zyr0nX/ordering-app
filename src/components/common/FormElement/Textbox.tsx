@@ -17,6 +17,8 @@ const Textbox = (
           type="text"
           className="m-0 w-full text-ellipsis border-none bg-neutral-200 p-0 text-left text-base leading-6 outline-none"
           ref={ref}
+          autoComplete="off"
+          onClick={(e) => e.stopPropagation()}
         />
       </div>
     </div>
