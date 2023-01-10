@@ -1,6 +1,8 @@
 import type { InputHTMLAttributes, ReactElement } from "react";
 import React, { forwardRef, useState } from "react";
 import IconArrowDropDown from "../Icon/IconArrowDropDown";
+import IconPlus from "../Icon/IconPlus";
+import Button from "./Button";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   Icon?: ReactElement;
@@ -33,9 +35,21 @@ const Textbox = (
         </div>
         {isExpand && (
           <>
-            <div className="translate-y-1/2` absolute h-12">
-              <div className="w-full border bg-red-500">
-                <div className="h-12">aaaaa</div>
+            <div className="absolute -ml-3.5 w-[calc(100%-6rem)] translate-y-1/4 rounded-lg bg-white shadow-lg">
+              <div className="mx-3 flex items-center justify-center">
+                <div className="py-2">
+                  <div className="p-6 text-center text-neutral-300">
+                    No result
+                  </div>
+                  <div className="mt-2">
+                    <Button
+                      Icon={
+                        <IconPlus viewBox="0 0 24 24" className="h-6 w-6" />
+                      }
+                      name="Enter manualy"
+                    ></Button>
+                  </div>
+                </div>
               </div>
             </div>
             <div

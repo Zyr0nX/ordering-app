@@ -10,9 +10,7 @@ const Textbox = (
   ref: React.Ref<HTMLInputElement>
 ) => {
   return (
-    <div className="flex w-full flex-row rounded-lg border-2 border-solid border-transparent bg-neutral-200 py-2.5 pl-3 active:border-black" onClick={() => {
-      ref.current.focus();
-    }}>
+    <div className="flex w-full flex-row rounded-lg border-2 border-solid border-transparent bg-neutral-200 py-2.5 pl-3 active:border-black">
       <div className="w-full px-4">
         <input
           placeholder={placeholder}
