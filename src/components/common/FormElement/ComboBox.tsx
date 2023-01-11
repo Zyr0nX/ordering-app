@@ -9,7 +9,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Textbox = (
-  { Icon, placeholder }: InputProps,
+  { placeholder }: InputProps,
   ref: React.Ref<HTMLInputElement>
 ) => {
   const [isExpand, setIsExpand] = useState<boolean>(false);
@@ -35,7 +35,7 @@ const Textbox = (
         </div>
         {isExpand && (
           <>
-            <div className="absolute -ml-3.5 w-[calc(100%-6rem)] translate-y-1/4 rounded-lg bg-white shadow-lg">
+            <div className="absolute top-20 -ml-3.5 w-[calc(100%-6rem)] rounded-lg bg-white shadow-lg">
               <div className="mx-3 flex items-center justify-center">
                 <div className="py-2">
                   <div className="p-6 text-center text-neutral-300">

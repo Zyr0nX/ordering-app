@@ -57,3 +57,14 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model Restaurant {
+  id                String  @id @default(cuid())
+  name              String
+  address           String
+  additionalAddress String?
+  firstName         String
+  lastName          String
+  email             String
+  phoneNumber       String
+}
