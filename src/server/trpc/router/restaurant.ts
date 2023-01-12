@@ -8,14 +8,14 @@ export const restaurantRouter = router({
       z.object({
         name: z.string(),
         address: z.string(),
-        additionaladdress: z.string().optional(),
+        additionaladdress: z.string().nullish(),
         firstname: z.string(),
         lastname: z.string(),
         email: z.string().email(),
         phonenumber: z.string(),
       })
     )
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       const prisma = new PrismaClient();
       await prisma.restaurant.create({
         data: {

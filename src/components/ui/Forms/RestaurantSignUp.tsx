@@ -27,9 +27,8 @@ const RestaurantSignUp = () => {
   const email = useRef<HTMLInputElement>(null);
   const phoneNumber = useRef<HTMLInputElement>(null);
 
+  const mutation = trpc.restaurant.sendrestaurantinfo.useMutation();
   const sendRestaurantInfo = () => {
-    console.log(1);
-
     if (!name.current?.value) {
       setIsValidName(false);
       return;
@@ -55,7 +54,7 @@ const RestaurantSignUp = () => {
       return;
     }
 
-    trpc.restaurant.sendrestaurantinfo.useQuery({
+    mutation.mutate({
       name: name.current?.value,
       address: address.current?.value,
       additionaladdress: additionalAddress.current?.value,
@@ -135,7 +134,7 @@ const RestaurantSignUp = () => {
         <Button
           backgroundColor="black"
           name="Submit"
-          onclick={sendRestaurantInfo()}
+          onClick={sendRestaurantInfo}
         />
       </div>
     </div>
