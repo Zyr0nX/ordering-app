@@ -1,37 +1,55 @@
-declare module "place-autocomplete" {
-  export interface MatchedSubstring {
-    length: number;
-    offset: number;
+declare module "mapbox_search" {
+  export interface Body {
+    id: string;
   }
 
-  export interface MainTextMatchedSubstring {
-    length: number;
-    offset: number;
+  export interface Action {
+    endpoint: string;
+    method: string;
+    body: Body;
+    multi_retrievable: boolean;
   }
 
-  export interface StructuredFormatting {
-    main_text: string;
-    main_text_matched_substrings: MainTextMatchedSubstring[];
-    secondary_text: string;
+  export interface ExternalIds {
+    mbx_poi: string;
+    foursquare: string;
+    federated: string;
+    tripadvisor: string;
   }
 
-  export interface Term {
-    offset: number;
-    value: string;
+  export interface Context {
+    layer: string;
+    localized_layer: string;
+    name: string;
   }
 
-  export interface Prediction {
+  export interface Metadata {
+    iso_3166_1: string;
+    iso_3166_2: string;
+  }
+
+  export interface Suggestion {
+    feature_name: string;
+    matching_name: string;
+    highlighted_name: string;
     description: string;
-    matched_substrings: MatchedSubstring[];
-    place_id: string;
-    reference: string;
-    structured_formatting: StructuredFormatting;
-    terms: Term[];
-    types: string[];
+    result_type: string[];
+    language: string;
+    action: Action;
+    coordinates: string;
+    maki: string;
+    category: string[];
+    internal_id: string;
+    external_ids: ExternalIds;
+    mapbox_id: string;
+    context: Context[];
+    metadata: Metadata;
   }
 
   export interface RootObject {
-    predictions: Prediction[];
-    status: string;
+    suggestions: Suggestion[];
+    attribution: string;
+    version: string;
+    response_uuid: string;
   }
 }

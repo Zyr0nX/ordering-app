@@ -1,9 +1,4 @@
-import { config, useConfirmAddress } from "@mapbox/search-js-react";
-import { PrismaClient } from "@prisma/client";
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { z } from "zod";
-import { env } from "../../../env/server.mjs";
-import { publicProcedure, router } from "../../../server/trpc/trpc";
+import React, { useState, useRef } from "react";
 import { trpc } from "../../../utils/trpc";
 import Button from "../../common/FormElement/Button";
 import ComboBox from "../../common/FormElement/ComboBox";
@@ -66,37 +61,31 @@ const RestaurantSignUp = () => {
       phonenumber: phoneNumber.current?.value,
     });
   };
-  const [showFormExpanded, setShowFormExpanded] = useState(false);
-  const [showMinimap, setShowMinimap] = useState(false);
-  const [feature, setFeature] = useState();
-  const [showValidationText, setShowValidationText] = useState(false);
-  const [token, setToken] = useState<string>("");
+  // useEffect(() => {
+  //   const accessToken = env.MAPBOX_TOKEN;
+  //   setToken(accessToken);
+  //   config.accessToken = accessToken;
+  // }, []);
 
-  useEffect(() => {
-    const accessToken = env.MAPBOX_ACCESS_TOKEN;
-    setToken(accessToken);
-    config.accessToken = accessToken;
-  }, []);
+  // const { formRef, showConfirm } = useConfirmAddress({
+  //   minimap: true,
+  //   skipConfirmModal: (feature) =>
+  //     ["exact", "high"].includes(feature.properties.match_code.confidence),
+  // });
 
-  const { formRef, showConfirm } = useConfirmAddress({
-    minimap: true,
-    skipConfirmModal: (feature) =>
-      ["exact", "high"].includes(feature.properties.match_code.confidence),
-  });
+  // const handleRetrieve = useCallback(
+  //   (res: { features: never[] }) => {
+  //     const feature = res.features[0];
+  //     setFeature(feature);
+  //     setShowMinimap(true);
+  //     setShowFormExpanded(true);
+  //   },
+  //   [setFeature, setShowMinimap]
+  // );
 
-  const handleRetrieve = useCallback(
-    (res: { features: never[] }) => {
-      const feature = res.features[0];
-      setFeature(feature);
-      setShowMinimap(true);
-      setShowFormExpanded(true);
-    },
-    [setFeature, setShowMinimap]
-  );
-
-  function handleSaveMarkerLocation(coordinate: string) {
-    console.log(`Marker moved to ${JSON.stringify(coordinate)}.`);
-  }
+  // function handleSaveMarkerLocation(coordinate: string) {
+  //   console.log(`Marker moved to ${JSON.stringify(coordinate)}.`);
+  // }
 
   return (
     <div className="p-12">

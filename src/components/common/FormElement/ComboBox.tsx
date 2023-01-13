@@ -5,6 +5,8 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import IconArrowDropDown from "../Icon/IconArrowDropDown";
 import IconPlus from "../Icon/IconPlus";
 import Button from "./Button";
+import Search from "@mapbox/search-js-web";
+import { mapboxSearch } from "../../../utils/mapbox/search";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   Icon?: ReactElement;
@@ -68,6 +70,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 // };
 
 // export default forwardRef(Textbox);
+
+const search = mapboxSearch("123");
+console.log(search);
 
 const people = [
   { id: 1, name: "Wade Cooper" },
