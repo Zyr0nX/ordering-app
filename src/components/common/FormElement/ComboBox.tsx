@@ -5,42 +5,47 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import IconArrowDropDown from "../Icon/IconArrowDropDown";
 import IconPlus from "../Icon/IconPlus";
 import Button from "./Button";
-import type { MapboxPlaces } from "../../../types/mapbox-places";
+import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
+import { useQuery } from "@tanstack/react-query";
 
 export interface ComboBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   Icon?: ReactElement;
-  data: MapboxPlaces | undefined;
   value: string;
+  a: any;
 }
 
-const ComboBox = ({ placeholder, value, onChange, data }: ComboBoxProps) => {
+const ComboBox = ({ placeholder, value, a }: ComboBoxProps) => {
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [query, setQuery] = useState("");
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["mapboxSearch", query],
+    queryFn: async () => {
+      const res = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?access_token=pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2p0MG01MXRqMW45cjQzb2R6b2ptc3J4MSJ9.zA2W0IkI0c6KaAhJfk9bWg`
+      );
+      return res.json();
+    },
+    initialData: [],
+  });
 
   const filteredData =
     query === ""
       ? data?.features
-      : data?.features?.filter((feature) =>
-          feature.place_name
-            .toLowerCase()
-            .replace(/\s+/g, "")
-            .includes(query.toLowerCase().replace(/\s+/g, ""))
+      : data?.features?.filter((feature: Feature) =>
+          feature.place_name.toLowerCase()
         );
-  console.log(value);
-  const f = () => {
-    (event: { target: { value: React.SetStateAction<string> } }) => {
-      setQuery(event.target.value);
-    };
-    onChange;
-    console.log("f");
-  };
+
   return (
-    <Combobox value={selectedAddress} onChange={setSelectedAddress}>
+    <Combobox value={value} onChange={a}>
       <div className="relative flex w-full flex-row justify-between rounded-lg border-2 border-solid border-transparent bg-neutral-200 active:border-black">
         <div className="w-full grow px-4">
           <Combobox.Input
-            onChange={f}
+            onChange={(e) => {
+              setQuery(e.target.value);
+            }}
             className="m-0 h-full w-full text-ellipsis border-none bg-neutral-200 py-2.5 pl-3 text-left text-base leading-6 outline-none"
+            displayValue={(feature: Feature) => feature.place_name}
           />
         </div>
         <div className="flex items-center pr-3">
@@ -67,7 +72,7 @@ const ComboBox = ({ placeholder, value, onChange, data }: ComboBoxProps) => {
                 </div>
               </>
             ) : (
-              filteredData?.map((data) => (
+              filteredData?.map((data: Feature) => (
                 <Combobox.Option
                   key={data.id}
                   className={({ active }) =>

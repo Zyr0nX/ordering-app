@@ -24,7 +24,6 @@ export const serverSchema = z.object({
   EMAIL_SERVER: z.string().url(),
   EMAIL_FROM: z.string(),
   MAPBOX_PUBLIC_TOKEN: z.string(),
-  MAPBOX_PRIVATE_TOKEN: z.string()
 });
 
 /**

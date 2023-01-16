@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import React, { useState, useRef, useEffect } from "react";
-import { MapboxPlaces } from "../../../types/mapbox-places";
+import { Feature, MapboxPlaces } from "../../../types/mapbox-places";
 import { trpc } from "../../../utils/trpc";
 import useInput from "../../../utils/useInput";
 import { useMapboxSearch } from "../../../utils/useMapboxSearch";
@@ -9,7 +10,8 @@ import Textbox from "../../common/FormElement/Textbox";
 
 const RestaurantSignUp = () => {
   const name = useInput("");
-  const address = useInput("");
+  const [address, setAddress] = useState<Feature>();
+  console.log(address);
   const additionalAddress = useInput("");
   const firstName = useInput("");
   const lastName = useInput("");
@@ -57,7 +59,7 @@ const RestaurantSignUp = () => {
 
     mutation.mutate({
       name: name.value,
-      address: address.value,
+      address: address.place_name,
       additionaladdress: additionalAddress.value,
       firstname: firstName.value,
       lastname: lastName.value,
@@ -68,27 +70,9 @@ const RestaurantSignUp = () => {
 
   const [searchResult, setSearchResult] = useState<MapboxPlaces>();
 
-  useEffect(() => {
-    async (
-      mapboxSearch:
-        | React.SetStateAction<MapboxPlaces | undefined>
-        | PromiseLike<React.SetStateAction<MapboxPlaces | undefined>>
-    ) => {
-      setSearchResult(await mapboxSearch);
-    };
-  }, [address.value]);
-
   return (
     <div className="p-12">
       <h2 className="text-2xl font-bold">Get Started</h2>
-      <div className="mb-2">
-        <ComboBox
-          placeholder="Test"
-          data={searchResult}
-          value={address.value}
-          onChange={address.onChange}
-        />
-      </div>
       <div className="mb-2">
         <Textbox
           placeholder="Store name"
@@ -102,11 +86,12 @@ const RestaurantSignUp = () => {
         </p>
       )}
       <div className="mb-2">
-        <Textbox
+        <ComboBox placeholder="Test" value={address} a={setAddress} />
+        {/* <Textbox
           placeholder="Store address"
           value={address.value}
           onChange={address.onChange}
-        />
+        /> */}
       </div>
       {isValidAddress != null && !isValidAddress && (
         <p className="pt-2 text-xs leading-4 text-red-500">

@@ -5,7 +5,7 @@ export interface MapboxPlaces {
   attribution: string;
 }
 
-interface Feature {
+export interface Feature {
   id: string;
   type: string;
   place_type: string[];
@@ -19,19 +19,19 @@ interface Feature {
   bbox?: number[];
 }
 
-interface Context {
+export interface Context {
   id: string;
   text: string;
   wikidata?: string;
   short_code?: string;
 }
 
-interface Geometry {
+export interface Geometry {
   type: string;
   coordinates: number[];
 }
 
-interface Properties {
+export interface Properties {
   accuracy?: string;
   wikidata?: string;
 }
