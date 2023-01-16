@@ -1,10 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { MapboxPlaces } from "../../../types/mapbox-places";
 import { trpc } from "../../../utils/trpc";
+import useInput from "../../../utils/useInput";
+import { useMapboxSearch } from "../../../utils/useMapboxSearch";
 import Button from "../../common/FormElement/Button";
 import ComboBox from "../../common/FormElement/ComboBox";
 import Textbox from "../../common/FormElement/Textbox";
 
 const RestaurantSignUp = () => {
+  const name = useInput("");
+  const address = useInput("");
+  const additionalAddress = useInput("");
+  const firstName = useInput("");
+  const lastName = useInput("");
+  const email = useInput("");
+  const phoneNumber = useInput("");
+
   const [isValidName, setIsValidName] = useState<boolean | null>(null);
   const [isValidAddress, setIsValidAddress] = useState<boolean | null>(null);
   const [isValidFirstName, setIsValidFirstName] = useState<boolean | null>(
@@ -16,87 +27,74 @@ const RestaurantSignUp = () => {
     null
   );
 
-  const name = useRef<HTMLInputElement>(null);
-  const address = useRef<HTMLInputElement>(null);
-  const additionalAddress = useRef<HTMLInputElement>(null);
-  const firstName = useRef<HTMLInputElement>(null);
-  const lastName = useRef<HTMLInputElement>(null);
-  const email = useRef<HTMLInputElement>(null);
-  const phoneNumber = useRef<HTMLInputElement>(null);
-
   const mutation = trpc.restaurant.sendrestaurantinfo.useMutation();
+
   const sendRestaurantInfo = () => {
-    if (!name.current?.value) {
+    if (!name) {
       setIsValidName(false);
       return;
     }
-    if (!address.current?.value) {
+    if (!address) {
       setIsValidAddress(false);
       return;
     }
-    if (!firstName.current?.value) {
+    if (!firstName) {
       setIsValidFirstName(false);
       return;
     }
-    if (!lastName.current?.value) {
+    if (!lastName) {
       setIsValidLastName(false);
       return;
     }
-    if (!email.current?.value) {
+    if (!email) {
       setIsValidEmail(false);
       return;
     }
-    if (!phoneNumber.current?.value) {
+    if (!phoneNumber) {
       setIsValidPhoneNumber(false);
       return;
     }
 
     mutation.mutate({
-      name: name.current?.value,
-      address: address.current?.value,
-      additionaladdress: additionalAddress.current?.value,
-      firstname: firstName.current?.value,
-      lastname: lastName.current?.value,
-      email: email.current?.value,
-      phonenumber: phoneNumber.current?.value,
+      name: name.value,
+      address: address.value,
+      additionaladdress: additionalAddress.value,
+      firstname: firstName.value,
+      lastname: lastName.value,
+      email: email.value,
+      phonenumber: phoneNumber.value,
     });
   };
-  // useEffect(() => {
-  //   const accessToken = env.MAPBOX_TOKEN;
-  //   setToken(accessToken);
-  //   config.accessToken = accessToken;
-  // }, []);
 
-  // const { formRef, showConfirm } = useConfirmAddress({
-  //   minimap: true,
-  //   skipConfirmModal: (feature) =>
-  //     ["exact", "high"].includes(feature.properties.match_code.confidence),
-  // });
+  const [searchResult, setSearchResult] = useState<MapboxPlaces>();
 
-  // const handleRetrieve = useCallback(
-  //   (res: { features: never[] }) => {
-  //     const feature = res.features[0];
-  //     setFeature(feature);
-  //     setShowMinimap(true);
-  //     setShowFormExpanded(true);
-  //   },
-  //   [setFeature, setShowMinimap]
-  // );
-
-  // function handleSaveMarkerLocation(coordinate: string) {
-  //   console.log(`Marker moved to ${JSON.stringify(coordinate)}.`);
-  // }
+  useEffect(() => {
+    async (
+      mapboxSearch:
+        | React.SetStateAction<MapboxPlaces | undefined>
+        | PromiseLike<React.SetStateAction<MapboxPlaces | undefined>>
+    ) => {
+      setSearchResult(await mapboxSearch);
+    };
+  }, [address.value]);
 
   return (
     <div className="p-12">
-      <div className="flex">
-        <h2 className="text-2xl font-bold">Get Started</h2>
+      <h2 className="text-2xl font-bold">Get Started</h2>
+      <div className="mb-2">
+        <ComboBox
+          placeholder="Test"
+          data={searchResult}
+          value={address.value}
+          onChange={address.onChange}
+        />
       </div>
       <div className="mb-2">
-        <ComboBox placeholder="Store name" />
-      </div>
-      <div className="mb-2">
-        <Textbox placeholder="Store name" ref={name} />
+        <Textbox
+          placeholder="Store name"
+          value={name.value}
+          onChange={name.onChange}
+        />
       </div>
       {isValidName != null && !isValidName && (
         <p className="pt-2 text-xs leading-4 text-red-500">
@@ -104,7 +102,11 @@ const RestaurantSignUp = () => {
         </p>
       )}
       <div className="mb-2">
-        <Textbox placeholder="Store address" ref={address} />
+        <Textbox
+          placeholder="Store address"
+          value={address.value}
+          onChange={address.onChange}
+        />
       </div>
       {isValidAddress != null && !isValidAddress && (
         <p className="pt-2 text-xs leading-4 text-red-500">
@@ -114,13 +116,18 @@ const RestaurantSignUp = () => {
       <div className="mb-2">
         <Textbox
           placeholder="Floor / Suite (Optional)"
-          ref={additionalAddress}
+          value={additionalAddress.value}
+          onChange={additionalAddress.onChange}
         />
       </div>
       <div className="mt-6 flex">
         <div className="mr-2 w-1/2">
           <div className="mb-2">
-            <Textbox placeholder="First name" ref={firstName} />
+            <Textbox
+              placeholder="First name"
+              value={firstName.value}
+              onChange={firstName.onChange}
+            />
           </div>
           {isValidFirstName != null && !isValidFirstName && (
             <p className="pt-2 text-xs leading-4 text-red-500">
@@ -130,7 +137,11 @@ const RestaurantSignUp = () => {
         </div>
         <div className="w-1/2">
           <div className="mb-2">
-            <Textbox placeholder="Last name" ref={lastName} />
+            <Textbox
+              placeholder="Last name"
+              value={lastName.value}
+              onChange={lastName.onChange}
+            />
           </div>
           {isValidLastName != null && !isValidLastName && (
             <p className="pt-2 text-xs leading-4 text-red-500">
@@ -140,7 +151,11 @@ const RestaurantSignUp = () => {
         </div>
       </div>
       <div className="mb-2">
-        <Textbox placeholder="Email" ref={email} />
+        <Textbox
+          placeholder="Email"
+          value={email.value}
+          onChange={email.onChange}
+        />
       </div>
       {isValidEmail != null && !isValidEmail && (
         <p className="pt-2 text-xs leading-4 text-red-500">
@@ -148,7 +163,11 @@ const RestaurantSignUp = () => {
         </p>
       )}
       <div className="mb-2">
-        <Textbox placeholder="Phone number" ref={phoneNumber} />
+        <Textbox
+          placeholder="Phone number"
+          value={phoneNumber.value}
+          onChange={phoneNumber.onChange}
+        />
       </div>
       {isValidPhoneNumber != null && !isValidPhoneNumber && (
         <p className="pt-2 text-xs leading-4 text-red-500">
