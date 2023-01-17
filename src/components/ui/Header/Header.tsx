@@ -21,101 +21,99 @@ const Header = () => {
     <>
       <Sidebar sidebar={sidebar} toggleSidebar={toggleSidebar} />
       <header>
-        <div className="mx-auto my-0 w-full bg-white">
-          <div className="relative my-0 mx-auto box-border flex h-24 min-w-[64rem] max-w-[120rem] flex-row items-center py-0 px-10 text-black">
-            <button
-              aria-label="Main navigation menu"
-              className="flex h-6 w-6 cursor-pointer items-center"
-              onClick={toggleSidebar}
-            >
-              <IconMenu
-                aria-hidden="true"
-                focusable="false"
-                className="h-5 w-5 shrink-0 grow-0 basis-auto cursor-pointer fill-current"
-                onClick={() => {
-                  setSidebar(true);
-                }}
-              />
-            </button>
+        <div className="relative flex h-24 w-full min-w-[64rem] max-w-[120rem] items-center bg-transparent px-10 text-black">
+          <button
+            aria-label="Main navigation menu"
+            className="flex h-6 w-6 cursor-pointer items-center"
+            onClick={toggleSidebar}
+          >
+            <IconMenu
+              aria-hidden="true"
+              focusable="false"
+              className="h-5 w-5 shrink-0 grow-0 basis-auto cursor-pointer fill-current"
+              onClick={() => {
+                setSidebar(true);
+              }}
+            />
+          </button>
 
-            <div className="m-0 h-px w-8 shrink-0 p-0"></div>
-            <Logo name="Virparyas" />
-            <div className="m-0 h-px w-10 shrink-0 p-0"></div>
-            <div className="m-0 h-px w-4 shrink-0 p-0"></div>
-            <span>
-              <Button
-                variant="address"
-                backgroundColor="gray"
-                Icon={
-                  <IconLocationPin
-                    width="1rem"
-                    height="1.5rem"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-label="Deliver to"
-                    role="img"
-                    focusable="false"
-                  />
-                }
-                name="Nam Tu Liem  ·  Now"
-              />
-            </span>
-            <div className="m-0 h-px w-12 shrink-0 p-0"></div>
-            <div className="flex w-full grow">
-              <div className="mx-auto my-0 w-full bg-white">
-                <div className="relative">
-                  <Input
-                    backgroundColor="gray"
-                    placeholder="Food, groceries, drinks, etc"
-                    Icon={
-                      <IconSearch
-                        aria-hidden="true"
-                        focusable="false"
-                        viewBox="0 0 20 20"
-                        className="h-4 w-4 flex-none fill-current"
-                      />
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="m-0 h-px w-6 shrink-0 p-0"></div>
-
-            <div className="flex grow-0 items-center justify-end">
-              <div className="relative flex max-w-75 overflow-hidden opacity-100 transition-max-width-opacity duration-100 ease-normal">
-                <div className="m-0 h-px w-6 shrink-0 p-0"></div>
-                <Button
-                  backgroundColor="black"
+          <div className="m-0 h-px w-8 shrink-0 p-0"></div>
+          <Logo name="Virparyas" />
+          <div className="m-0 h-px w-10 shrink-0 p-0"></div>
+          <div className="m-0 h-px w-4 shrink-0 p-0"></div>
+          <span>
+            <Button
+              variant="address"
+              backgroundColor="gray"
+              Icon={
+                <IconLocationPin
+                  width="1rem"
+                  height="1.5rem"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-label="Deliver to"
+                  role="img"
+                  focusable="false"
+                />
+              }
+              name="Nam Tu Liem  ·  Now"
+            />
+          </span>
+          <div className="m-0 h-px w-12 shrink-0 p-0"></div>
+          <div className="flex w-full grow">
+            <div className="mx-auto my-0 w-full">
+              <div className="relative">
+                <Input
+                  backgroundColor="gray"
+                  placeholder="Food, groceries, drinks, etc"
                   Icon={
-                    <IconShoppingCart
+                    <IconSearch
                       aria-hidden="true"
                       focusable="false"
-                      viewBox="0 0 16 16"
+                      viewBox="0 0 20 20"
                       className="h-4 w-4 flex-none fill-current"
                     />
                   }
-                  name="Cart · 0"
                 />
               </div>
-              <div className="w-6"></div>
-              <Anchor
-                backgroundColor="gray"
+            </div>
+          </div>
+
+          <div className="m-0 h-px w-6 shrink-0 p-0"></div>
+
+          <div className="flex grow-0 items-center justify-end">
+            <div className="relative flex max-w-75 overflow-hidden opacity-100 transition-max-width-opacity duration-100 ease-normal">
+              <div className="m-0 h-px w-6 shrink-0 p-0"></div>
+              <Button
+                backgroundColor="black"
                 Icon={
-                  <IconPerson
+                  <IconShoppingCart
                     aria-hidden="true"
                     focusable="false"
-                    viewBox="0 0 26 26"
+                    viewBox="0 0 16 16"
                     className="h-4 w-4 flex-none fill-current"
                   />
                 }
-                href="/login"
-                name="Log in"
+                name="Cart · 0"
               />
-              <div className="w-4"></div>
-              <Anchor backgroundColor="gray" href="/signin" name="Sign up" />
             </div>
+            <div className="w-6"></div>
+            <Anchor
+              backgroundColor="gray"
+              Icon={
+                <IconPerson
+                  aria-hidden="true"
+                  focusable="false"
+                  viewBox="0 0 26 26"
+                  className="h-4 w-4 flex-none fill-current"
+                />
+              }
+              href="/login"
+              name="Log in"
+            />
+            <div className="w-4"></div>
+            <Anchor backgroundColor="gray" href="/signin" name="Sign up" />
           </div>
         </div>
       </header>

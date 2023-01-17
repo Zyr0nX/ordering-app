@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useState, useRef, useEffect } from "react";
-import { Feature, MapboxPlaces } from "../../../types/mapbox-places";
+import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
 import { trpc } from "../../../utils/trpc";
 import useInput from "../../../utils/useInput";
 import { useMapboxSearch } from "../../../utils/useMapboxSearch";
@@ -86,7 +86,11 @@ const RestaurantSignUp = () => {
         </p>
       )}
       <div className="mb-2">
-        <ComboBox placeholder="Test" value={address} a={setAddress} />
+        <ComboBox
+          placeholder="Test"
+          value={address?.place_name || ""}
+          a={setAddress}
+        />
         {/* <Textbox
           placeholder="Store address"
           value={address.value}

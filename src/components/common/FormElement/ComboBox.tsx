@@ -46,6 +46,7 @@ const ComboBox = ({ placeholder, value, a }: ComboBoxProps) => {
             }}
             className="m-0 h-full w-full text-ellipsis border-none bg-neutral-200 py-2.5 pl-3 text-left text-base leading-6 outline-none"
             displayValue={(feature: Feature) => feature.place_name}
+            placeholder="Address"
           />
         </div>
         <div className="flex items-center pr-3">
