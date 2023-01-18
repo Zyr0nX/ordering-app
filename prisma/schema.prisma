@@ -40,14 +40,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
-  role          String    @default("user")
+  role          Role        @default(USER)
   accounts      Account[]
   sessions      Session[]
+  restaurant    Restaurant?
 }
 
 model VerificationToken {
@@ -67,4 +68,14 @@ model Restaurant {
   lastName          String
   email             String
   phoneNumber       String
+  isVerified        Boolean @default(false)
+  userId            String  @unique
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  RESTAURANT
+  DELIVER
+  ADMIN
 }

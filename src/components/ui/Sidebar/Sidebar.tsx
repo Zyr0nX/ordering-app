@@ -1,10 +1,11 @@
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
 import React from "react";
+
 import Anchor from "../../common/Anchor";
 import Backdrop from "../../common/Backdrop/Backdrop";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { signOut } from "next-auth/react";
-import Link from "next/link";
 
 export interface SidebarProps {
   sidebar: boolean;

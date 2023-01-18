@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import type { MapboxPlaces } from "../types/mapbox-places";
 
 export const useMapboxSearch = async (

@@ -1,4 +1,4 @@
-import type { ReactElement, MouseEventHandler } from "react";
+import type { MouseEventHandler, ReactElement } from "react";
 import React from "react";
 
 export interface BackdropProps {

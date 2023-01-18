@@ -1,4 +1,5 @@
 import React from "react";
+
 import type { IconProps } from "./IconProps";
 
 const IconSearch: React.FC<IconProps> = ({ ...props }) => {

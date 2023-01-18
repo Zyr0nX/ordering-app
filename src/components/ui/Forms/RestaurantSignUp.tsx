@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
 import { trpc } from "../../../utils/trpc";
 import useInput from "../../../utils/useInput";
@@ -67,8 +68,6 @@ const RestaurantSignUp = () => {
       phonenumber: phoneNumber.value,
     });
   };
-
-  const [searchResult, setSearchResult] = useState<MapboxPlaces>();
 
   return (
     <div className="p-12">

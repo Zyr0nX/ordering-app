@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import Logo from "../../common/Logo";
-import Button from "../../common/Button";
-import Input from "../../common/Input";
+
 import Anchor from "../../common/Anchor";
-import Sidebar from "../Sidebar";
-import IconMenu from "../../common/Icon/IconMenu";
+import Button from "../../common/Button";
 import IconLocationPin from "../../common/Icon/IconLocationPin";
-import IconShoppingCart from "../../common/Icon/IconShoppingCart";
-import IconSearch from "../../common/Icon/IconSearch";
+import IconMenu from "../../common/Icon/IconMenu";
 import IconPerson from "../../common/Icon/IconPerson";
+import IconSearch from "../../common/Icon/IconSearch";
+import IconShoppingCart from "../../common/Icon/IconShoppingCart";
+import Input from "../../common/Input";
+import Logo from "../../common/Logo";
+import Sidebar from "../Sidebar";
 
 const Header = () => {
   const [sidebar, setSidebar] = useState<boolean>(false);

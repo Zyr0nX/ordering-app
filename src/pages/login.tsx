@@ -1,8 +1,8 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 
-import Header from "../components/ui/Header/Header";
 import SignIn from "../components/ui/Auth/SignIn";
+import Header from "../components/ui/Header/Header";
 
 const Home: NextPage = () => {
   return (

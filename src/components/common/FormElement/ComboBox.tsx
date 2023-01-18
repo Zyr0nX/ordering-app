@@ -1,12 +1,13 @@
-import { Fragment, InputHTMLAttributes, ReactElement, useEffect } from "react";
-import React, { useState } from "react";
 import { Combobox, Transition } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/20/solid";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment, InputHTMLAttributes, ReactElement, useEffect } from "react";
+import React, { useState } from "react";
+
+import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
 import IconArrowDropDown from "../Icon/IconArrowDropDown";
 import IconPlus from "../Icon/IconPlus";
 import Button from "./Button";
-import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
-import { useQuery } from "@tanstack/react-query";
 
 export interface ComboBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   Icon?: ReactElement;
