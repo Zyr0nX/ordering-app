@@ -8,11 +8,11 @@ const ProductCard = () => {
   return (
     <div className="w-[calc(25%-18px)]">
       <Link href="" className="mr-6">
-        <div className="h-32">
+        <div className="h-32 overflow-hidden rounded-xl">
           <Image
             alt="a"
             src={a}
-            className="object-cover h-full rounded-xl hover:scale-110 transition-transform duration-100 ease-in-out"
+            className="object-cover h-full hover:scale-110 transition-transform duration-100 ease-in-out"
           ></Image>
         </div>
         <div className="">
