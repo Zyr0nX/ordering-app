@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import Script from "next/script";
 import React, { useEffect, useRef, useState } from "react";
 
 import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
@@ -7,6 +8,7 @@ import useInput from "../../../utils/useInput";
 import { useMapboxSearch } from "../../../utils/useMapboxSearch";
 import Button from "../../common/FormElement/Button";
 import ComboBox from "../../common/FormElement/ComboBox";
+import { PlacesAutocomplete } from "../../common/FormElement/PlacesAutocomplete";
 import Textbox from "../../common/FormElement/Textbox";
 
 const RestaurantSignUp = () => {
@@ -72,6 +74,8 @@ const RestaurantSignUp = () => {
   return (
     <div className="p-12">
       <h2 className="text-2xl font-bold">Get Started</h2>
+
+      <PlacesAutocomplete />
       <div className="mb-2">
         <Textbox
           placeholder="Store name"
