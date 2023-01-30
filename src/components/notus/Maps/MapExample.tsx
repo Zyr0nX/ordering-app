@@ -3,10 +3,10 @@ import React from "react";
 function MapExample() {
   const mapRef = React.useRef(null);
   React.useEffect(() => {
-    let google = window.google;
+    const google = window.google;
     let map = mapRef.current;
-    let lat = "40.748817";
-    let lng = "-73.985428";
+    const lat = 40.748817;
+    const lng = -73.985428;
     const myLatlng = new google.maps.LatLng(lat, lng);
     const mapOptions = {
       zoom: 12,

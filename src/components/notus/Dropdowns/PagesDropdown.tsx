@@ -2,7 +2,7 @@ import { createPopper } from "@popperjs/core";
 import Link from "next/link";
 import React from "react";
 
-const IndexDropdown = () => {
+const PagesDropdown = () => {
   // dropdown props
   const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
   const btnDropdownRef = React.createRef<HTMLAnchorElement>();
@@ -23,7 +23,7 @@ const IndexDropdown = () => {
   return (
     <>
       <a
-        className="hover:text-slate-500 text-slate-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+        className="lg:text-white lg:hover:text-slate-200 text-slate-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
         href="#pablo"
         ref={btnDropdownRef}
         onClick={(e) => {
@@ -132,4 +132,4 @@ const IndexDropdown = () => {
   );
 };
 
-export default IndexDropdown;
+export default PagesDropdown;

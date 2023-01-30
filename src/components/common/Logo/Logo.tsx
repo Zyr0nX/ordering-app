@@ -7,7 +7,7 @@ export interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ name }) => {
   return (
-    <Link href="/">
+    <Link href="/" legacyBehavior>
       <div className="block w-auto select-none text-2xl font-bold">{name}</div>
     </Link>
   );
