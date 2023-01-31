@@ -1,9 +1,11 @@
 // components
-import TableDropdown from "components/Dropdowns/TableDropdown.js";
+import Image from "next/image";
 import PropTypes from "prop-types";
 import React from "react";
 
-export default function CardTable({ color }) {
+import TableDropdown from "../Dropdowns/TableDropdown";
+
+export default function CardTable({ color }: { color: string }) {
   return (
     <>
       <div
@@ -94,11 +96,12 @@ export default function CardTable({ color }) {
             <tbody>
               <tr>
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
-                    src="/img/bootstrap.jpg"
+                  {/* <Image
+                    src="https://via.placeholder.com/100.png"
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
-                  ></img>{" "}
+                    fill
+                  ></Image>{" "} */}
                   <span
                     className={
                       "ml-3 font-bold " +
@@ -116,26 +119,30 @@ export default function CardTable({ color }) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <img
-                      src="/img/team-1-800x800.jpg"
+                    {/* <Image
+                      src="https://via.placeholder.com/800"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow"
-                    ></img>
-                    <img
-                      src="/img/team-2-800x800.jpg"
+                      fill
+                    ></Image>
+                    <Image
+                      src="https://via.placeholder.com/800"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
-                      src="/img/team-3-800x800.jpg"
+                      fill
+                    ></Image>
+                    <Image
+                      src="https://via.placeholder.com/800"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
-                      src="/img/team-4-470x470.png"
+                      fill
+                    ></Image>
+                    <Image
+                      src="https://via.placeholder.com/800"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
+                      fill
+                    ></Image> */}
                   </div>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -157,11 +164,12 @@ export default function CardTable({ color }) {
               </tr>
               <tr>
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
-                    src="/img/angular.jpg"
+                  {/* <Image
+                    src="https://via.placeholder.com/24"
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
-                  ></img>{" "}
+                    fill
+                  ></Image>{" "}
                   <span
                     className={
                       "ml-3 font-bold " +
@@ -169,7 +177,7 @@ export default function CardTable({ color }) {
                     }
                   >
                     Angular Now UI Kit PRO
-                  </span>
+                  </span> */}
                 </th>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   $1,800 USD
@@ -180,26 +188,26 @@ export default function CardTable({ color }) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <img
+                    {/* <Image
                       src="/img/team-1-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-2-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-3-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-4-470x470.png"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
+                    ></Image> */}
                   </div>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -221,11 +229,11 @@ export default function CardTable({ color }) {
               </tr>
               <tr>
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
+                  {/* <Image
                     src="/img/sketch.jpg"
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
-                  ></img>{" "}
+                  ></Image>{" "} */}
                   <span
                     className={
                       "ml-3 font-bold " +
@@ -243,26 +251,26 @@ export default function CardTable({ color }) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <img
+                    {/* <Image
                       src="/img/team-1-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-2-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-3-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-4-470x470.png"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
+                    ></Image> */}
                   </div>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -284,11 +292,11 @@ export default function CardTable({ color }) {
               </tr>
               <tr>
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
+                  {/* <Image
                     src="/img/react.jpg"
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
-                  ></img>{" "}
+                  ></Image>{" "} */}
                   <span
                     className={
                       "ml-3 font-bold " +
@@ -307,26 +315,26 @@ export default function CardTable({ color }) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <img
+                    {/* <Image
                       src="/img/team-1-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-2-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-3-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-4-470x470.png"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
+                    ></Image> */}
                   </div>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -348,11 +356,11 @@ export default function CardTable({ color }) {
               </tr>
               <tr>
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
+                  {/* <Image
                     src="/img/vue.jpg"
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
-                  ></img>{" "}
+                  ></Image>{" "} */}
                   <span
                     className={
                       "ml-3 font-bold " +
@@ -371,26 +379,26 @@ export default function CardTable({ color }) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <img
+                    {/* <Image
                       src="/img/team-1-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-2-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-3-800x800.jpg"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
-                    <img
+                    ></Image>
+                    <Image
                       src="/img/team-4-470x470.png"
                       alt="..."
                       className="w-10 h-10 rounded-full border-2 border-slate-50 shadow -ml-4"
-                    ></img>
+                    ></Image> */}
                   </div>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
