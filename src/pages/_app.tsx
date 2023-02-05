@@ -1,3 +1,4 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Poppins } from "@next/font/google";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";

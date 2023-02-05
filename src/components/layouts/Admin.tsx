@@ -7,7 +7,7 @@ import HeaderStats from "../notus/Headers/HeaderStats";
 import AdminNavbar from "../notus/Navbars/AdminNavbar";
 import Sidebar from "../notus/Sidebar/Sidebar";
 
-export default function Admin(children: ReactElement) {
+export default function Admin({ children }: { children: ReactElement }) {
   return (
     <>
       <Sidebar />

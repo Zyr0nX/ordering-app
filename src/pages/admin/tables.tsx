@@ -7,7 +7,7 @@ import CardTable from "../../components/notus/Cards/CardTable";
 
 export default function Tables() {
   return (
-    <>
+    <Admin>
       <div className="flex flex-wrap mt-4">
         <div className="w-full mb-12 px-4">
           <CardTable />
@@ -16,8 +16,6 @@ export default function Tables() {
           <CardTable color="dark" />
         </div>
       </div>
-    </>
+    </Admin>
   );
 }
-
-Tables.layout = Admin;
