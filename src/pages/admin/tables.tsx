@@ -6,6 +6,7 @@ import Admin from "../../components/layouts/Admin";
 import CardTable from "../../components/notus/Cards/CardTable";
 
 export default function Tables() {
+  const [data, setData] = React.useState([]);
   return (
     <Admin>
       <div className="flex flex-wrap mt-4">

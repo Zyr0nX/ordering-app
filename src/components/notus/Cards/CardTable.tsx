@@ -3,35 +3,10 @@ import Image from "next/image";
 import PropTypes from "prop-types";
 import React from "react";
 
+import Modal from "../Components/Modal";
 import TableDropdown from "../Dropdowns/TableDropdown";
 
 export default function CardTable({ color }: { color: string }) {
-  const data = [
-    {
-      name: "Argon Design System",
-      budget: "$2,500 USD",
-      status: "Pending",
-      users: "0/10",
-      completion: "60%",
-      color: "bg-orange-500",
-    },
-    {
-      name: "Black Dashboard",
-      budget: "$3,150 USD",
-      status: "Delivered",
-      users: "0/10",
-      completion: "100%",
-      color: "bg-green-500",
-    },
-    {
-      name: "Argon Design System",
-      budget: "$2,500 USD",
-      status: "Pending",
-      users: "0/10",
-      completion: "60%",
-      color: "bg-orange-500",
-    },
-  ];
   return (
     <>
       <div
@@ -52,6 +27,7 @@ export default function CardTable({ color }: { color: string }) {
                 Card Tables
               </h3>
             </div>
+            <Modal />
           </div>
         </div>
         <div className="block w-full overflow-x-auto overflow-y-">

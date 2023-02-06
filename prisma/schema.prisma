@@ -71,6 +71,18 @@ model Restaurant {
   isVerified        Boolean @default(false)
   userId            String  @unique
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Food              Food[]
+}
+
+model Food {
+  id           String     @id @default(cuid())
+  name         String
+  description  String
+  price        Int
+  calories     Int
+  image        String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
 }
 
 enum Role {
