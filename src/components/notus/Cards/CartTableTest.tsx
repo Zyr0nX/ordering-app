@@ -11,7 +11,7 @@ import React from "react";
 
 import TableDropdown from "../Dropdowns/TableDropdown";
 
-export default function CardTable({
+export default function CardTableTest({
   color,
   data,
   columns,

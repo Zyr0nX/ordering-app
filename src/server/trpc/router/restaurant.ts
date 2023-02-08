@@ -51,9 +51,7 @@ export const restaurantRouter = router({
           description: input.description,
           calories: 0,
           image: "",
-          restaurantId: await prisma.restaurant.findFirst({
-            where: { userId: useSession().data?.user?.id },
-          }),
+          restaurant: { connect: { userId: useSession().data?.user?.id } },
         },
       });
     }),

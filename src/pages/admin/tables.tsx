@@ -4,6 +4,7 @@ import React from "react";
 import Admin from "../../components/layouts/Admin";
 // components
 import CardTable from "../../components/notus/Cards/CardTable";
+import CardTableTest from "../../components/notus/Cards/CartTableTest";
 
 export default function Tables() {
   const [data, setData] = React.useState([]);
@@ -15,6 +16,9 @@ export default function Tables() {
         </div>
         <div className="w-full mb-12 px-4">
           <CardTable color="dark" />
+        </div>
+        <div className="w-full mb-12 px-4">
+          <CardTableTest color="dark" />
         </div>
       </div>
     </Admin>
