@@ -1,4 +1,7 @@
 import React from "react";
+import { create } from "zustand";
+
+import AddFood from "../Forms/AddFood";
 
 export default function Modal() {
   const [showModal, setShowModal] = React.useState(false);
@@ -30,18 +33,7 @@ export default function Modal() {
                   </button>
                 </div>
                 {/*body*/}
-                <div className="relative p-6 flex-auto">
-                  <div className="relative flex w-full flex-wrap items-stretch mb-3">
-                    <input
-                      type="text"
-                      placeholder="Regular Input"
-                      className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full pr-10"
-                    />
-                    <span className="z-10 h-full leading-snug font-normal text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 right-0 pr-3 py-3">
-                      <i className="fas fa-user"></i>
-                    </span>
-                  </div>
-                </div>
+                <AddFood />
                 {/*footer*/}
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
