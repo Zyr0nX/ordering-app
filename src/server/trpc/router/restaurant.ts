@@ -29,7 +29,7 @@ export const restaurantRouter = router({
           lastName: input.lastname,
           email: input.email,
           phoneNumber: input.phonenumber,
-          user: { connect: { id: useSession().data?.user?.id } },
+          userId: input.userId,
         },
       });
     }),
@@ -39,6 +39,7 @@ export const restaurantRouter = router({
         name: z.string(),
         price: z.number(),
         description: z.string(),
+        calories: z.number(),
         restaurantId: z.string().cuid(),
       })
     )
@@ -49,9 +50,9 @@ export const restaurantRouter = router({
           name: input.name,
           price: input.price,
           description: input.description,
-          calories: 0,
+          calories: input.calories,
           image: "",
-          restaurant: { connect: { userId: useSession().data?.user?.id } },
+          restaurantId: input.restaurantId,
         },
       });
     }),

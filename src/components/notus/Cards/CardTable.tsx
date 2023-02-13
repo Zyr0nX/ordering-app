@@ -1,26 +1,37 @@
 // components
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import PropTypes from "prop-types";
 import React from "react";
 import { create } from "zustand";
 
+import { trpc } from "../../../utils/trpc";
+import useInput from "../../../utils/useInput";
 import Modal from "../Components/Modal";
 import TableDropdown from "../Dropdowns/TableDropdown";
-
-const useFoodStore = create((set) => ({
-  name: "",
-  description: "",
-  price: 0,
-  calories: 0,
-  image: "",
-  setName: () => set((state) => ({ name: state.name })),
-  setDescription: () => set((state) => ({ description: state.description })),
-  setPrice: () => set((state) => ({ price: state.price })),
-  setCalories: () => set((state) => ({ calories: state.calories })),
-  setImage: () => set((state) => ({ image: state.image })),
-}));
+import AddFood from "../Forms/AddFood";
 
 export default function CardTable({ color }: { color: string }) {
+  const restaurantId = useSession().data?.user?.restaurantId;
+
+  const [showModal, setShowModal] = React.useState(false);
+
+  const name = useInput<string>("");
+  const description = useInput<string>("");
+  const price = useInput<number>(0);
+  const calories = useInput<number>(0);
+  const mutation = trpc.restaurant.createFood.useMutation();
+
+  const onSubmit = () => {
+    mutation.mutate({
+      name: name.value,
+      description: description.value,
+      price: Number(price.value),
+      calories: Number(calories.value),
+      restaurantId: restaurantId ?? "",
+    });
+  };
+
   return (
     <div
       className={
@@ -40,7 +51,67 @@ export default function CardTable({ color }: { color: string }) {
               Card Tables
             </h3>
           </div>
-          <Modal />
+          <button
+            className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            type="button"
+            onClick={() => setShowModal(true)}
+          >
+            Create
+          </button>
+          {showModal ? (
+            <>
+              <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                <div className="relative my-6 mx-auto w-[48rem]">
+                  {/*content*/}
+                  <form
+                    method="post"
+                    className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none"
+                  >
+                    {/*header*/}
+                    <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                      <h3 className="text-3xl font-semibold">Create</h3>
+                      <button
+                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                        onClick={() => setShowModal(false)}
+                      >
+                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                          ×
+                        </span>
+                      </button>
+                    </div>
+                    {/*body*/}
+                    <AddFood
+                      name={name}
+                      description={description}
+                      price={price}
+                      calories={calories}
+                    />
+                    {/*footer*/}
+                    <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                      <button
+                        className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Close
+                      </button>
+                      <button
+                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="submit"
+                        onClick={() => {
+                          onSubmit();
+                          setShowModal(false);
+                        }}
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+            </>
+          ) : null}
         </div>
       </div>
       <div className="block w-full overflow-x-auto overflow-y-">

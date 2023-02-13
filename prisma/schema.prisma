@@ -48,7 +48,8 @@ model User {
   role          Role        @default(USER)
   accounts      Account[]
   sessions      Session[]
-  restaurant    Restaurant?
+  restaurantId  String?     @unique
+  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -70,8 +71,8 @@ model Restaurant {
   phoneNumber       String
   isVerified        Boolean @default(false)
   userId            String  @unique
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   Food              Food[]
+  User              User?
 }
 
 model Food {

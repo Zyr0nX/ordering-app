@@ -1,20 +1,21 @@
+import type { ChangeEvent, SetStateAction } from "react";
 import { useState } from "react";
 
-interface type {
-  value: string;
-  onChange: (event: { target: { value: string } }) => void;
+export interface useInputType<T> {
+  value: T;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const useInput = (initialValue: string): type => {
-  const [value, setValue] = useState(initialValue);
+const useInput = <T>(initialValue: T): useInputType<T> => {
+  const [value, setValue] = useState<T>(initialValue);
 
-  const handleChange = (event: { target: { value: string } }) => {
-    setValue(event.target.value);
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value as SetStateAction<T>);
   };
 
   return {
     value,
-    onChange: handleChange,
+    onChange,
   };
 };
 

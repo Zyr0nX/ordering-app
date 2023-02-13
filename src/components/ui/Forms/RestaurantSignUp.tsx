@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import Script from "next/script";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -12,6 +13,8 @@ import { PlacesAutocomplete } from "../../common/FormElement/PlacesAutocomplete"
 import Textbox from "../../common/FormElement/Textbox";
 
 const RestaurantSignUp = () => {
+  const userId = useSession().data?.user?.id || "";
+
   const name = useInput("");
   const [address, setAddress] = useState<Feature>();
   console.log(address);
@@ -62,12 +65,13 @@ const RestaurantSignUp = () => {
 
     mutation.mutate({
       name: name.value,
-      address: address.place_name,
+      address: address.place_name ?? "",
       additionaladdress: additionalAddress.value,
       firstname: firstName.value,
       lastname: lastName.value,
       email: email.value,
       phonenumber: phoneNumber.value,
+      userId: userId,
     });
   };
 
