@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { useSession } from "next-auth/react";
 import { z } from "zod";
 
 import { publicProcedure, router } from "../trpc";

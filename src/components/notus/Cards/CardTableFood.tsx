@@ -5,8 +5,9 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React from "react";
+import React, { useState } from "react";
 
+import { trpc } from "../../../utils/trpc";
 import useInput from "../../../utils/useInput";
 import Modal from "../Components/Modal";
 
@@ -82,11 +83,23 @@ const CardTableFood = ({ color }: { color: string }) => {
   const description = useInput<string>("");
   const price = useInput<number>(0);
   const calories = useInput<number>(0);
+  const [image, setImage] = useState<File | undefined | null>(undefined);
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+  console.log(image);
+
+  const uploadFileMutation = trpc.file.upload.useMutation();
+
+  const onFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      uploadFileMutation.mutateAsync(file);
+    }
+  };
 
   return (
     <div
@@ -192,6 +205,43 @@ const CardTableFood = ({ color }: { color: string }) => {
                           onChange={calories.onChange}
                         />
                       </div>
+                      <div className="mb-3 pt-0">
+                        <label htmlFor="image" className="py-3 text-sm">
+                          Image:
+                        </label>
+                        <div className="flex flex-col items-center px-3 py-3 text-slate-600 relative bg-white rounded text-sm border border-slate-300 w-full">
+                          {!image ? (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth="1.5"
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+                                />
+                              </svg>
+                              <div className="">Click here to upload file</div>
+                              <input
+                                id="image"
+                                name="image"
+                                type="file"
+                                accept="image/*"
+                                className="w-full h-full opacity-0 absolute top-0"
+                                value={image}
+                                onChange={onFileUploadChange}
+                              />
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center"></div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     {/*footer*/}
                     <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
@@ -218,7 +268,7 @@ const CardTableFood = ({ color }: { color: string }) => {
           ) : null}
         </div>
       </div>
-      <div className="block w-full overflow-x-auto overflow-y-">
+      <div className="block w-full overflow-x-auto">
         {/* Projects table */}
         <table className="items-center w-full bg-transparent border-collapse">
           <thead>
