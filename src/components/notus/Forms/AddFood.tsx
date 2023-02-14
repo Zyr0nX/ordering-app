@@ -22,7 +22,7 @@ const AddFood: React.FC<AddFoodProps> = ({
           name="name"
           type="text"
           placeholder="Name"
-          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border border-blueGray-300 outline-none focus:outline-none focus:shadow-outline w-full"
+          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
           value={name.value}
           onChange={name.onChange}
         />
@@ -32,7 +32,7 @@ const AddFood: React.FC<AddFoodProps> = ({
           name="description"
           type="text"
           placeholder="Description"
-          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border border-blueGray-300 outline-none focus:outline-none focus:shadow-outline w-full"
+          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
           value={description.value}
           onChange={description.onChange}
         />
@@ -43,7 +43,7 @@ const AddFood: React.FC<AddFoodProps> = ({
           type="number"
           min={0}
           placeholder="Price"
-          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border border-blueGray-300 outline-none focus:outline-none focus:shadow-outline w-full"
+          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
           value={price.value}
           onChange={price.onChange}
         />
@@ -54,7 +54,7 @@ const AddFood: React.FC<AddFoodProps> = ({
           type="number"
           min={0}
           placeholder="Calories"
-          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border border-blueGray-300 outline-none focus:outline-none focus:shadow-outline w-full"
+          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
           value={calories.value}
           onChange={calories.onChange}
         />

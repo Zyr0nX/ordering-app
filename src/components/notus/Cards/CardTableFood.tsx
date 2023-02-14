@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-table";
 import React from "react";
 
+import useInput from "../../../utils/useInput";
 import Modal from "../Components/Modal";
 
 interface Food {
@@ -75,6 +76,12 @@ const columns = [
 const CardTableFood = ({ color }: { color: string }) => {
   const [data, setData] = React.useState(() => [...foodData]);
 
+  const [showModal, setShowModal] = React.useState(false);
+
+  const name = useInput<string>("");
+  const description = useInput<string>("");
+  const price = useInput<number>(0);
+  const calories = useInput<number>(0);
   const table = useReactTable({
     data,
     columns,
@@ -100,7 +107,115 @@ const CardTableFood = ({ color }: { color: string }) => {
               Card Tables
             </h3>
           </div>
-          <Modal />
+          <button
+            className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+            type="button"
+            onClick={() => setShowModal(true)}
+          >
+            Create
+          </button>
+          {showModal ? (
+            <>
+              <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+                <div className="relative my-6 mx-auto w-[48rem]">
+                  {/*content*/}
+                  <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                    {/*header*/}
+                    <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                      <h3 className="text-3xl font-semibold">Create</h3>
+                      <button
+                        className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                        onClick={() => setShowModal(false)}
+                      >
+                        <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                          ×
+                        </span>
+                      </button>
+                    </div>
+                    {/*body*/}
+                    <div className="relative p-6 flex-auto">
+                      <div className="mb-3 pt-0">
+                        <label htmlFor="name" className="py-3 text-sm">
+                          Name:
+                        </label>
+                        <input
+                          id="name"
+                          name="name"
+                          type="text"
+                          placeholder="Name"
+                          className="px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
+                          value={name.value}
+                          onChange={name.onChange}
+                        />
+                      </div>
+                      <div className="mb-3 pt-0">
+                        <label htmlFor="description" className="py-3 text-sm">
+                          Description:
+                        </label>
+                        <input
+                          id="description"
+                          name="description"
+                          type="text"
+                          placeholder="Description"
+                          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
+                          value={description.value}
+                          onChange={description.onChange}
+                        />
+                      </div>
+                      <div className="mb-3 pt-0">
+                        <label htmlFor="price" className="py-3 text-sm">
+                          Price:
+                        </label>
+                        <input
+                          id="price"
+                          name="price"
+                          type="number"
+                          min={0}
+                          placeholder="Price"
+                          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
+                          value={price.value}
+                          onChange={price.onChange}
+                        />
+                      </div>
+                      <div className="mb-3 pt-0">
+                        <label htmlFor="calories" className="py-3 text-sm">
+                          Calories:
+                        </label>
+                        <input
+                          id="calories"
+                          name="calories"
+                          type="number"
+                          min={0}
+                          placeholder="Calories"
+                          className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
+                          value={calories.value}
+                          onChange={calories.onChange}
+                        />
+                      </div>
+                    </div>
+                    {/*footer*/}
+                    <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+                      <button
+                        className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="button"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Close
+                      </button>
+                      <button
+                        className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                        type="submit"
+                        onClick={() => setShowModal(false)}
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+            </>
+          ) : null}
         </div>
       </div>
       <div className="block w-full overflow-x-auto overflow-y-">
@@ -136,7 +251,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center"
+                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
@@ -144,7 +259,6 @@ const CardTableFood = ({ color }: { color: string }) => {
               </tr>
             ))}
           </tbody>
-          <tfoot></tfoot>
         </table>
       </div>
     </div>

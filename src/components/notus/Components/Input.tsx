@@ -9,7 +9,7 @@ const Input: React.FC<React.HtmlHTMLAttributes<HTMLInputElement>> = ({
       <input
         type="text"
         placeholder={placeholder}
-        className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border border-blueGray-300 outline-none focus:outline-none focus:shadow-outline w-full"
+        className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
       />
     </div>
   );
