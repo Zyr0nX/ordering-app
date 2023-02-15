@@ -36,15 +36,11 @@ const columns = [
 ];
 
 const CardTableFood = ({ color }: { color: string }) => {
-  const restaurantId = useSession().data?.user?.restaurantId || "";
+  const { data: session, status } = useSession();
   const [data, setData] = React.useState<Food[]>();
+  const restaurantId = session?.user?.restaurantId;
   const foodQuery = trpc.food.getByRestaurantId.useQuery({ restaurantId });
-  useEffect(() => {
-    console.log(restaurantId);
-
-    const foodData = foodQuery.data as Food[];
-    setData(foodData);
-  }, [restaurantId]);
+  setData(foodQuery.data as Food[]);
 
   const [showModal, setShowModal] = React.useState(false);
   const [image, setImage] = React.useState<string | null>(null);
@@ -93,12 +89,14 @@ const CardTableFood = ({ color }: { color: string }) => {
       price: parseFloat(price.current?.value || "0"),
       calories: parseInt(calories.current?.value || "0"),
       image: image || "",
-      restaurantId: restaurantId,
+      restaurantId: session?.user?.restaurantId as string,
     };
 
     createFoodMutation.mutateAsync(food);
   };
-  if (!data) return null;
+  if (status === "loading") {
+    return "Loading or not authenticated...";
+  }
   return (
     <div
       className={
@@ -279,7 +277,7 @@ const CardTableFood = ({ color }: { color: string }) => {
       </div>
       <div className="block w-full overflow-x-auto">
         {/* Projects table */}
-        {foodQuery && (
+        {data && (
           <table className="items-center w-full bg-transparent border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
