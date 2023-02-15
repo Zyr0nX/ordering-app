@@ -23,7 +23,7 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   EMAIL_SERVER: z.string().url(),
   EMAIL_FROM: z.string(),
-  MAPBOX_PUBLIC_TOKEN: z.string(),
+  CLOUDINARY_URL: z.string().url(),
 });
 
 /**

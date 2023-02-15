@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { trpc } from "../../../utils/trpc";
 import useInput from "../../../utils/useInput";
@@ -78,27 +78,29 @@ const CardTableFood = ({ color }: { color: string }) => {
   const [data, setData] = React.useState(() => [...foodData]);
 
   const [showModal, setShowModal] = React.useState(false);
+  const [uploaded, setUploaded] = React.useState(false);
 
   const name = useInput<string>("");
   const description = useInput<string>("");
   const price = useInput<number>(0);
   const calories = useInput<number>(0);
-  const [image, setImage] = useState<File | undefined | null>(undefined);
+  const imageRef = useRef<HTMLInputElement>(null);
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-  console.log(image);
+
+  console.log(imageRef.current?.files?.[0]);
 
   const uploadFileMutation = trpc.file.upload.useMutation();
 
   const onFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
       uploadFileMutation.mutateAsync(file);
     }
+    setUploaded(true);
   };
 
   return (
@@ -210,7 +212,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           Image:
                         </label>
                         <div className="flex flex-col items-center px-3 py-3 text-slate-600 relative bg-white rounded text-sm border border-slate-300 w-full">
-                          {!image ? (
+                          {!uploaded ? (
                             <>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -233,7 +235,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                                 type="file"
                                 accept="image/*"
                                 className="w-full h-full opacity-0 absolute top-0"
-                                value={image}
+                                ref={imageRef}
                                 onChange={onFileUploadChange}
                               />
                             </>
