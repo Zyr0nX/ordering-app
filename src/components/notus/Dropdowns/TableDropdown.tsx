@@ -11,11 +11,6 @@ const NotificationDropdown = () => {
   const [style, setStyle] = useState<string>("");
 
   const buttonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const yAxes = buttonRef.current?.getBoundingClientRect().y as number;
-    console.log(buttonRef.current?.getBoundingClientRect().y);
-    setStyle(`translateY(${yAxes}px)`);
-  }, []);
 
   return (
     <Menu as="div" className="relative">

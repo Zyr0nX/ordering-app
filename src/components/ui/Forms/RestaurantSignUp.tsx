@@ -35,7 +35,7 @@ const RestaurantSignUp = () => {
     null
   );
 
-  const mutation = trpc.restaurant.sendrestaurantinfo.useMutation();
+  const mutation = trpc.restaurant.create.useMutation();
 
   const sendRestaurantInfo = () => {
     if (!name) {

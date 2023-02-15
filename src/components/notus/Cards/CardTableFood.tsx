@@ -1,61 +1,22 @@
-import { Prisma } from "@prisma/client";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import React, { useEffect, useRef } from "react";
 
 import { trpc } from "../../../utils/trpc";
-import useInput from "../../../utils/useInput";
-import Modal from "../Components/Modal";
 
 interface Food {
   name: string;
   description: string;
+  image: string;
   calories: number;
   price: number;
 }
-
-const foodData: Food[] = [
-  {
-    name: "Frozen yoghurt",
-    description: "a",
-    calories: 159,
-    price: 6.0,
-  },
-  {
-    name: "Ice cream sandwich",
-    description: "a",
-    calories: 237,
-    price: 9.0,
-  },
-  {
-    name: "Eclair",
-    description: "a",
-    calories: 262,
-    price: 16.0,
-  },
-  {
-    name: "Cupcake",
-    description: "a",
-    calories: 305,
-    price: 3.7,
-  },
-  {
-    name: "Gingerbread",
-    description: "a",
-    calories: 356,
-    price: 16.0,
-  },
-  {
-    name: "Jelly bean",
-    description: "a",
-    calories: 375,
-    price: 0.0,
-  },
-];
 
 const columnHelper = createColumnHelper<Food>();
 
@@ -75,34 +36,69 @@ const columns = [
 ];
 
 const CardTableFood = ({ color }: { color: string }) => {
-  const [data, setData] = React.useState(() => [...foodData]);
+  const restaurantId = useSession().data?.user?.restaurantId || "";
+  const [data, setData] = React.useState<Food[]>();
+  const foodQuery = trpc.food.getByRestaurantId.useQuery({ restaurantId });
+  useEffect(() => {
+    console.log(restaurantId);
+
+    const foodData = foodQuery.data as Food[];
+    setData(foodData);
+  }, [restaurantId]);
 
   const [showModal, setShowModal] = React.useState(false);
-  const [uploaded, setUploaded] = React.useState(false);
+  const [image, setImage] = React.useState<string | null>(null);
 
-  const name = useInput<string>("");
-  const description = useInput<string>("");
-  const price = useInput<number>(0);
-  const calories = useInput<number>(0);
+  const name = useRef<HTMLInputElement>(null);
+  const description = useRef<HTMLInputElement>(null);
+  const price = useRef<HTMLInputElement>(null);
+  const calories = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
+
   const table = useReactTable({
-    data,
+    data: data as Food[],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  console.log(imageRef.current?.files?.[0]);
+  const onFileUploadChange = async () => {
+    const files = imageRef.current?.files;
 
-  const uploadFileMutation = trpc.file.upload.useMutation();
-
-  const onFileUploadChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      uploadFileMutation.mutateAsync(file);
+    if (files) {
+      const formData = new FormData();
+      formData.append("file", files[0] as Blob);
+      formData.append("upload_preset", "fn6bsq9s");
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dkxjgboi8/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      setImage(data.secure_url);
     }
-    setUploaded(true);
   };
 
+  const onFileUploadRemove = () => {
+    setImage(null);
+  };
+
+  const createFoodMutation = trpc.food.create.useMutation();
+
+  const onSubmit = async () => {
+    const food = {
+      name: name.current?.value || "",
+      description: description.current?.value || "",
+      price: parseFloat(price.current?.value || "0"),
+      calories: parseInt(calories.current?.value || "0"),
+      image: image || "",
+      restaurantId: restaurantId,
+    };
+
+    createFoodMutation.mutateAsync(food);
+  };
+  if (!data) return null;
   return (
     <div
       className={
@@ -159,8 +155,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           type="text"
                           placeholder="Name"
                           className="px-3 py-3 placeholder-slate-300 text-slate-600 bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
-                          value={name.value}
-                          onChange={name.onChange}
+                          ref={name}
                         />
                       </div>
                       <div className="mb-3 pt-0">
@@ -173,8 +168,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           type="text"
                           placeholder="Description"
                           className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
-                          value={description.value}
-                          onChange={description.onChange}
+                          ref={description}
                         />
                       </div>
                       <div className="mb-3 pt-0">
@@ -188,8 +182,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           min={0}
                           placeholder="Price"
                           className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
-                          value={price.value}
-                          onChange={price.onChange}
+                          ref={price}
                         />
                       </div>
                       <div className="mb-3 pt-0">
@@ -203,8 +196,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           min={0}
                           placeholder="Calories"
                           className="px-3 py-3 placeholder-slate-300 text-slate-600 relative bg-white rounded text-sm border border-slate-300 outline-none focus:outline-none focus:shadow-outline w-full"
-                          value={calories.value}
-                          onChange={calories.onChange}
+                          ref={calories}
                         />
                       </div>
                       <div className="mb-3 pt-0">
@@ -212,7 +204,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                           Image:
                         </label>
                         <div className="flex flex-col items-center px-3 py-3 text-slate-600 relative bg-white rounded text-sm border border-slate-300 w-full">
-                          {!uploaded ? (
+                          {!image ? (
                             <>
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -240,7 +232,22 @@ const CardTableFood = ({ color }: { color: string }) => {
                               />
                             </>
                           ) : (
-                            <div className="flex flex-col items-center"></div>
+                            <div className="flex flex-col items-center">
+                              <Image
+                                src={image}
+                                alt="image"
+                                width={694}
+                                height={345.25}
+                                className="rounded-lg w-auto h-auto"
+                              />
+                              <button
+                                className="mt-4 bg-red-500 text-white active:bg-red-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                type="button"
+                                onClick={onFileUploadRemove}
+                              >
+                                Remove
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -257,7 +264,7 @@ const CardTableFood = ({ color }: { color: string }) => {
                       <button
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="submit"
-                        onClick={() => setShowModal(false)}
+                        onClick={onSubmit}
                       >
                         Save Changes
                       </button>
@@ -272,46 +279,51 @@ const CardTableFood = ({ color }: { color: string }) => {
       </div>
       <div className="block w-full overflow-x-auto">
         {/* Projects table */}
-        <table className="items-center w-full bg-transparent border-collapse">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className={
-                      "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                      (color === "light"
-                        ? "bg-slate-50 text-slate-500 border-slate-100"
-                        : "bg-slate-600 text-slate-200 border-slate-500")
-                    }
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {foodQuery && (
+          <table className="items-center w-full bg-transparent border-collapse">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className={
+                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                        (color === "light"
+                          ? "bg-slate-50 text-slate-500 border-slate-100"
+                          : "bg-slate-600 text-slate-200 border-slate-500")
+                      }
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
