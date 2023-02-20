@@ -4,10 +4,21 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { IncomingMessage, ServerResponse } from "http";
+import {
+  InferGetServerSidePropsType,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
+import { AuthOptions } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";
 
+import { authOptions } from "../../../pages/api/auth/[...nextauth]";
+import { createContext } from "../../../server/trpc/context";
 import { trpc } from "../../../utils/trpc";
 
 interface Food {
@@ -35,12 +46,19 @@ const columns = [
   }),
 ];
 
-const CardTableFood = ({ color }: { color: string }) => {
-  const { data: session, status } = useSession();
+const CardTableFood = ({
+  color,
+  session,
+}: {
+  color: string;
+  session: InferGetServerSidePropsType<typeof getServerSideProps>;
+}) => {
   const [data, setData] = React.useState<Food[]>();
-  const restaurantId = session?.user?.restaurantId;
-  const foodQuery = trpc.food.getByRestaurantId.useQuery({ restaurantId });
-  setData(foodQuery.data as Food[]);
+  console.log(session);
+  // const foodQuery = trpc.food.getByRestaurantId.useQuery({
+  //   restaurantId: session,
+  // });
+  // setData(foodQuery.data as Food[]);
 
   const [showModal, setShowModal] = React.useState(false);
   const [image, setImage] = React.useState<string | null>(null);
@@ -94,9 +112,6 @@ const CardTableFood = ({ color }: { color: string }) => {
 
     createFoodMutation.mutateAsync(food);
   };
-  if (status === "loading") {
-    return "Loading or not authenticated...";
-  }
   return (
     <div
       className={
@@ -328,3 +343,22 @@ const CardTableFood = ({ color }: { color: string }) => {
 };
 
 export default CardTableFood;
+
+export const getServerSideProps = async (context: CreateNextContextOptions) => {
+  const session = await createContext(context);
+  console.log(session);
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
+};
