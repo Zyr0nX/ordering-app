@@ -46,20 +46,10 @@ const columns = [
   }),
 ];
 
-const CardTableFood = ({
-  color,
-  session,
-}: {
-  color: string;
-  session: InferGetServerSidePropsType<typeof getServerSideProps>;
-}) => {
+const CardTableFood = ({ color }: { color: string }) => {
+  const createFoodMutation = trpc.food.create.useMutation();
   const [data, setData] = React.useState<Food[]>();
-  console.log(session);
-  // const foodQuery = trpc.food.getByRestaurantId.useQuery({
-  //   restaurantId: session,
-  // });
-  // setData(foodQuery.data as Food[]);
-
+  const { data: sessionData, status: sessionStatus } = useSession();
   const [showModal, setShowModal] = React.useState(false);
   const [image, setImage] = React.useState<string | null>(null);
 
@@ -68,6 +58,14 @@ const CardTableFood = ({
   const price = useRef<HTMLInputElement>(null);
   const calories = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
+
+  if (sessionStatus === "authenticated") {
+    console.log(trpc.food.getByRestaurantId);
+    const foodQuery = trpc.food.getByRestaurantId.useQuery({
+      restaurantId: sessionData?.user?.restaurantId as string,
+    });
+    foodQuery.isSuccess && setData(foodQuery.data as Food[]);
+  }
 
   const table = useReactTable({
     data: data as Food[],
@@ -98,8 +96,6 @@ const CardTableFood = ({
     setImage(null);
   };
 
-  const createFoodMutation = trpc.food.create.useMutation();
-
   const onSubmit = async () => {
     const food = {
       name: name.current?.value || "",
@@ -107,11 +103,15 @@ const CardTableFood = ({
       price: parseFloat(price.current?.value || "0"),
       calories: parseInt(calories.current?.value || "0"),
       image: image || "",
-      restaurantId: session?.user?.restaurantId as string,
+      restaurantId: sessionData?.user?.restaurantId as string,
     };
 
     createFoodMutation.mutateAsync(food);
   };
+
+  if (sessionStatus && data === undefined) {
+    return <div>Loading...</div>;
+  }
   return (
     <div
       className={
@@ -344,21 +344,21 @@ const CardTableFood = ({
 
 export default CardTableFood;
 
-export const getServerSideProps = async (context: CreateNextContextOptions) => {
-  const session = await createContext(context);
-  console.log(session);
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+// export const getServerSideProps = async (context: CreateNextContextOptions) => {
+//   const session = await getServerSession(context.req, context.res, authOptions);
+//   console.log(session);
+//   if (!session) {
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  return {
-    props: {
-      session,
-    },
-  };
-};
+//   return {
+//     props: {
+//       session,
+//     },
+//   };
+// };
