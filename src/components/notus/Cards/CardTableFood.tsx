@@ -58,14 +58,17 @@ const CardTableFood = ({ color }: { color: string }) => {
   const price = useRef<HTMLInputElement>(null);
   const calories = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
-
-  if (sessionStatus === "authenticated") {
-    console.log(trpc.food.getByRestaurantId);
-    const foodQuery = trpc.food.getByRestaurantId.useQuery({
+  const foodQuery = trpc.food.getByRestaurantId.useQuery(
+    {
       restaurantId: sessionData?.user?.restaurantId as string,
-    });
-    foodQuery.isSuccess && setData(foodQuery.data as Food[]);
-  }
+    },
+    { enabled: sessionStatus === "authenticated" }
+  );
+  useEffect(() => {
+    if (sessionStatus === "authenticated" && foodQuery.isSuccess) {
+      setData(foodQuery.data as Food[]);
+    }
+  }, [sessionStatus, foodQuery]);
 
   const table = useReactTable({
     data: data as Food[],

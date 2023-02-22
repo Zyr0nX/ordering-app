@@ -20,9 +20,14 @@ const Home: NextPage = () => {
           <Header />
         </div>
         <CategoryBar />
-        <ProductCard />
-        <IndexDropdown />
-        <NotificationDropdown />
+        <div className="grid grid-cols-4 gap-4">
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+        </div>
+        {/* <IndexDropdown />
+        <NotificationDropdown /> */}
       </div>
     </>
   );

@@ -71,8 +71,9 @@ model Restaurant {
   phoneNumber       String
   isVerified        Boolean @default(false)
   userId            String  @unique
-  Food              Food[]
-  User              User?
+  food              Food[]
+  brandImage        String?
+  user              User?
 }
 
 model Food {
