@@ -1,8 +1,11 @@
+import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import type { Food, Restaurant } from "prisma/prisma-client";
 import React, { useEffect, useState } from "react";
 
+import FoodCard from "../../components/common/FoodCard/FoodCard";
+import Header from "../../components/ui/Header";
 import { trpc } from "../../utils/trpc";
 
 const RestaurantDetail = () => {
@@ -19,31 +22,49 @@ const RestaurantDetail = () => {
     (Restaurant & { food: Food[] }) | null | undefined
   >();
   const [restaurantId, setRestaurantId] = useState<string>();
-  const restaurantQuery = trpc.restaurant.get.useQuery(
+  trpc.restaurant.get.useQuery(
     { id: restaurantId as string },
-    { enabled: restaurantId !== undefined }
-  );
-  useEffect(() => {
-    if (restaurantId) {
-      setRestaurantData(restaurantQuery.data);
+    {
+      enabled: restaurantId !== undefined,
+      onSuccess: (data) => {
+        setRestaurantData(data);
+      },
     }
-  }, [restaurantId, restaurantQuery.data]);
+  );
   if (!restaurantData) {
     return <div>Loading...</div>;
   }
   console.log(restaurantData);
   return (
-    <div className="grid grid-cols-4 gap-4">
-      <div className="min-w-[1024px] max-h-[1920px] h-40 w-full">
+    <>
+      <Head>
+        <title>Viparyas | {restaurantData.name}</title>
+        <meta name="description" content="Vyparyas | Home" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="relative flex h-full min-w-full flex-col">
+        <Header />
+      </div>
+      <div className="min-w-[1024px] max-h-[1920px] h-40">
         <Image
           src={restaurantData.brandImage as string}
           alt="Brand Image"
           width={1024}
           height={160}
-          priority
+          className="object-cover h-full w-full"
         ></Image>
       </div>
-    </div>
+      <div className="m-10">
+        <h1 className="font-bold text-4xl">
+          {restaurantData.name} ({restaurantData.address})
+        </h1>
+        {restaurantData.food.map((food) => (
+          <div className="grid grid-cols-4" key={food.id}>
+            <FoodCard data={food} />
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 

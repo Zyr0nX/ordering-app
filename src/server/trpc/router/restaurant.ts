@@ -17,9 +17,8 @@ export const restaurantRouter = router({
         userId: z.string().cuid(),
       })
     )
-    .mutation(async ({ input }) => {
-      const prisma = new PrismaClient();
-      await prisma.restaurant.create({
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.restaurant.create({
         data: {
           name: input.name,
           address: input.address,
@@ -28,7 +27,7 @@ export const restaurantRouter = router({
           lastName: input.lastname,
           email: input.email,
           phoneNumber: input.phonenumber,
-          userId: input.userId,
+          userId: ctx.session?.user?.id as string,
         },
       });
     }),
