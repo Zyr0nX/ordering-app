@@ -1,8 +1,7 @@
 import { z } from "zod";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { publicProcedure, router } from "../trpc";
-
-export const cartRouter = router({
+export const cartRouter = createTRPCRouter({
   addItems: publicProcedure
     .input(
       z.object({

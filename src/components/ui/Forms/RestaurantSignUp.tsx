@@ -1,16 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import Script from "next/script";
-import React, { useEffect, useRef, useState } from "react";
-
 import type { Feature, MapboxPlaces } from "../../../types/mapbox-places";
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../../utils/api";
 import useInput from "../../../utils/useInput";
 import { useMapboxSearch } from "../../../utils/useMapboxSearch";
 import Button from "../../common/FormElement/Button";
 import ComboBox from "../../common/FormElement/ComboBox";
 import { PlacesAutocomplete } from "../../common/FormElement/PlacesAutocomplete";
 import Textbox from "../../common/FormElement/Textbox";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import Script from "next/script";
+import React, { useEffect, useRef, useState } from "react";
 
 const RestaurantSignUp = () => {
   const userId = useSession().data?.user?.id || "";

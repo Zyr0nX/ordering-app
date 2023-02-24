@@ -1,12 +1,11 @@
+import FoodCard from "../../components/common/FoodCard/FoodCard";
+import Header from "../../components/ui/Header";
+import { trpc } from "../../utils/api";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import type { Food, Restaurant } from "prisma/prisma-client";
 import React, { useEffect, useState } from "react";
-
-import FoodCard from "../../components/common/FoodCard/FoodCard";
-import Header from "../../components/ui/Header";
-import { trpc } from "../../utils/trpc";
 
 const RestaurantDetail = () => {
   const router = useRouter();

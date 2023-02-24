@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { publicProcedure, router } from "../trpc";
-
-export const foodRouter = router({
+export const foodRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({
@@ -28,6 +27,7 @@ export const foodRouter = router({
         },
       });
     }),
+
   getByRestaurantId: publicProcedure
     .input(z.object({ restaurantId: z.string().cuid() }))
     .query(async ({ input }) => {

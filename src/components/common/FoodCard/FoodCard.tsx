@@ -1,9 +1,9 @@
+import { trpc } from "../../../utils/api";
 import type { Food } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { MouseEventHandler } from "react";
-
-import { trpc } from "../../../utils/trpc";
+import type { MouseEventHandler } from "react";
+import React from "react";
 
 const FoodCard = ({ data }: { data: Food }) => {
   const cartMutation = trpc.cart.addItems.useMutation();

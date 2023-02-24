@@ -1,15 +1,14 @@
 // components
+import { trpc } from "../../../utils/api";
+import useInput from "../../../utils/useInput";
+import Modal from "../Components/Modal";
+import TableDropdown from "../Dropdowns/TableDropdown";
+import AddFood from "../Forms/AddFood";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import PropTypes from "prop-types";
 import React from "react";
 import { create } from "zustand";
-
-import { trpc } from "../../../utils/trpc";
-import useInput from "../../../utils/useInput";
-import Modal from "../Components/Modal";
-import TableDropdown from "../Dropdowns/TableDropdown";
-import AddFood from "../Forms/AddFood";
 
 export default function CardTable({ color }: { color: string }) {
   const restaurantId = useSession().data?.user?.restaurantId;

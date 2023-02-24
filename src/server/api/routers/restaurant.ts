@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-import { publicProcedure, router } from "../trpc";
-
-export const restaurantRouter = router({
+export const restaurantRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({

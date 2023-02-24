@@ -1,16 +1,16 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { Restaurant } from "prisma/prisma-client";
+import { type Restaurant } from "prisma/prisma-client";
 import { useEffect, useState } from "react";
+import { api } from "~/utils/api";
 
 import CategoryBar from "../components/common/Category/CategoryBar";
 import ProductCard from "../components/common/Product/ProductCard";
 import Header from "../components/ui/Header/Header";
-import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const getAllRestaurantsQuery = trpc.restaurant.getAll.useQuery();
+  const getAllRestaurantsQuery = api.restaurant.getAll.useQuery();
   useEffect(() => {
     console.log(getAllRestaurantsQuery.data);
     if (getAllRestaurantsQuery.status === "success") {

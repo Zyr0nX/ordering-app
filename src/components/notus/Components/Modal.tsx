@@ -1,9 +1,8 @@
-import React from "react";
-import { create } from "zustand";
-
-import { trpc } from "../../../utils/trpc";
+import { trpc } from "../../../utils/api";
 import useInput, { useInputType } from "../../../utils/useInput";
 import AddFood from "../Forms/AddFood";
+import React from "react";
+import { create } from "zustand";
 
 interface AddFoodProps {
   name: useInputType<string>;

@@ -1,3 +1,6 @@
+import { authOptions } from "../../../pages/api/auth/[...nextauth]";
+import { createContext } from "../../../server/trpc/context";
+import { trpc } from "../../../utils/api";
 import {
   createColumnHelper,
   flexRender,
@@ -16,10 +19,6 @@ import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useRef } from "react";
-
-import { authOptions } from "../../../pages/api/auth/[...nextauth]";
-import { createContext } from "../../../server/trpc/context";
-import { trpc } from "../../../utils/trpc";
 
 interface Food {
   name: string;
