@@ -9,7 +9,12 @@ module.exports = {
       fontFamily: {
         roboto: ["var(--font-roboto)", ...defaultTheme.fontFamily.sans],
       },
+      colors: {
+        viparyasDarkBlue: "#2722FE",
+        viparyasTeal: "#34C7AC",
+        virparyasMainBlue: "#2E2C9A",
+      },
     },
+    plugins: [require("@headlessui/tailwindcss")],
   },
-  plugins: [require("@headlessui/tailwindcss")],
 };
