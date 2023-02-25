@@ -11,7 +11,7 @@ export const cartRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.restaurant.update({
         data: {
-          Approved: "APPROVED",
+          approved: "APPROVED",
         },
         where: {
           id: input.restaurantId,
@@ -27,7 +27,7 @@ export const cartRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.restaurant.update({
         data: {
-          Approved: "REJECTED",
+          approved: "REJECTED",
         },
         where: {
           id: input.restaurantId,
@@ -37,7 +37,7 @@ export const cartRouter = createTRPCRouter({
   getRestaurants: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.restaurant.findMany({
       where: {
-        Approved: "PENDING",
+        approved: "PENDING",
       },
     });
   }),

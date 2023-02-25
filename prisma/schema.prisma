@@ -109,7 +109,7 @@ model Cart {
 enum Role {
   USER
   RESTAURANT
-  DELIVER
+  SHIPPER
   ADMIN
 }
 
