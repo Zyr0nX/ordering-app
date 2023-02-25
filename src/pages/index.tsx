@@ -1,5 +1,4 @@
 import { type NextPage } from "next";
-import { signOut } from "next-auth/react";
 import Head from "next/head";
 
 const Home: NextPage = () => {
@@ -10,7 +9,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <button onClick={void signOut()}>Log out</button>
+      <button>a</button>
     </>
   );
 };

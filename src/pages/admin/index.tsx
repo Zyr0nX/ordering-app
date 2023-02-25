@@ -1,17 +1,18 @@
-import { type NextPage } from "next";
+import { type GetServerSidePropsContext, type NextPage } from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminBody from "~/components/ui/AdminBody";
 import AdminHeader from "~/components/ui/AdminHeader";
+import { getServerAuthSession } from "~/server/auth";
 
-const index: NextPage = () => {
+const Index: NextPage = () => {
   return (
     <Admin>
       <>
-        <div className="">
+        <div>
           <AdminHeader />
         </div>
-        <div className="relative -top-8 mx-4 md:mx-20 md:-top-16">
+        <div className="relative -top-8 mx-4 md:-top-16 md:mx-20">
           <AdminBody />
         </div>
       </>
@@ -19,4 +20,26 @@ const index: NextPage = () => {
   );
 };
 
-export default index;
+export const getServerSideProps = async (context: {
+  req: GetServerSidePropsContext["req"];
+  res: GetServerSidePropsContext["res"];
+}) => {
+  const session = await getServerAuthSession(context);
+
+  if (!session || session.user.role !== "ADMIN") {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      session,
+    },
+  };
+};
+
+export default Index;

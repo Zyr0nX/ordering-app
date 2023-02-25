@@ -1,16 +1,15 @@
-import React from "react";
-
 import AdminCard from "../common/AdminCard";
 import AdminMainButton from "../common/AdminMainButton";
 import GreenCheckmark from "../icons/GreenCheckmark";
 import RedCross from "../icons/RedCross";
 import RestaurantIcon from "../icons/RestaurantIcon";
 import ShipperIcon from "../icons/ShipperIcon";
+import React from "react";
 
 const AdminBody = () => {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 mx-2 md:mx-12">
+      <div className="mx-2 grid grid-cols-2 gap-4 md:mx-12">
         <AdminMainButton
           text="Restaurants"
           icon={<RestaurantIcon className="md:h-24 md:w-24" />}
@@ -21,8 +20,8 @@ const AdminBody = () => {
         />
       </div>
       <div className="mt-8">
-        <p className="text-virparyasMainBlue my-2">Required Approval</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p className="my-2 text-virparyasMainBlue">Required Approval</p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AdminCard
             text="Sabrina’s Cafe"
             subtext="Restaurant"

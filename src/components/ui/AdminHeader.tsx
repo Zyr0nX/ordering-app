@@ -1,15 +1,18 @@
-import React from "react";
-
 import LogoutIcon from "../icons/LogoutIcon";
+import { signOut } from "next-auth/react";
+import React from "react";
 
 const AdminHeader: React.FC = () => {
   return (
-    <div className="pt-16 md:pt-8 pb-24 md:pb-32 text-white relative bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 flex justify-center items-center">
-      <div className="absolute right-5 top-5">
+    <div className="relative flex items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 pt-16 pb-24 text-white md:pt-8 md:pb-32">
+      <button
+        className="absolute right-0 top-0 p-5"
+        onClick={() => void signOut()}
+      >
         <LogoutIcon />
-      </div>
+      </button>
       <div>
-        <p className="text-xl text-center mb-5 md:text-2xl">
+        <p className="mb-5 text-center text-xl md:text-2xl">
           Today&apos;s stats
         </p>
         <div className="flex">

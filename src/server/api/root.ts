@@ -1,9 +1,8 @@
-import { exampleRouter } from "~/server/api/routers/example";
-import { createTRPCRouter } from "~/server/api/trpc";
-
 import { cartRouter } from "./routers/cart";
 import { foodRouter } from "./routers/food";
 import { restaurantRouter } from "./routers/restaurant";
+import { exampleRouter } from "~/server/api/routers/example";
+import { createTRPCRouter } from "~/server/api/trpc";
 
 /**
  * This is the primary router for your server.
