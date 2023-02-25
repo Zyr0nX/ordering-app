@@ -10,7 +10,7 @@ const Home: NextPage = () => {
         <meta name="description" content="Vyparyas | Home" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <button onClick={() => signOut()}>Log out</button>
+      <button onClick={void signOut()}>Log out</button>
     </>
   );
 };
