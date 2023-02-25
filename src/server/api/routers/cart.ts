@@ -10,7 +10,6 @@ export const cartRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(ctx.session?.user?.id);
       await ctx.prisma.cart.create({
         data: {
           foodId: input.foodId,

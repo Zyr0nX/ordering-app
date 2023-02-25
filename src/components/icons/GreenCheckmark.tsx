@@ -1,4 +1,4 @@
-import React, { HtmlHTMLAttributes } from "react";
+import React, { type HtmlHTMLAttributes } from "react";
 
 const GreenCheckmark: React.FC<HtmlHTMLAttributes<HTMLOrSVGElement>> = ({
   ...props

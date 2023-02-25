@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Example {
@@ -19,16 +20,17 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -37,6 +39,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
@@ -48,9 +52,8 @@ model User {
   role          Role        @default(USER)
   accounts      Account[]
   sessions      Session[]
-  restaurantId  String?     @unique
-  restaurant    Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  Cart          Cart[]
+  Restaurant    Restaurant?
+  Cart          Cart?
 }
 
 model VerificationToken {
@@ -70,11 +73,11 @@ model Restaurant {
   lastName          String
   email             String
   phoneNumber       String
-  isVerified        Boolean @default(false)
+  approved          Approve @default(PENDING)
   userId            String  @unique
   food              Food[]
   brandImage        String?
-  user              User?
+  user              User?   @relation(fields: [userId], references: [id])
 }
 
 model Food {
@@ -87,17 +90,20 @@ model Food {
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   Cart         Cart[]
+
+  @@index([restaurantId])
 }
 
 model Cart {
   id       String @id @default(cuid())
-  userId   String
+  userId   String @unique
   foodId   String
   quantity Int
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   food     Food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
 
   @@unique([userId, foodId])
+  @@index([foodId])
 }
 
 enum Role {
@@ -105,4 +111,10 @@ enum Role {
   RESTAURANT
   DELIVER
   ADMIN
+}
+
+enum Approve {
+  PENDING
+  APPROVED
+  REJECTED
 }
