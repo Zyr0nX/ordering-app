@@ -13,6 +13,8 @@ module.exports = {
         viparyasDarkBlue: "#2722FE",
         viparyasTeal: "#34C7AC",
         virparyasMainBlue: "#2E2C9A",
+        virparyasLightBrown: "#C77234",
+        virparyasBackground: "#F4F4F4",
       },
     },
     plugins: [require("@headlessui/tailwindcss")],

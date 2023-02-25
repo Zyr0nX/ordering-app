@@ -18,7 +18,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <main
-        className={`${roboto.variable} min-h-screen bg-[#f4f4f4] font-sans`}
+        className={`${roboto.variable} min-h-screen bg-virparyasBackground font-roboto`}
       >
         <Component {...pageProps} />
       </main>
