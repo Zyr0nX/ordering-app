@@ -4,7 +4,7 @@ import Guest from "~/components/layouts/Guest";
 import SignInForm from "~/components/ui/SignInForm";
 import { getServerAuthSession } from "~/server/auth";
 
-const Index: NextPage = () => {
+const SignIn: NextPage = () => {
   return (
     <Guest>
       <div className="flex min-h-screen w-screen items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80">
@@ -36,4 +36,4 @@ export const getServerSideProps = async (context: {
   };
 };
 
-export default Index;
+export default SignIn;
