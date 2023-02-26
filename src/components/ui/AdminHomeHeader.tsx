@@ -2,7 +2,7 @@ import LogoutIcon from "../icons/LogoutIcon";
 import { signOut } from "next-auth/react";
 import React from "react";
 
-const AdminHeader: React.FC = () => {
+const AdminHomeHeader: React.FC = () => {
   return (
     <div className="relative flex items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 pt-16 pb-24 text-white md:pt-8 md:pb-32">
       <button
@@ -30,4 +30,4 @@ const AdminHeader: React.FC = () => {
   );
 };
 
-export default AdminHeader;
+export default AdminHomeHeader;

@@ -1,7 +1,4 @@
-import AdminCard from "../common/AdminCard";
 import AdminMainButton from "../common/AdminMainButton";
-import GreenCheckmark from "../icons/GreenCheckmark";
-import RedCross from "../icons/RedCross";
 import RestaurantIcon from "../icons/RestaurantIcon";
 import ShipperIcon from "../icons/ShipperIcon";
 import React from "react";
@@ -13,13 +10,35 @@ const AdminBody = () => {
         <AdminMainButton
           text="Restaurants"
           icon={<RestaurantIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
         />
         <AdminMainButton
           text="Shippers"
           icon={<ShipperIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
+        />
+        <AdminMainButton
+          text="Shippers"
+          icon={<ShipperIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
+        />
+        <AdminMainButton
+          text="Shippers"
+          icon={<ShipperIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
+        />
+        <AdminMainButton
+          text="Shippers"
+          icon={<ShipperIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
+        />
+        <AdminMainButton
+          text="Shippers"
+          icon={<ShipperIcon className="md:h-24 md:w-24" />}
+          href="/admin/restaurants"
         />
       </div>
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <p className="my-2 text-virparyasMainBlue">Required Approval</p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AdminCard
@@ -41,7 +60,7 @@ const AdminBody = () => {
             icon2={<RedCross className="md:h-10 md:w-10" />}
           />
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

@@ -1,16 +1,18 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
 import React from "react";
-import Guest from "~/components/layouts/Guest";
-import SignInForm from "~/components/ui/SignInForm";
+import Admin from "~/components/layouts/Admin";
+import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
+import AdminRestaurantsBody from "~/components/ui/AdminRestaurantsBody";
 import { getServerAuthSession } from "~/server/auth";
 
-const SignIn: NextPage = () => {
+const Index: NextPage = () => {
   return (
-    <Guest>
-      <div className="flex min-h-screen w-screen items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80">
-        <SignInForm />
-      </div>
-    </Guest>
+    <Admin>
+      <>
+        <AdminCommonHeader />
+        <AdminRestaurantsBody />
+      </>
+    </Admin>
   );
 };
 
@@ -20,7 +22,7 @@ export const getServerSideProps = async (context: {
 }) => {
   const session = await getServerAuthSession(context);
 
-  if (session) {
+  if (!session || session.user.role !== "ADMIN") {
     return {
       redirect: {
         destination: "/",
@@ -30,8 +32,10 @@ export const getServerSideProps = async (context: {
   }
 
   return {
-    props: {},
+    props: {
+      session,
+    },
   };
 };
 
-export default SignIn;
+export default Index;

@@ -2,7 +2,7 @@ import { type GetServerSidePropsContext, type NextPage } from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminBody from "~/components/ui/AdminBody";
-import AdminHeader from "~/components/ui/AdminHeader";
+import AdminHeader from "~/components/ui/AdminHomeHeader";
 import { getServerAuthSession } from "~/server/auth";
 
 const Index: NextPage = () => {
