@@ -5,6 +5,14 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import RestaurantRegistrationForm from "~/components/ui/RestaurantRegistrationForm";
 import { type CountryCode } from "~/utils/types";
 
+export const getServerSideProps = ({ country }: CountryCode) => {
+  return {
+    props: {
+      country,
+    },
+  };
+};
+
 const RestaurantRegistration = ({ country }: CountryCode) => {
   console.log("country", country);
   return (
@@ -18,7 +26,3 @@ const RestaurantRegistration = ({ country }: CountryCode) => {
 };
 
 export default RestaurantRegistration;
-
-export const getServerSideProps = ({ country }: CountryCode) => ({
-  props: country,
-});
