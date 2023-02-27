@@ -6,6 +6,7 @@ import RestaurantRegistrationForm from "~/components/ui/RestaurantRegistrationFo
 import { type CountryCode } from "~/utils/types";
 
 const RestaurantRegistration = ({ country }: CountryCode) => {
+  console.log("country", country);
   return (
     <Guest>
       <>
@@ -18,13 +19,6 @@ const RestaurantRegistration = ({ country }: CountryCode) => {
 
 export default RestaurantRegistration;
 
-export const getServerSideProps = (context: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
-  const country = context.req.headers["x-country"];
-
-  return {
-    props: { country: country },
-  };
-};
+export const getServerSideProps = ({ country }: CountryCode) => ({
+  props: country,
+});
