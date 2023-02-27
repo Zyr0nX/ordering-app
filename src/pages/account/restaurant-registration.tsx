@@ -1,30 +1,30 @@
-import { type GetServerSidePropsContext } from "next";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import RestaurantRegistrationForm from "~/components/ui/RestaurantRegistrationForm";
-import { type CountryCode } from "~/utils/types";
+import { type CountryCodes } from "~/utils/types";
 
-const RestaurantRegistration = ({ country }: CountryCode) => {
+export const getServerSideProps = ({ query }: { query: CountryCodes }) => {
+  return {
+    props: {
+      query,
+    },
+  };
+};
+
+const RestaurantRegistration = ({
+  query,
+}: {
+  query: { country: CountryCodes };
+}) => {
   return (
     <Guest>
       <>
         <GuestCommonHeader />
-        <RestaurantRegistrationForm country={country} />
+        <RestaurantRegistrationForm country={query.country} />
       </>
     </Guest>
   );
 };
 
 export default RestaurantRegistration;
-
-export const getServerSideProps = (context: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
-  const country = context.req.headers["x-country"];
-
-  return {
-    props: { country: country },
-  };
-};
