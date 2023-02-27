@@ -6,6 +6,7 @@ import RestaurantRegistrationForm from "~/components/ui/RestaurantRegistrationFo
 import { type CountryCode } from "~/utils/types";
 
 const RestaurantRegistration = ({ country }: CountryCode) => {
+  console.log("country", country);
   return (
     <Guest>
       <>
