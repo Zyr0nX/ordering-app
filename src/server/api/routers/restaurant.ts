@@ -1,8 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  publicProcedure,
+  protectedProcedure,
+} from "~/server/api/trpc";
 
 export const restaurantRouter = createTRPCRouter({
+  registration: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        address: z.string(),
+        additionaladdress: z.string().nullish(),
+        firstname: z.string(),
+        lastname: z.string(),
+        email: z.string().email(),
+        phonenumber: z.string().regex(/^\d+$/),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.restaurant.create({
+        data: {
+          name: input.name,
+          address: input.address,
+          additionalAddress: input.additionaladdress,
+          firstName: input.firstname,
+          lastName: input.lastname,
+          email: input.email,
+          phoneNumber: input.phonenumber,
+          userId: ctx.session?.user?.id,
+        },
+      });
+    }),
   create: publicProcedure
     .input(
       z.object({
