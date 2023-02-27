@@ -22,9 +22,10 @@ export const getServerSideProps = (context: {
   req: GetServerSidePropsContext["req"];
   res: GetServerSidePropsContext["res"];
 }) => {
+  console.log("context.req.headers", context.req);
   const country = context.req.headers["x-country"];
 
   return {
-    props: { country: country || null },
+    props: { country: country },
   };
 };
