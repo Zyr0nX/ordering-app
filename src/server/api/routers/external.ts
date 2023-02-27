@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import PhoneJson from "~/utils/phone.json";
 import { type PhonePrefixResponse } from "~/utils/types";
 
 export const externalRouter = createTRPCRouter({
@@ -258,11 +259,8 @@ export const externalRouter = createTRPCRouter({
         "MZ",
       ])
     )
-    .query(async ({ input }) => {
-      const res = await fetch("http://country.io/phone.json");
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const phonePrefixList: PhonePrefixResponse = await res.json();
+    .query(({ input }) => {
+      const phonePrefixList = PhoneJson as PhonePrefixResponse;
 
       const country = input;
 
