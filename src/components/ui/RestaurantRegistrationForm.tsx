@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
+import { type CountryCode } from "~/utils/types";
 
-const SignInForm = () => {
+const RestaurantRegistrationForm = ({ country }: CountryCode) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -21,7 +22,19 @@ const SignInForm = () => {
   const [validAdditionAddress, setValidAdditionAddress] = useState(false);
   const [validCategory, setValidCategory] = useState(false);
 
+  const [phonePrefix, setPhonePrefix] = useState<string | null>(null);
+
   const registrationMutation = api.restaurant.registration.useMutation();
+
+  api.external.phonePrefix.useQuery(
+    {
+      country: country,
+    },
+    {
+      enabled: country !== undefined,
+      onSuccess: (data) => setPhonePrefix(data),
+    }
+  );
 
   const handleDiscard = () => {
     if (confirm("Are you sure you want to discard?")) {
@@ -146,7 +159,7 @@ const SignInForm = () => {
         </div>
         <div className="flex flex-col">
           <label htmlFor="phone" className="font-medium">
-            * Phone:
+            * Phone {phonePrefix}:
           </label>
           <input
             type="text"
@@ -247,7 +260,10 @@ const SignInForm = () => {
           >
             Discard
           </button>
-          <button className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white">
+          <button
+            className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
+            onClick={handleConfirm}
+          >
             Confirm
           </button>
         </div>
@@ -256,4 +272,4 @@ const SignInForm = () => {
   );
 };
 
-export default SignInForm;
+export default RestaurantRegistrationForm;

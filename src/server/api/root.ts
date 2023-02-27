@@ -1,4 +1,5 @@
 import { cartRouter } from "./routers/cart";
+import { externalRouter } from "./routers/external";
 import { foodRouter } from "./routers/food";
 import { restaurantRouter } from "./routers/restaurant";
 import { exampleRouter } from "~/server/api/routers/example";
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
   restaurant: restaurantRouter,
   food: foodRouter,
   cart: cartRouter,
+  external: externalRouter,
 });
 
 // export type definition of API
