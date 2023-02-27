@@ -12,12 +12,16 @@ export const getServerSideProps = ({ query }: { query: CountryCodes }) => {
   };
 };
 
-const RestaurantRegistration = ({ query }: { query: CountryCodes }) => {
+const RestaurantRegistration = ({
+  query,
+}: {
+  query: { country: CountryCodes };
+}) => {
   return (
     <Guest>
       <>
         <GuestCommonHeader />
-        <RestaurantRegistrationForm country={query} />
+        <RestaurantRegistrationForm country={query.country} />
       </>
     </Guest>
   );

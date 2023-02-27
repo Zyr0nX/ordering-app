@@ -26,15 +26,10 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
 
   const registrationMutation = api.restaurant.registration.useMutation();
 
-  api.external.phonePrefix.useQuery(
-    {
-      country: country,
-    },
-    {
-      enabled: country !== undefined,
-      onSuccess: (data) => setPhonePrefix(data),
-    }
-  );
+  api.external.phonePrefix.useQuery(country, {
+    enabled: !!country,
+    onSuccess: (data) => setPhonePrefix(data),
+  });
 
   const handleDiscard = () => {
     if (confirm("Are you sure you want to discard?")) {
