@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
-import { type CountryCode } from "~/utils/types";
+import { type CountryCodes } from "~/utils/types";
 
-const RestaurantRegistrationForm = ({ country }: CountryCode) => {
+const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
