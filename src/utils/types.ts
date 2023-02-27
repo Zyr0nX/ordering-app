@@ -502,6 +502,5 @@ export interface CountryCode {
     | "ID"
     | "UA"
     | "QA"
-    | "MZ"
-    | "unknown";
+    | "MZ";
 }

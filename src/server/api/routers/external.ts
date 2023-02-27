@@ -257,7 +257,6 @@ export const externalRouter = createTRPCRouter({
           "UA",
           "QA",
           "MZ",
-          "unknown",
         ]),
       })
     )
@@ -269,7 +268,7 @@ export const externalRouter = createTRPCRouter({
 
       const country = input.country;
 
-      if (country === "unknown" || !phonePrefixList[country]) {
+      if (!country || !phonePrefixList[country]) {
         return null;
       }
 
