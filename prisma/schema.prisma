@@ -65,7 +65,7 @@ model VerificationToken {
 }
 
 model Restaurant {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
   name              String
   address           String
   additionalAddress String?
@@ -73,11 +73,13 @@ model Restaurant {
   lastName          String
   email             String
   phoneNumber       String
-  approved          Approve @default(PENDING)
-  userId            String  @unique
+  approved          Approve  @default(PENDING)
+  userId            String   @unique
   food              Food[]
   brandImage        String?
-  user              User?   @relation(fields: [userId], references: [id])
+  user              User?    @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Food {

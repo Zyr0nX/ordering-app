@@ -1,3 +1,4 @@
+import { adminRouter } from "./routers/admin";
 import { cartRouter } from "./routers/cart";
 import { externalRouter } from "./routers/external";
 import { foodRouter } from "./routers/food";
@@ -12,6 +13,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
+  admin: adminRouter,
   restaurant: restaurantRouter,
   food: foodRouter,
   cart: cartRouter,

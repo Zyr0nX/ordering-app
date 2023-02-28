@@ -9,7 +9,7 @@ const Index: NextPage = () => {
   return (
     <Admin>
       <>
-        <AdminCommonHeader title="Restaurants" />
+        <AdminCommonHeader title="Requests" />
         <AdminRestaurantsBody />
       </>
     </Admin>

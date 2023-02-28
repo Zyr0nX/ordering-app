@@ -138,7 +138,7 @@ const enforceAdminIsAuthed = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const AdminProtectedProcedure = t.procedure.use(enforceAdminIsAuthed);
+export const adminProtectedProcedure = t.procedure.use(enforceAdminIsAuthed);
 
 const enforceRestaurantIsAuthed = t.middleware(({ ctx, next }) => {
   if (
@@ -164,6 +164,6 @@ const enforceRestaurantIsAuthed = t.middleware(({ ctx, next }) => {
  *
  * @see https://trpc.io/docs/procedures
  */
-export const RestaurantProtectedProcedure = t.procedure.use(
+export const restaurantProtectedProcedure = t.procedure.use(
   enforceRestaurantIsAuthed
 );

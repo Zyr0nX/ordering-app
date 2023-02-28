@@ -3,14 +3,14 @@ import LogoutIcon from "../icons/LogoutIcon";
 import { signOut } from "next-auth/react";
 import React from "react";
 
-const AdminCommonHeader = () => {
+const AdminCommonHeader = ({ title }: { title: string }) => {
   return (
     <div className="flex items-center justify-between bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 p-6 text-white">
       <button onClick={() => void signOut()}>
         <BackArrowIcon className="h-6 w-6 fill-white" />
       </button>
       <div>
-        <p className="text-2xl font-bold">Restaurants</p>
+        <p className="text-2xl font-bold">{title}</p>
       </div>
       <button onClick={() => void signOut()}>
         <LogoutIcon />

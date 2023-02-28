@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-export const cartRouter = createTRPCRouter({
-  approveRestaurant: publicProcedure
+export const adminRouter = createTRPCRouter({
+  approveRestaurant: adminProtectedProcedure
     .input(
       z.object({
         restaurantId: z.string().cuid(),
@@ -18,7 +18,7 @@ export const cartRouter = createTRPCRouter({
         },
       });
     }),
-  rejectRestaurant: publicProcedure
+  rejectRestaurant: adminProtectedProcedure
     .input(
       z.object({
         restaurantId: z.string().cuid(),
@@ -34,11 +34,20 @@ export const cartRouter = createTRPCRouter({
         },
       });
     }),
-  getRestaurants: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.restaurant.findMany({
-      where: {
-        approved: "PENDING",
-      },
-    });
-  }),
+  getPendingRestaurantRequests: adminProtectedProcedure.query(
+    async ({ ctx }) => {
+      return await ctx.prisma.restaurant.findMany({
+        where: {
+          approved: "PENDING",
+        },
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+    }
+  ),
 });
