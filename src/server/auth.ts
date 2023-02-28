@@ -38,6 +38,11 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    async signIn({ user }) {
+      const userCount = await prisma.user.count();
+      user.role = userCount === 0 ? "ADMIN" : "USER";
+      return true;
+    },
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
