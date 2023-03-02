@@ -46,6 +46,11 @@ export const adminRouter = createTRPCRouter({
               email: true,
             },
           },
+          restaurantType: {
+            select: {
+              name: true,
+            },
+          },
         },
       });
     }

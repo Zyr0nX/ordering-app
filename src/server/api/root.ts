@@ -3,6 +3,7 @@ import { cartRouter } from "./routers/cart";
 import { externalRouter } from "./routers/external";
 import { foodRouter } from "./routers/food";
 import { restaurantRouter } from "./routers/restaurant";
+import { restaurantTypeRouter } from "./routers/restaurantType";
 import { spamRouter } from "./routers/spam";
 import { exampleRouter } from "~/server/api/routers/example";
 import { createTRPCRouter } from "~/server/api/trpc";
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   cart: cartRouter,
   external: externalRouter,
   spam: spamRouter,
+  restaurantType: restaurantTypeRouter,
 });
 
 // export type definition of API

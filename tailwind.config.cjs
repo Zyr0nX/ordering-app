@@ -17,6 +17,7 @@ module.exports = {
         virparyasBackground: "#F4F4F4",
         virparyasRed: "#DA4343",
         virparyasLightBlue: "#00B6DE",
+        virparyasGreen: "#2C9A44",
       },
     },
     plugins: [require("@headlessui/tailwindcss")],

@@ -12,11 +12,14 @@ export const restaurantRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         address: z.string(),
-        additionaladdress: z.string().nullish(),
+        additionaladdress: z.string().optional(),
         firstname: z.string(),
         lastname: z.string(),
         email: z.string().email(),
-        phonenumber: z.string().regex(/^\d+$/),
+        phonenumber: z
+          .string()
+          .regex(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g),
+        restaurantTypeId: z.string().cuid().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -30,6 +33,7 @@ export const restaurantRouter = createTRPCRouter({
           email: input.email,
           phoneNumber: input.phonenumber,
           userId: ctx.session?.user?.id,
+          restaurantTypeId: input.restaurantTypeId,
         },
       });
     }),
@@ -44,6 +48,7 @@ export const restaurantRouter = createTRPCRouter({
         email: z.string().email(),
         phonenumber: z.string(),
         userId: z.string().cuid(),
+        restaurantTypeId: z.string().cuid(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -57,6 +62,7 @@ export const restaurantRouter = createTRPCRouter({
           email: input.email,
           phoneNumber: input.phonenumber,
           userId: ctx.session?.user?.id as string,
+          restaurantTypeId: input.restaurantTypeId,
         },
       });
     }),
