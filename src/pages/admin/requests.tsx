@@ -2,7 +2,7 @@ import { type GetServerSidePropsContext, type NextPage } from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
-import AdminRestaurantsBody from "~/components/ui/AdminRestaurantsBody";
+import AdminRequestsBody from "~/components/ui/AdminRequestsBody";
 import { getServerAuthSession } from "~/server/auth";
 
 const Index: NextPage = () => {
@@ -10,7 +10,7 @@ const Index: NextPage = () => {
     <Admin>
       <>
         <AdminCommonHeader title="Requests" />
-        <AdminRestaurantsBody />
+        <AdminRequestsBody />
       </>
     </Admin>
   );

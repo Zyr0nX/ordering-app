@@ -1,14 +1,12 @@
-import CloudIcon from "../icons/CloudIcon";
 import GreenCheckmark from "../icons/GreenCheckmark";
 import RedCross from "../icons/RedCross";
 import { Dialog, Transition } from "@headlessui/react";
 import { type Restaurant } from "@prisma/client";
-import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
 
 const AdminRequestsBody = () => {
-  const [approvedList, setApprovedList] = useState<
+  const [pendingList, setPendingList] = useState<
     (Restaurant & {
       user: {
         email: string | null;
@@ -41,9 +39,9 @@ const AdminRequestsBody = () => {
   }
 
   const pendingRestaurantRequestsQuery =
-    api.admin.getApprovedRestaurants.useQuery(undefined, {
+    api.admin.getPendingRestaurantRequests.useQuery(undefined, {
       onSuccess: (data) => {
-        setApprovedList(data);
+        setPendingList(data);
       },
       refetchInterval: 5000,
     });
@@ -63,12 +61,6 @@ const AdminRequestsBody = () => {
     rejectRestaurantMutation.mutate({ restaurantId: id });
   };
 
-  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      console.log("File(s) you selected here: ", e.target.files);
-    }
-  };
-
   const handleSelect = (
     restaurant: Restaurant & {
       user: {
@@ -86,7 +78,7 @@ const AdminRequestsBody = () => {
     <div className="m-4 text-virparyasMainBlue">
       <div className="relative mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {approvedList.map((restaurant) => (
+          {pendingList.map((restaurant) => (
             <div
               key={restaurant.id}
               className="flex flex-auto cursor-pointer rounded-2xl bg-white p-4 pt-3 shadow-[0_4px_4px_0_rgba(0,0,0,0.1)]"
@@ -145,31 +137,64 @@ const AdminRequestsBody = () => {
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
-                  <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all md:w-3/4">
+                  <Dialog.Panel className="w-3/4 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                     <Dialog.Title as="h3" className="text-3xl font-bold">
-                      Edit Mode
+                      View Mode
                     </Dialog.Title>
                     <div className="mt-2">
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <p className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col">
-                          <label
-                            htmlFor="category"
-                            className="truncate font-medium"
-                          >
-                            Category:
+                          <label htmlFor="firstName" className="font-medium">
+                            First name:
                           </label>
                           <input
                             type="text"
-                            id="category"
+                            id="firstName"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.restaurantType?.name}
+                            value={selectedRestaurant?.firstName}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label htmlFor="lastName" className="font-medium">
+                            Last name:
+                          </label>
+                          <input
+                            type="text"
+                            id="lastName"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            placeholder="Email..."
+                            value={selectedRestaurant?.lastName}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label htmlFor="phone" className="font-medium">
+                            Phone number:
+                          </label>
+                          <input
+                            type="text"
+                            id="phone"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            placeholder="Email..."
+                            value={selectedRestaurant?.phoneNumber}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label htmlFor="email" className="font-medium">
+                            Email:
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            placeholder="Email..."
+                            value={selectedRestaurant?.user?.email || ""}
                           />
                         </div>
                         <div className="flex flex-col">
                           <label
                             htmlFor="restaurantName"
-                            className="truncate font-medium"
+                            className="font-medium"
                           >
                             Restaurant Name:
                           </label>
@@ -182,10 +207,7 @@ const AdminRequestsBody = () => {
                           />
                         </div>
                         <div className="flex flex-col">
-                          <label
-                            htmlFor="address"
-                            className="truncate font-medium"
-                          >
+                          <label htmlFor="address" className="font-medium">
                             Address:
                           </label>
                           <input
@@ -199,7 +221,7 @@ const AdminRequestsBody = () => {
                         <div className="flex flex-col">
                           <label
                             htmlFor="additionalAddress"
-                            className="truncate font-medium"
+                            className="font-medium"
                           >
                             Additional Address:
                           </label>
@@ -211,102 +233,21 @@ const AdminRequestsBody = () => {
                             value={selectedRestaurant?.additionalAddress || ""}
                           />
                         </div>
-                        <div className="flex gap-4">
-                          <div className="flex flex-col">
-                            <label
-                              htmlFor="firstName"
-                              className="truncate font-medium"
-                            >
-                              First name:
-                            </label>
-                            <input
-                              type="text"
-                              id="firstName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                              placeholder="Email..."
-                              value={selectedRestaurant?.firstName}
-                            />
-                          </div>
-                          <div className="flex flex-col">
-                            <label
-                              htmlFor="lastName"
-                              className="truncate font-medium"
-                            >
-                              Last name:
-                            </label>
-                            <input
-                              type="text"
-                              id="lastName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                              placeholder="Email..."
-                              value={selectedRestaurant?.lastName}
-                            />
-                          </div>
-                        </div>
                         <div className="flex flex-col">
-                          <label
-                            htmlFor="phone"
-                            className="truncate font-medium"
-                          >
-                            Phone number:
+                          <label htmlFor="category" className="font-medium">
+                            Category:
                           </label>
                           <input
                             type="text"
-                            id="phone"
+                            id="category"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.phoneNumber}
+                            value={selectedRestaurant?.restaurantType?.name}
                           />
                         </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="email"
-                            className="truncate font-medium"
-                          >
-                            Email:
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            value={selectedRestaurant?.user?.email || ""}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="brandImage"
-                            className="truncate font-medium"
-                          >
-                            Brand image:
-                          </label>
-                          <div
-                            className="relative overflow-hidden rounded-xl"
-                            onDragEnter={(e) => handleDrag(e)}
-                          >
-                            <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
-                              <CloudIcon />
-                              <p className="font-medium text-white">
-                                Upload a new brand image
-                              </p>
-                            </div>
-                            <Image
-                              src="https://res.cloudinary.com/dkxjgboi8/image/upload/v1676449877/kqk04jx8dbzayhpsz106.png"
-                              alt="Brand Image"
-                              width={300}
-                              height={125}
-                            ></Image>
-                            <input
-                              type="file"
-                              id="brandImage"
-                              className="absolute top-0 h-full w-full cursor-pointer opacity-0"
-                              accept="image/*"
-                              onChange={(e) => handleImage(e)}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      </p>
                     </div>
+
                     <div className="px-auto mt-4 flex justify-center gap-4">
                       <button
                         type="button"

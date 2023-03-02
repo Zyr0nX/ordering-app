@@ -2,6 +2,7 @@ import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 import { Roboto } from "next/font/google";
+import NextNProgress from "nextjs-progressbar";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
 
@@ -20,6 +21,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <main
         className={`${roboto.variable} min-h-screen bg-virparyasBackground font-roboto`}
       >
+        <NextNProgress />
         <Component {...pageProps} />
       </main>
     </SessionProvider>

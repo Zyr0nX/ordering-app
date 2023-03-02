@@ -55,4 +55,23 @@ export const adminRouter = createTRPCRouter({
       });
     }
   ),
+  getApprovedRestaurants: adminProtectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.restaurant.findMany({
+      where: {
+        approved: "APPROVED",
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+        restaurantType: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+  }),
 });

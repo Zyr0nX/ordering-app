@@ -112,12 +112,12 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
       setValidAdditionAddress(true);
     }
 
-    if (!z.string().safeParse(categoryRef.current?.value).success) {
-      invalid = true;
-      setValidCategory(false);
-    } else {
-      setValidCategory(true);
-    }
+    // if (!z.string().safeParse(categoryRef.current?.value).success) {
+    //   invalid = true;
+    //   setValidCategory(false);
+    // } else {
+    //   setValidCategory(true);
+    // }
 
     if (invalid) return;
 
