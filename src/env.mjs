@@ -27,9 +27,11 @@ const server = z.object({
   EMAIL_FROM: z.string(),
   // TWITTER_CLIENT_ID: z.string(),
   // TWITTER_CLIENT_SECRET: z.string(),
-  CLOUDINARY_URL: z.string().url(),
   UPSTASH_REDIS_REST_URL: z.string().url(),
   UPSTASH_REDIS_REST_TOKEN: z.string(),
+  CLOUDINARY_CLOUD_NAME: z.string(),
+  CLOUDINARY_API_KEY: z.string(),
+  CLOUDINARY_API_SECRET: z.string(),
 });
 
 /**
@@ -57,12 +59,14 @@ const processEnv = {
   FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
   EMAIL_SERVER: process.env.EMAIL_SERVER,
   EMAIL_FROM: process.env.EMAIL_FROM,
-  CLOUDINARY_URL: process.env.CLOUDINARY_URL,
   // TWITTER_CLIENT_ID: process.env.TWITTER_CLIENT_ID,
   // TWITTER_CLIENT_SECRET: process.env.TWITTER_CLIENT_SECRET,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 };
 
 // Don't touch the part below

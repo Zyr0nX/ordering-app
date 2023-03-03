@@ -6,6 +6,7 @@ import { type Restaurant } from "@prisma/client";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
+import getBase64 from "~/utils/getBase64";
 
 const AdminRequestsBody = () => {
   const [approvedList, setApprovedList] = useState<
@@ -32,6 +33,8 @@ const AdminRequestsBody = () => {
     }
   >();
 
+  const [image, setImage] = useState<string | null>(null);
+
   function closeModal() {
     setIsOpen(false);
   }
@@ -40,7 +43,7 @@ const AdminRequestsBody = () => {
     setIsOpen(true);
   }
 
-  const pendingRestaurantRequestsQuery =
+  const approvedRestaurantRequestsQuery =
     api.admin.getApprovedRestaurants.useQuery(undefined, {
       onSuccess: (data) => {
         setApprovedList(data);
@@ -49,10 +52,17 @@ const AdminRequestsBody = () => {
     });
 
   const approveRestaurantMutation = api.admin.approveRestaurant.useMutation({
-    onSuccess: () => pendingRestaurantRequestsQuery.refetch(),
+    onSuccess: () => approvedRestaurantRequestsQuery.refetch(),
   });
+
   const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
-    onSuccess: () => pendingRestaurantRequestsQuery.refetch(),
+    onSuccess: () => approvedRestaurantRequestsQuery.refetch(),
+  });
+
+  const uploadImageMutation = api.external.uploadCloudinary.useMutation({
+    onSuccess: (data) => {
+      setImage(data);
+    },
   });
 
   const handleApprove = (id: string) => {
@@ -65,7 +75,8 @@ const AdminRequestsBody = () => {
 
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      console.log("File(s) you selected here: ", e.target.files);
+      const base64 = await getBase64(e.target.files[0]);
+      uploadImageMutation.mutate(base64);
     }
   };
 
@@ -80,6 +91,7 @@ const AdminRequestsBody = () => {
     }
   ) => {
     setSelectedRestaurant(restaurant);
+    setImage(restaurant.brandImage);
     openModal();
   };
   return (
@@ -163,7 +175,9 @@ const AdminRequestsBody = () => {
                             id="category"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.restaurantType?.name}
+                            defaultValue={
+                              selectedRestaurant?.restaurantType?.name
+                            }
                           />
                         </div>
                         <div className="flex flex-col">
@@ -178,7 +192,7 @@ const AdminRequestsBody = () => {
                             id="restaurantName"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.name}
+                            defaultValue={selectedRestaurant?.name}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -193,7 +207,7 @@ const AdminRequestsBody = () => {
                             id="address"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.address}
+                            defaultValue={selectedRestaurant?.address}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -208,7 +222,9 @@ const AdminRequestsBody = () => {
                             id="additionalAddress"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.additionalAddress || ""}
+                            defaultValue={
+                              selectedRestaurant?.additionalAddress || ""
+                            }
                           />
                         </div>
                         <div className="flex gap-4">
@@ -224,7 +240,7 @@ const AdminRequestsBody = () => {
                               id="firstName"
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
-                              value={selectedRestaurant?.firstName}
+                              defaultValue={selectedRestaurant?.firstName}
                             />
                           </div>
                           <div className="flex flex-col">
@@ -239,7 +255,7 @@ const AdminRequestsBody = () => {
                               id="lastName"
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
-                              value={selectedRestaurant?.lastName}
+                              defaultValue={selectedRestaurant?.lastName}
                             />
                           </div>
                         </div>
@@ -255,7 +271,7 @@ const AdminRequestsBody = () => {
                             id="phone"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.phoneNumber}
+                            defaultValue={selectedRestaurant?.phoneNumber}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -270,7 +286,7 @@ const AdminRequestsBody = () => {
                             id="email"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.user?.email || ""}
+                            defaultValue={selectedRestaurant?.user?.email || ""}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -280,28 +296,29 @@ const AdminRequestsBody = () => {
                           >
                             Brand image:
                           </label>
-                          <div
-                            className="relative overflow-hidden rounded-xl"
-                            onDragEnter={(e) => handleDrag(e)}
-                          >
+                          <div className="relative h-[125px] w-[300px] overflow-hidden rounded-xl">
                             <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
                               <CloudIcon />
                               <p className="font-medium text-white">
                                 Upload a new brand image
                               </p>
                             </div>
-                            <Image
-                              src="https://res.cloudinary.com/dkxjgboi8/image/upload/v1676449877/kqk04jx8dbzayhpsz106.png"
-                              alt="Brand Image"
-                              width={300}
-                              height={125}
-                            ></Image>
+                            {image && (
+                              <Image
+                                src={image}
+                                alt="Brand Image"
+                                width={300}
+                                height={125}
+                                className="h-auto w-auto"
+                              ></Image>
+                            )}
+
                             <input
                               type="file"
                               id="brandImage"
                               className="absolute top-0 h-full w-full cursor-pointer opacity-0"
                               accept="image/*"
-                              onChange={(e) => handleImage(e)}
+                              onChange={(e) => void handleImage(e)}
                             />
                           </div>
                         </div>

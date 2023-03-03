@@ -1,6 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import getBase64 from "~/utils/getBase64";
 import PhoneJson from "~/utils/phone.json";
 import { type PhonePrefixResponse } from "~/utils/types";
 
@@ -273,22 +275,14 @@ export const externalRouter = createTRPCRouter({
       return phonePrefix;
     }),
   uploadCloudinary: publicProcedure
-    .input(
-      z.object({
-        file: z.string(),
-        folder: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      const { file, folder } = input;
+    .input(z.string())
+    .mutation(async ({ input }) => {
       cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
+        cloud_name: env.CLOUDINARY_CLOUD_NAME,
+        api_key: env.CLOUDINARY_API_KEY,
+        api_secret: env.CLOUDINARY_API_SECRET,
       });
-      const { secure_url } = await cloudinary.uploader.upload(file, {
-        folder,
-      });
+      const { secure_url } = await cloudinary.uploader.upload(input);
       return secure_url;
     }),
 });
