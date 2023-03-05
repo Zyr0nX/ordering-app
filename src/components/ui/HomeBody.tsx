@@ -56,6 +56,7 @@ const HomeBody = ({
                 fill
                 alt="Restaurant Image"
                 className="object-cover"
+                priority
               />
             </div>
             <div className="py-3 px-4">

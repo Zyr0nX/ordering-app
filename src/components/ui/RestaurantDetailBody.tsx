@@ -25,6 +25,7 @@ const RestaurantDetailBody = ({
               fill
               alt="Restaurant Image"
               className="object-cover"
+              priority
             />
           </div>
           <div className="p-4 text-virparyasMainBlue">
