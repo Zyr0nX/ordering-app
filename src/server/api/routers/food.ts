@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
@@ -14,9 +13,8 @@ export const foodRouter = createTRPCRouter({
         restaurantId: z.string().cuid(),
       })
     )
-    .mutation(async ({ input }) => {
-      const prisma = new PrismaClient();
-      await prisma.food.create({
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.food.create({
         data: {
           name: input.name,
           price: input.price,
@@ -30,9 +28,8 @@ export const foodRouter = createTRPCRouter({
 
   getByRestaurantId: publicProcedure
     .input(z.object({ restaurantId: z.string().cuid() }))
-    .query(async ({ input }) => {
-      const prisma = new PrismaClient();
-      const food = await prisma.food.findMany({
+    .query(async ({ input, ctx }) => {
+      const food = await ctx.prisma.food.findMany({
         where: {
           restaurantId: input.restaurantId,
         },

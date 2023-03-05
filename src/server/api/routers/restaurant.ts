@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -80,9 +79,8 @@ export const restaurantRouter = createTRPCRouter({
         userId: z.string().cuid(),
       })
     )
-    .mutation(async ({ input }) => {
-      const prisma = new PrismaClient();
-      await prisma.restaurant.update({
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.restaurant.update({
         where: {
           id: input.id,
         },
@@ -104,9 +102,8 @@ export const restaurantRouter = createTRPCRouter({
         id: z.string().cuid(),
       })
     )
-    .mutation(async ({ input }) => {
-      const prisma = new PrismaClient();
-      await prisma.restaurant.delete({
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.restaurant.delete({
         where: {
           id: input.id,
         },
@@ -118,9 +115,8 @@ export const restaurantRouter = createTRPCRouter({
         id: z.string().cuid(),
       })
     )
-    .query(async ({ input }) => {
-      const prisma = new PrismaClient();
-      const restaurant = await prisma.restaurant.findUnique({
+    .query(async ({ input, ctx }) => {
+      const restaurant = await ctx.prisma.restaurant.findUnique({
         where: {
           id: input.id,
         },
@@ -130,9 +126,23 @@ export const restaurantRouter = createTRPCRouter({
       });
       return restaurant;
     }),
-  getAll: publicProcedure.query(async () => {
-    const prisma = new PrismaClient();
-    const restaurants = await prisma.restaurant.findMany();
+  getAllApproved: publicProcedure.query(async ({ ctx }) => {
+    const restaurants = await ctx.prisma.restaurant.findMany({
+      where: {
+        approved: "APPROVED",
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        brandImage: true,
+        restaurantType: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
     return restaurants;
   }),
 });

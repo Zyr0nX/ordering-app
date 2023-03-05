@@ -36,5 +36,8 @@ const config = {
       },
     ],
   },
+  experimental: {
+    swcPlugins: [["next-superjson-plugin", {}]],
+  },
 };
 export default config;

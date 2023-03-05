@@ -8,7 +8,7 @@ import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
 import getBase64 from "~/utils/getBase64";
 
-const AdminRequestsBody = () => {
+const AdminRestaurantsBody = () => {
   const [approvedList, setApprovedList] = useState<
     (Restaurant & {
       user: {
@@ -51,7 +51,7 @@ const AdminRequestsBody = () => {
       refetchInterval: 5000,
     });
 
-  const approveRestaurantMutation = api.admin.approveRestaurant.useMutation({
+  const editRestaurantMutation = api.admin.editRestaurant.useMutation({
     onSuccess: () => approvedRestaurantRequestsQuery.refetch(),
   });
 
@@ -65,8 +65,18 @@ const AdminRequestsBody = () => {
     },
   });
 
-  const handleApprove = (id: string) => {
-    approveRestaurantMutation.mutate({ restaurantId: id });
+  const handleEditRestaurant = (id: string) => {
+    editRestaurantMutation.mutate({
+      restaurantId: id,
+      name: "",
+      address: "",
+      userId: "",
+      email: "",
+      restaurantTypeId: "",
+      firstname: "",
+      lastname: "",
+      phonenumber: "",
+    });
   };
 
   const handleReject = (id: string) => {
@@ -94,6 +104,7 @@ const AdminRequestsBody = () => {
     setImage(restaurant.brandImage);
     openModal();
   };
+  console.log(image);
   return (
     <div className="m-4 text-virparyasMainBlue">
       <div className="relative mt-4">
@@ -117,7 +128,7 @@ const AdminRequestsBody = () => {
                   <button
                     type="button"
                     className="mr-2"
-                    onClick={() => handleApprove(restaurant.id)}
+                    onClick={() => handleEditRestaurant(restaurant.id)}
                   >
                     <GreenCheckmark className="md:h-10 md:w-10" />
                   </button>
@@ -307,9 +318,8 @@ const AdminRequestsBody = () => {
                               <Image
                                 src={image}
                                 alt="Brand Image"
-                                width={300}
-                                height={125}
-                                className="h-auto w-auto"
+                                fill
+                                className="object-cover"
                               ></Image>
                             )}
 
@@ -332,16 +342,16 @@ const AdminRequestsBody = () => {
                           handleReject(selectedRestaurant?.id || "")
                         }
                       >
-                        Reject
+                        Discard
                       </button>
                       <button
                         type="button"
                         className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
                         onClick={() =>
-                          handleApprove(selectedRestaurant?.id || "")
+                          handleEditRestaurant(selectedRestaurant?.id || "")
                         }
                       >
-                        Approve
+                        Confirm
                       </button>
                     </div>
                   </Dialog.Panel>
@@ -355,4 +365,4 @@ const AdminRequestsBody = () => {
   );
 };
 
-export default AdminRequestsBody;
+export default AdminRestaurantsBody;

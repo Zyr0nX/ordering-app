@@ -74,4 +74,37 @@ export const adminRouter = createTRPCRouter({
       },
     });
   }),
+  editRestaurant: adminProtectedProcedure
+    .input(
+      z.object({
+        restaurantId: z.string().cuid(),
+        name: z.string(),
+        address: z.string(),
+        additionaladdress: z.string().nullish(),
+        firstname: z.string(),
+        lastname: z.string(),
+        email: z.string().email(),
+        phonenumber: z.string(),
+        userId: z.string().cuid(),
+        restaurantTypeId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.restaurant.update({
+        data: {
+          name: input.name,
+          address: input.address,
+          additionalAddress: input.additionaladdress,
+          firstName: input.firstname,
+          lastName: input.lastname,
+          email: input.email,
+          phoneNumber: input.phonenumber,
+          userId: input.userId,
+          restaurantTypeId: input.restaurantTypeId,
+        },
+        where: {
+          id: input.restaurantId,
+        },
+      });
+    }),
 });

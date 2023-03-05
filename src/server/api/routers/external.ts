@@ -2,7 +2,6 @@ import { v2 as cloudinary } from "cloudinary";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import getBase64 from "~/utils/getBase64";
 import PhoneJson from "~/utils/phone.json";
 import { type PhonePrefixResponse } from "~/utils/types";
 
