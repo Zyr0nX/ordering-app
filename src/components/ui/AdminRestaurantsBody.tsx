@@ -4,10 +4,13 @@ import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
 import SearchIcon from "../icons/SearchIcon";
 import { Dialog, Transition, Listbox } from "@headlessui/react";
+import { type Restaurant, type User, type RestaurantType } from "@prisma/client";
 import Image from "next/image";
-import React, { Fragment, useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
 import getBase64 from "~/utils/getBase64";
+
 
 interface restaurantProps {
   restaurantType: {
@@ -36,8 +39,11 @@ const AdminRestaurantsBody = ({
   restaurant,
   restaurantType,
 }: {
-  restaurant: restaurantProps[];
-  restaurantType: restaurantTypeProps[];
+  restaurant: (Restaurant & {
+    user: User;
+    restaurantType: RestaurantType | null;
+  })[];
+  restaurantType: RestaurantType[];
 }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -48,33 +54,18 @@ const AdminRestaurantsBody = ({
 
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const [approvedList, setApprovedList] = useState<restaurantProps[]>([]);
-
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedRestaurant, setSelectedRestaurant] =
-    useState<restaurantProps>();
+  const [selectedRestaurant, setSelectedRestaurant] = useState<
+    Restaurant & {
+      user: User;
+      restaurantType: RestaurantType | null;
+    }
+  >();
 
   const [image, setImage] = useState<string | null>(null);
 
-  const [selected, setSelected] = useState<{ id: string; name: string } | null>(
-    null
-  );
-  const [restaurantTypes, setRestaurantTypes] = useState<
-    restaurantTypeProps[] | null
-  >(null);
-
-  useEffect(() => {
-    if (restaurant) {
-      setApprovedList(restaurant);
-    }
-  }, [restaurant]);
-
-  useEffect(() => {
-    if (restaurantType) {
-      setRestaurantTypes(restaurantType);
-    }
-  }, [restaurantType]);
+  const [selected, setSelected] = useState<RestaurantType | null>(null);
 
   function closeModal() {
     setIsOpen(false);
@@ -84,16 +75,47 @@ const AdminRestaurantsBody = ({
     setIsOpen(true);
   }
 
+  const utils = api.useContext();
+
   const approvedRestaurantRequestsQuery =
     api.admin.getApprovedRestaurants.useQuery(undefined, {
-      onSuccess: (data) => {
-        setApprovedList(data);
-      },
+      initialData: restaurant,
       refetchInterval: 5000,
     });
 
   const editRestaurantMutation = api.admin.editRestaurant.useMutation({
-    onSuccess: () => approvedRestaurantRequestsQuery.refetch(),
+    onMutate: async (newData) => {
+      await utils.admin.getApprovedRestaurants.cancel();
+      const prevData = utils.admin.getApprovedRestaurants.getData();
+      utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
+        return old?.map((restaurant) => {
+          if (restaurant.id === newData.restaurantId) {
+            return {
+              ...restaurant,
+              name: newData.name,
+              address: newData.address,
+              firstName: newData.firstname,
+              lastName: newData.lastname,
+              phoneNumber: newData.phonenumber,
+              additionalAddress: newData.additionaladdress as string,
+              brandImage: newData.brandImage as string,
+              restaurantType: {
+                id: newData.restaurantTypeId,
+                name: selected?.name as string,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            };
+          } else {
+            return restaurant;
+          }
+        });
+      });
+      return { prevData };
+    },
+    onSettled: async () => {
+      await utils.admin.getApprovedRestaurants.invalidate();
+    },
   });
 
   const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
@@ -131,24 +153,20 @@ const AdminRestaurantsBody = ({
     }
   };
 
-  const handleSelect = (restaurant: restaurantProps) => {
-    setSelectedRestaurant(restaurant);
-    setSelected(restaurant.restaurantType);
-    setImage(restaurant.brandImage);
+  const handleSelect = (restaurant: (Restaurant & {
+    user: User;
+    restaurantType: RestaurantType | null;
+  })) => {
     openModal();
+    setSelectedRestaurant(restaurant);
+    setSelected(
+      restaurantType.find(
+        (type) => type.id === restaurant.restaurantType?.id
+      ) ?? null
+    );
+    setImage(restaurant.brandImage);
   };
 
-  const handleSearch = () => {
-    const search = searchRef.current?.value;
-    if (search && search?.length > 2) {
-      const filtered = restaurant.filter((restaurant) =>
-        restaurant.name.toLowerCase().includes(search.toLowerCase())
-      );
-      setApprovedList(filtered);
-    } else {
-      setApprovedList(restaurant);
-    }
-  };
   return (
     <div className="m-4 text-virparyasMainBlue">
       <div className="flex h-12 w-full overflow-hidden rounded-2xl">
@@ -156,19 +174,20 @@ const AdminRestaurantsBody = ({
           type="text"
           className="grow rounded-l-2xl px-4 text-xl placeholder:text-lg placeholder:font-light focus-within:outline-none"
           placeholder="Search"
-          onChange={handleSearch}
           ref={searchRef}
         />
-        <button
-          type="button"
+        <Link
+          href={`/admin/restaurants/search?searchQuery=${
+            searchRef.current?.value as string
+          }`}
           className="flex items-center bg-virparyasMainBlue px-4"
         >
           <SearchIcon />
-        </button>
+        </Link>
       </div>
       <div className="mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {approvedList.map((restaurant) => (
+          {approvedRestaurantRequestsQuery.data.map((restaurant) => (
             <div
               key={restaurant.id}
               className="flex flex-auto cursor-pointer rounded-2xl bg-white p-4 pt-3 shadow-[0_4px_4px_0_rgba(0,0,0,0.1)]"
@@ -184,11 +203,16 @@ const AdminRestaurantsBody = ({
                   </p>
                 </div>
                 <div className="flex">
-                  <button type="button" className="mr-2" onClick={openModal}>
+                  <button
+                    type="button"
+                    className="relative z-10 mr-2"
+                    onClick={openModal}
+                  >
                     <BluePencil className="md:h-10 md:w-10" />
                   </button>
                   <button
                     type="button"
+                    className="relative z-10"
                     onClick={() => handleReject(restaurant.id)}
                   >
                     <RedCross className="md:h-10 md:w-10" />
@@ -247,7 +271,7 @@ const AdminRestaurantsBody = ({
                                   <DropDownIcon />
                                 </span>
                               </Listbox.Button>
-                              {restaurantTypes && (
+                              {restaurantType && (
                                 <Transition
                                   as={Fragment}
                                   leave="transition ease-in duration-100"
@@ -255,7 +279,7 @@ const AdminRestaurantsBody = ({
                                   leaveTo="opacity-0"
                                 >
                                   <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                                    {restaurantTypes.map((restaurantType) => (
+                                    {restaurantType.map((restaurantType) => (
                                       <Listbox.Option
                                         key={restaurantType.id}
                                         className={({ active }) =>

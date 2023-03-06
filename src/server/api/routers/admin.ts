@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -55,34 +56,19 @@ export const adminRouter = createTRPCRouter({
       });
     }
   ),
-  getApprovedRestaurants: adminProtectedProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.restaurant.findMany({
-      where: {
-        approved: "APPROVED",
-      },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        brandImage: true,
-        additionalAddress: true,
-        firstName: true,
-        lastName: true,
-        phoneNumber: true,
-        restaurantType: {
-          select: {
-            id: true,
-            name: true,
-          },
+  getApprovedRestaurants: adminProtectedProcedure.query(
+    async ({ ctx }) => {
+      return await ctx.prisma.restaurant.findMany({
+        where: {
+          approved: "APPROVED",
         },
-        user: {
-          select: {
-            email: true,
-          },
+        include: {
+          user: true,
+          restaurantType: true,
         },
-      },
-    });
-  }),
+      });
+    }
+  ),
   editRestaurant: adminProtectedProcedure
     .input(
       z.object({

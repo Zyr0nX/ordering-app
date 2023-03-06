@@ -91,7 +91,6 @@ model Restaurant {
 model RestaurantType {
   id          String       @id @default(cuid())
   name        String
-  description String
   restaurant  Restaurant[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt

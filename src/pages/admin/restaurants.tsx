@@ -44,35 +44,13 @@ export const getServerSideProps = async (
     where: {
       approved: "APPROVED",
     },
-    select: {
-      id: true,
-      name: true,
-      address: true,
-      brandImage: true,
-      additionalAddress: true,
-      firstName: true,
-      lastName: true,
-      phoneNumber: true,
-      restaurantType: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      user: {
-        select: {
-          email: true,
-        },
-      },
+    include: {
+      restaurantType: true,
+      user: true,
     },
   });
 
-  const restaurantType = await prisma.restaurantType.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  const restaurantType = await prisma.restaurantType.findMany();
 
   return {
     props: {
