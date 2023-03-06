@@ -1,6 +1,5 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
-import { type RestaurantType } from "@prisma/client";
 import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
@@ -27,12 +26,20 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
 
   const [phonePrefix, setPhonePrefix] = useState<string | null>(null);
   const [restaurantTypes, setRestaurantTypes] = useState<
-    RestaurantType[] | null
+    | {
+        id: string;
+        name: string;
+      }[]
+    | null
   >(null);
 
-  const [selected, setSelected] = useState<RestaurantType | undefined>(
-    undefined
-  );
+  const [selected, setSelected] = useState<
+    | {
+        id: string;
+        name: string;
+      }
+    | undefined
+  >(undefined);
 
   const registrationMutation = api.restaurant.registration.useMutation();
 
@@ -44,7 +51,7 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
   api.restaurantType.getAll.useQuery(undefined, {
     onSuccess: (data) => {
       setRestaurantTypes(data);
-      setSelected(data[0]);
+      setSelected(data[1]);
     },
   });
 
@@ -250,56 +257,60 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
             ref={additionAddresRef}
           />
         </div>
-        <Listbox value={selected} onChange={setSelected}>
-          <div className="relative">
-            <Listbox.Label className="font-medium">* Category:</Listbox.Label>
-            <Listbox.Button className="relative h-10 w-full rounded-xl bg-white px-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue">
-              {/* relative h-full w-full rounded-lg bg-white text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm */}
-              <span className="truncate">{selected?.name}</span>
-              <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
-                <DropDownIcon />
-              </span>
-            </Listbox.Button>
-            {restaurantTypes && (
-              <Transition
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
+        <Listbox
+          value={selected}
+          onChange={setSelected}
+          defaultValue={selected}
+        >
+          {({ open }) => (
+            <div className="relative">
+              <Listbox.Label className="font-medium">* Category:</Listbox.Label>
+              <Listbox.Button
+                className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                  open ? "ring-2 ring-virparyasMainBlue" : ""
+                }`}
               >
-                <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  {restaurantTypes.map((restaurantType) => (
-                    <Listbox.Option
-                      key={restaurantType.id}
-                      className={({ active }) =>
-                        `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                          active
-                            ? "bg-amber-100 text-amber-900"
-                            : "text-gray-900"
-                        }`
-                      }
-                      value={restaurantType}
-                    >
-                      {({ selected }) => (
-                        <>
+                <span className="truncate">{selected?.name}</span>
+                <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                  <DropDownIcon />
+                </span>
+              </Listbox.Button>
+              {restaurantTypes && (
+                <Transition
+                  as={Fragment}
+                  leave="transition ease-in duration-100"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                    {restaurantTypes.map((restaurantType) => (
+                      <Listbox.Option
+                        key={restaurantType.id}
+                        className={({ active }) =>
+                          `relative cursor-default select-none text-viparyasDarkBlue ${
+                            active ? "bg-[#E9E9FF]" : "text-gray-900"
+                          }`
+                        }
+                        value={restaurantType}
+                      >
+                        {({ selected }) => (
                           <span
-                            className={`block truncate ${
-                              selected ? "font-medium" : "font-normal"
+                            className={`block truncate py-2 px-4 ${
+                              selected
+                                ? "bg-virparyasMainBlue font-semibold text-white"
+                                : ""
                             }`}
                           >
                             {restaurantType.name}
                           </span>
-                          {selected ? (
-                            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"></span>
-                          ) : null}
-                        </>
-                      )}
-                    </Listbox.Option>
-                  ))}
-                </Listbox.Options>
-              </Transition>
-            )}
-          </div>
+                        )}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </Transition>
+              )}
+            </div>
+          )}
         </Listbox>
         <div className="mt-4 flex gap-4">
           <button

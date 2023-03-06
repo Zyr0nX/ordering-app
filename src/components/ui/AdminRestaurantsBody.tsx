@@ -1,39 +1,77 @@
+import BluePencil from "../icons/BluePencil";
 import CloudIcon from "../icons/CloudIcon";
-import GreenCheckmark from "../icons/GreenCheckmark";
+import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
-import { Dialog, Transition } from "@headlessui/react";
-import { type Restaurant } from "@prisma/client";
+import { Dialog, Transition, Listbox } from "@headlessui/react";
 import Image from "next/image";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useRef, useEffect } from "react";
 import { api } from "~/utils/api";
 import getBase64 from "~/utils/getBase64";
 
-const AdminRestaurantsBody = () => {
-  const [approvedList, setApprovedList] = useState<
-    (Restaurant & {
-      user: {
-        email: string | null;
-      };
-      restaurantType: {
-        name: string;
-      } | null;
-    })[]
-  >([]);
+interface restaurantProps {
+  restaurantType: {
+    id: string;
+    name: string;
+  } | null;
+  id: string;
+  name: string;
+  address: string;
+  brandImage: string | null;
+  additionalAddress: string | null;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  user: {
+    email: string | null;
+  };
+}
+
+interface restaurantTypeProps {
+  id: string;
+  name: string;
+}
+
+const AdminRestaurantsBody = ({
+  restaurant,
+  restaurantType,
+}: {
+  restaurant: restaurantProps[];
+  restaurantType: restaurantTypeProps[];
+}) => {
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const restaurantNameRef = useRef<HTMLInputElement>(null);
+  const addressRef = useRef<HTMLInputElement>(null);
+  const additionalAddressRef = useRef<HTMLInputElement>(null);
+
+  const [approvedList, setApprovedList] = useState<restaurantProps[]>([]);
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedRestaurant, setSelectedRestaurant] = useState<
-    Restaurant & {
-      user: {
-        email: string | null;
-      };
-      restaurantType: {
-        name: string;
-      } | null;
-    }
-  >();
+  const [selectedRestaurant, setSelectedRestaurant] =
+    useState<restaurantProps>();
 
   const [image, setImage] = useState<string | null>(null);
+
+  const [selected, setSelected] = useState<{ id: string; name: string } | null>(
+    null
+  );
+  const [restaurantTypes, setRestaurantTypes] = useState<
+    restaurantTypeProps[] | null
+  >(null);
+
+  useEffect(() => {
+    if (restaurant) {
+      setApprovedList(restaurant);
+    }
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (restaurantType) {
+      setRestaurantTypes(restaurantType);
+    }
+  }, [restaurantType]);
 
   function closeModal() {
     setIsOpen(false);
@@ -65,22 +103,22 @@ const AdminRestaurantsBody = () => {
     },
   });
 
+  const handleReject = (id: string) => {
+    rejectRestaurantMutation.mutate({ restaurantId: id });
+  };
+
   const handleEditRestaurant = (id: string) => {
     editRestaurantMutation.mutate({
       restaurantId: id,
-      name: "",
-      address: "",
-      userId: "",
-      email: "",
-      restaurantTypeId: "",
-      firstname: "",
-      lastname: "",
-      phonenumber: "",
+      name: restaurantNameRef.current?.value as string,
+      address: addressRef.current?.value as string,
+      restaurantTypeId: selected?.id as string,
+      firstname: firstNameRef.current?.value as string,
+      lastname: lastNameRef.current?.value as string,
+      phonenumber: phoneRef.current?.value as string,
+      additionaladdress: additionalAddressRef.current?.value,
+      brandImage: image,
     });
-  };
-
-  const handleReject = (id: string) => {
-    rejectRestaurantMutation.mutate({ restaurantId: id });
   };
 
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,21 +128,12 @@ const AdminRestaurantsBody = () => {
     }
   };
 
-  const handleSelect = (
-    restaurant: Restaurant & {
-      user: {
-        email: string | null;
-      };
-      restaurantType: {
-        name: string;
-      } | null;
-    }
-  ) => {
+  const handleSelect = (restaurant: restaurantProps) => {
     setSelectedRestaurant(restaurant);
+    setSelected(restaurant.restaurantType);
     setImage(restaurant.brandImage);
     openModal();
   };
-  console.log(image);
   return (
     <div className="m-4 text-virparyasMainBlue">
       <div className="relative mt-4">
@@ -125,12 +154,8 @@ const AdminRestaurantsBody = () => {
                   </p>
                 </div>
                 <div className="flex">
-                  <button
-                    type="button"
-                    className="mr-2"
-                    onClick={() => handleEditRestaurant(restaurant.id)}
-                  >
-                    <GreenCheckmark className="md:h-10 md:w-10" />
+                  <button type="button" className="mr-2" onClick={openModal}>
+                    <BluePencil className="md:h-10 md:w-10" />
                   </button>
                   <button
                     type="button"
@@ -174,29 +199,69 @@ const AdminRestaurantsBody = () => {
                     </Dialog.Title>
                     <div className="mt-2">
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="category"
-                            className="truncate font-medium"
-                          >
-                            Category:
-                          </label>
-                          <input
-                            type="text"
-                            id="category"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            defaultValue={
-                              selectedRestaurant?.restaurantType?.name
-                            }
-                          />
-                        </div>
+                        <Listbox value={selected} onChange={setSelected}>
+                          {({ open }) => (
+                            <div className="relative">
+                              <Listbox.Label className="font-medium">
+                                * Category:
+                              </Listbox.Label>
+                              <Listbox.Button
+                                className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                                  open ? "ring-2 ring-virparyasMainBlue" : ""
+                                }`}
+                              >
+                                <span className="truncate">
+                                  {selected?.name}
+                                </span>
+                                <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                                  <DropDownIcon />
+                                </span>
+                              </Listbox.Button>
+                              {restaurantTypes && (
+                                <Transition
+                                  as={Fragment}
+                                  leave="transition ease-in duration-100"
+                                  leaveFrom="opacity-100"
+                                  leaveTo="opacity-0"
+                                >
+                                  <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                    {restaurantTypes.map((restaurantType) => (
+                                      <Listbox.Option
+                                        key={restaurantType.id}
+                                        className={({ active }) =>
+                                          `relative cursor-default select-none text-viparyasDarkBlue ${
+                                            active
+                                              ? "bg-[#E9E9FF]"
+                                              : "text-gray-900"
+                                          }`
+                                        }
+                                        value={restaurantType}
+                                      >
+                                        {({ selected }) => (
+                                          <span
+                                            className={`block truncate py-2 px-4 ${
+                                              selected
+                                                ? "bg-virparyasMainBlue font-semibold text-white"
+                                                : ""
+                                            }`}
+                                          >
+                                            {restaurantType.name}
+                                          </span>
+                                        )}
+                                      </Listbox.Option>
+                                    ))}
+                                  </Listbox.Options>
+                                </Transition>
+                              )}
+                            </div>
+                          )}
+                        </Listbox>
                         <div className="flex flex-col">
                           <label
                             htmlFor="restaurantName"
                             className="truncate font-medium"
                           >
-                            Restaurant Name:
+                            * Restaurant Name:
                           </label>
                           <input
                             type="text"
@@ -204,6 +269,7 @@ const AdminRestaurantsBody = () => {
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
                             defaultValue={selectedRestaurant?.name}
+                            ref={restaurantNameRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -219,6 +285,7 @@ const AdminRestaurantsBody = () => {
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
                             defaultValue={selectedRestaurant?.address}
+                            ref={addressRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -236,6 +303,7 @@ const AdminRestaurantsBody = () => {
                             defaultValue={
                               selectedRestaurant?.additionalAddress || ""
                             }
+                            ref={additionalAddressRef}
                           />
                         </div>
                         <div className="flex gap-4">
@@ -252,6 +320,7 @@ const AdminRestaurantsBody = () => {
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
                               defaultValue={selectedRestaurant?.firstName}
+                              ref={firstNameRef}
                             />
                           </div>
                           <div className="flex flex-col">
@@ -267,6 +336,7 @@ const AdminRestaurantsBody = () => {
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
                               defaultValue={selectedRestaurant?.lastName}
+                              ref={lastNameRef}
                             />
                           </div>
                         </div>
@@ -283,6 +353,7 @@ const AdminRestaurantsBody = () => {
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
                             defaultValue={selectedRestaurant?.phoneNumber}
+                            ref={phoneRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -295,9 +366,10 @@ const AdminRestaurantsBody = () => {
                           <input
                             type="email"
                             id="email"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue disabled:bg-white disabled:text-gray-500"
                             placeholder="Email..."
                             defaultValue={selectedRestaurant?.user?.email || ""}
+                            disabled
                           />
                         </div>
                         <div className="flex flex-col">
@@ -307,13 +379,20 @@ const AdminRestaurantsBody = () => {
                           >
                             Brand image:
                           </label>
-                          <div className="relative h-[125px] w-[300px] overflow-hidden rounded-xl">
-                            <div className="absolute top-0 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
+                          <div className="relative h-[125px] w-full overflow-hidden rounded-xl">
+                            <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
                               <CloudIcon />
                               <p className="font-medium text-white">
                                 Upload a new brand image
                               </p>
                             </div>
+                            <input
+                              type="file"
+                              id="brandImage"
+                              className="absolute top-0 z-10 h-full w-full cursor-pointer opacity-0"
+                              accept="image/*"
+                              onChange={(e) => void handleImage(e)}
+                            />
                             {image && (
                               <Image
                                 src={image}
@@ -322,14 +401,6 @@ const AdminRestaurantsBody = () => {
                                 className="object-cover"
                               ></Image>
                             )}
-
-                            <input
-                              type="file"
-                              id="brandImage"
-                              className="absolute top-0 h-full w-full cursor-pointer opacity-0"
-                              accept="image/*"
-                              onChange={(e) => void handleImage(e)}
-                            />
                           </div>
                         </div>
                       </div>
@@ -338,9 +409,7 @@ const AdminRestaurantsBody = () => {
                       <button
                         type="button"
                         className="w-36 rounded-xl bg-virparyasRed py-2 px-10 font-medium text-white"
-                        onClick={() =>
-                          handleReject(selectedRestaurant?.id || "")
-                        }
+                        onClick={closeModal}
                       >
                         Discard
                       </button>

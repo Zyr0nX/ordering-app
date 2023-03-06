@@ -43,7 +43,6 @@ export const getServerSideProps = async ({
   query: { slug: string[] };
 }) => {
   const id = query.slug[1];
-  console.log(query);
 
   if (!id) {
     return {

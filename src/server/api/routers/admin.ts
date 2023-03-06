@@ -60,15 +60,24 @@ export const adminRouter = createTRPCRouter({
       where: {
         approved: "APPROVED",
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        brandImage: true,
+        additionalAddress: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        restaurantType: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         user: {
           select: {
             email: true,
-          },
-        },
-        restaurantType: {
-          select: {
-            name: true,
           },
         },
       },
@@ -83,10 +92,9 @@ export const adminRouter = createTRPCRouter({
         additionaladdress: z.string().nullish(),
         firstname: z.string(),
         lastname: z.string(),
-        email: z.string().email(),
         phonenumber: z.string(),
-        userId: z.string().cuid(),
         restaurantTypeId: z.string().cuid(),
+        brandImage: z.string().url().nullish(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -97,10 +105,9 @@ export const adminRouter = createTRPCRouter({
           additionalAddress: input.additionaladdress,
           firstName: input.firstname,
           lastName: input.lastname,
-          email: input.email,
           phoneNumber: input.phonenumber,
-          userId: input.userId,
           restaurantTypeId: input.restaurantTypeId,
+          brandImage: input.brandImage,
         },
         where: {
           id: input.restaurantId,
