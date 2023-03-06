@@ -1,8 +1,9 @@
-import { type NextPage } from "next";
+import { type GetServerSidePropsContext, type NextPage } from "next";
 import { type InferGetServerSidePropsType } from "next";
 import Guest from "~/components/layouts/Guest";
 import HomeBody from "~/components/ui/HomeBody";
 import HomeHeader from "~/components/ui/HomeHeader";
+import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
 const Home: NextPage<
@@ -20,19 +21,18 @@ const Home: NextPage<
 
 export default Home;
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session = await getServerAuthSession(context);
   const restaurants = await prisma.restaurant.findMany({
     where: {
       approved: "APPROVED",
     },
-    select: {
-      id: true,
-      name: true,
-      address: true,
-      brandImage: true,
-      restaurantType: {
-        select: {
-          name: true,
+    include: {
+      Favorite: {
+        where: {
+          userId: session?.user.id,
         },
       },
     },

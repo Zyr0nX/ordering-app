@@ -2,6 +2,7 @@ import BluePencil from "../icons/BluePencil";
 import CloudIcon from "../icons/CloudIcon";
 import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
+import SearchIcon from "../icons/SearchIcon";
 import { Dialog, Transition, Listbox } from "@headlessui/react";
 import Image from "next/image";
 import React, { Fragment, useState, useRef, useEffect } from "react";
@@ -44,6 +45,8 @@ const AdminRestaurantsBody = ({
   const restaurantNameRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLInputElement>(null);
   const additionalAddressRef = useRef<HTMLInputElement>(null);
+
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const [approvedList, setApprovedList] = useState<restaurantProps[]>([]);
 
@@ -134,9 +137,36 @@ const AdminRestaurantsBody = ({
     setImage(restaurant.brandImage);
     openModal();
   };
+
+  const handleSearch = () => {
+    const search = searchRef.current?.value;
+    if (search && search?.length > 2) {
+      const filtered = restaurant.filter((restaurant) =>
+        restaurant.name.toLowerCase().includes(search.toLowerCase())
+      );
+      setApprovedList(filtered);
+    } else {
+      setApprovedList(restaurant);
+    }
+  };
   return (
     <div className="m-4 text-virparyasMainBlue">
-      <div className="relative mt-4">
+      <div className="flex h-12 w-full overflow-hidden rounded-2xl">
+        <input
+          type="text"
+          className="grow rounded-l-2xl px-4 text-xl placeholder:text-lg placeholder:font-light focus-within:outline-none"
+          placeholder="Search"
+          onChange={handleSearch}
+          ref={searchRef}
+        />
+        <button
+          type="button"
+          className="flex items-center bg-virparyasMainBlue px-4"
+        >
+          <SearchIcon />
+        </button>
+      </div>
+      <div className="mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {approvedList.map((restaurant) => (
             <div
