@@ -1,6 +1,9 @@
 import AdminMainButton from "../common/AdminMainButton";
+import CategoryIcon from "../icons/CategoryIcon";
+import RequestIcon from "../icons/RequestIcon";
 import RestaurantIcon from "../icons/RestaurantIcon";
 import ShipperIcon from "../icons/ShipperIcon";
+import UserIcon from "../icons/UserIcon";
 import React from "react";
 
 const AdminBody = () => {
@@ -15,52 +18,24 @@ const AdminBody = () => {
         <AdminMainButton
           text="Shippers"
           icon={<ShipperIcon className="md:h-24 md:w-24" />}
-          href="/admin/restaurants"
+          href="/admin/shippers"
         />
         <AdminMainButton
-          text="Shippers"
-          icon={<ShipperIcon className="md:h-24 md:w-24" />}
-          href="/admin/restaurants"
+          text="Users"
+          icon={<UserIcon className="md:h-24 md:w-24" />}
+          href="/admin/users"
         />
         <AdminMainButton
-          text="Shippers"
-          icon={<ShipperIcon className="md:h-24 md:w-24" />}
-          href="/admin/restaurants"
+          text="Requests"
+          icon={<RequestIcon className="md:h-24 md:w-24" />}
+          href="/admin/requests"
         />
         <AdminMainButton
-          text="Shippers"
-          icon={<ShipperIcon className="md:h-24 md:w-24" />}
-          href="/admin/restaurants"
-        />
-        <AdminMainButton
-          text="Shippers"
-          icon={<ShipperIcon className="md:h-24 md:w-24" />}
-          href="/admin/restaurants"
+          text="Categories"
+          icon={<CategoryIcon className="md:h-24 md:w-24" />}
+          href="/admin/categories"
         />
       </div>
-      {/* <div className="mt-8">
-        <p className="my-2 text-virparyasMainBlue">Required Approval</p>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <AdminCard
-            text="Sabrina’s Cafe"
-            subtext="Restaurant"
-            icon1={<GreenCheckmark className="md:h-10 md:w-10" />}
-            icon2={<RedCross className="md:h-10 md:w-10" />}
-          />
-          <AdminCard
-            text="John Doe"
-            subtext="Shipper"
-            icon1={<GreenCheckmark className="md:h-10 md:w-10" />}
-            icon2={<RedCross className="md:h-10 md:w-10" />}
-          />
-          <AdminCard
-            text="Jane Doe"
-            subtext="Shipper"
-            icon1={<GreenCheckmark className="md:h-10 md:w-10" />}
-            icon2={<RedCross className="md:h-10 md:w-10" />}
-          />
-        </div>
-      </div> */}
     </>
   );
 };

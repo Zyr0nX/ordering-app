@@ -8,12 +8,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -55,6 +49,7 @@ model User {
   Restaurant    Restaurant?
   Cart          Cart?
   Favorite      Favorite[]
+  Shipper       Shipper?
 }
 
 model VerificationToken {
@@ -72,7 +67,6 @@ model Restaurant {
   additionalAddress String?
   firstName         String
   lastName          String
-  email             String
   phoneNumber       String
   approved          Approve         @default(PENDING)
   userId            String          @unique
@@ -89,11 +83,11 @@ model Restaurant {
 }
 
 model RestaurantType {
-  id          String       @id @default(cuid())
-  name        String
-  restaurant  Restaurant[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id         String       @id @default(cuid())
+  name       String
+  restaurant Restaurant[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model Food {
@@ -106,6 +100,8 @@ model Food {
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   Cart         Cart[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
   @@index([restaurantId])
 }
@@ -131,6 +127,21 @@ model Favorite {
 
   @@unique([userId, restaurantId])
   @@index([restaurantId])
+}
+
+model Shipper {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  ssn         String
+  phone       String
+  avatar      String
+  approved    Approve  @default(PENDING)
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {

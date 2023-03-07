@@ -119,7 +119,9 @@ const HomeBody = ({
                 <div className="p-2">
                   <HeartIcon
                     className={
-                      restaurant.Favorite.length > 0 ? "fill-virparyasMainBlue" : ""
+                      restaurant.Favorite.length > 0
+                        ? "fill-virparyasMainBlue"
+                        : ""
                     }
                   />
                 </div>

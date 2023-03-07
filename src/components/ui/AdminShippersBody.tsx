@@ -3,50 +3,38 @@ import CloudIcon from "../icons/CloudIcon";
 import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
 import SearchIcon from "../icons/SearchIcon";
-import SleepIcon from "../icons/SleepIcon";
 import { Dialog, Transition, Listbox } from "@headlessui/react";
-import {
-  type Restaurant,
-  type User,
-  type RestaurantType,
-} from "@prisma/client";
+import { type Shipper, type User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import { api } from "~/utils/api";
+import days from "~/utils/day.json";
 import getBase64 from "~/utils/getBase64";
 
-const AdminRestaurantsBody = ({
-  restaurants,
-  restaurantTypes,
+const AdminShippersBody = ({
+  shippers,
 }: {
-  restaurants: (Restaurant & {
+  shippers: (Shipper & {
     user: User;
-    restaurantType: RestaurantType | null;
   })[];
-  restaurantTypes: RestaurantType[];
 }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
-  const restaurantNameRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const additionalAddressRef = useRef<HTMLInputElement>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
 
+  const [selectedDay, setSelectedDay] = useState(days[0]);
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const [selectedRestaurant, setSelectedRestaurant] = useState<
-    Restaurant & {
+  const [selectedShipper, setSelectedShipper] = useState<
+    Shipper & {
       user: User;
-      restaurantType: RestaurantType | null;
     }
   >();
 
   const [image, setImage] = useState<string | null>(null);
-
-  const [selected, setSelected] = useState<RestaurantType | null>(null);
 
   function closeModal() {
     setIsOpen(false);
@@ -58,62 +46,25 @@ const AdminRestaurantsBody = ({
 
   const utils = api.useContext();
 
-  const approvedRestaurantQuery = api.admin.getApprovedRestaurants.useQuery(
+  const approvedShippersQuery = api.admin.getApprovedShippers.useQuery(
     undefined,
     {
-      initialData: restaurants,
+      initialData: shippers,
       refetchInterval: 5000,
     }
   );
 
-  const editRestaurantMutation = api.admin.editRestaurant.useMutation({
+  const rejectShipperMutation = api.admin.rejectShipper.useMutation({
     onMutate: async (newData) => {
-      await utils.admin.getApprovedRestaurants.cancel();
-      const prevData = utils.admin.getApprovedRestaurants.getData();
-      utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
-        return old?.map((restaurant) => {
-          if (restaurant.id === newData.restaurantId) {
-            return {
-              ...restaurant,
-              name: newData.name,
-              address: newData.address,
-              firstName: newData.firstname,
-              lastName: newData.lastname,
-              phoneNumber: newData.phonenumber,
-              additionalAddress: newData.additionaladdress as string,
-              brandImage: newData.brandImage as string,
-              restaurantType: {
-                id: newData.restaurantTypeId,
-                name: selected?.name as string,
-                updatedAt: new Date(),
-                createdAt: new Date(),
-              },
-            };
-          } else {
-            return restaurant;
-          }
-        });
+      await utils.admin.getApprovedShippers.cancel();
+      const prevData = utils.admin.getApprovedShippers.getData();
+      utils.admin.getApprovedShippers.setData(undefined, (old) => {
+        return old?.filter((shipper) => shipper.id !== newData.shipperId);
       });
       return { prevData };
     },
     onSettled: async () => {
-      await utils.admin.getApprovedRestaurants.invalidate();
-    },
-  });
-
-  const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
-    onMutate: async (newData) => {
-      await utils.admin.getApprovedRestaurants.cancel();
-      const prevData = utils.admin.getApprovedRestaurants.getData();
-      utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
-        return old?.filter(
-          (restaurant) => restaurant.id !== newData.restaurantId
-        );
-      });
-      return { prevData };
-    },
-    onSettled: async () => {
-      await utils.admin.getApprovedRestaurants.invalidate();
+      await utils.admin.getApprovedShippers.invalidate();
     },
   });
 
@@ -124,21 +75,7 @@ const AdminRestaurantsBody = ({
   });
 
   const handleReject = (id: string) => {
-    rejectRestaurantMutation.mutate({ restaurantId: id });
-  };
-
-  const handleEditRestaurant = (id: string) => {
-    editRestaurantMutation.mutate({
-      restaurantId: id,
-      name: restaurantNameRef.current?.value as string,
-      address: addressRef.current?.value as string,
-      restaurantTypeId: selected?.id as string,
-      firstname: firstNameRef.current?.value as string,
-      lastname: lastNameRef.current?.value as string,
-      phonenumber: phoneRef.current?.value as string,
-      additionaladdress: additionalAddressRef.current?.value,
-      brandImage: image,
-    });
+    rejectShipperMutation.mutate({ shipperId: id });
   };
 
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,31 +86,14 @@ const AdminRestaurantsBody = ({
   };
 
   const handleSelect = (
-    restaurant: Restaurant & {
+    shipper: Shipper & {
       user: User;
-      restaurantType: RestaurantType | null;
     }
   ) => {
     openModal();
-    setSelectedRestaurant(restaurant);
-    setSelected(
-      restaurantTypes.find(
-        (type) => type.id === restaurant.restaurantType?.id
-      ) ?? null
-    );
-    setImage(restaurant.brandImage);
+    setSelectedShipper(shipper);
+    setImage(shipper.avatar);
   };
-
-  if (approvedRestaurantQuery.data.length === 0) {
-    return (
-      <div className="m-4 text-virparyasMainBlue">
-        <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
-          <p className="text-xl font-semibold">No restaurants found</p>
-          <SleepIcon />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="m-4 text-virparyasMainBlue">
@@ -195,16 +115,16 @@ const AdminRestaurantsBody = ({
       </div>
       <div className="mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {approvedRestaurantQuery.data.map((restaurant) => (
+          {approvedShippersQuery.data.map((shipper) => (
             <div
-              key={restaurant.id}
+              key={shipper.id}
               className="flex flex-auto cursor-pointer rounded-2xl bg-white p-4 pt-3 shadow-[0_4px_4px_0_rgba(0,0,0,0.1)]"
-              onClick={() => handleSelect(restaurant)}
+              onClick={() => handleSelect(shipper)}
             >
               <div className="flex w-full items-center justify-between">
                 <div className="text-virparyasMainBlue">
                   <p className="text-xl font-medium md:mt-2 md:text-3xl">
-                    {restaurant.name}
+                    {shipper.firstName + " " + shipper.lastName}
                   </p>
                   <p className="text-xs font-light md:mb-2 md:text-base">
                     Restaurant
@@ -221,7 +141,7 @@ const AdminRestaurantsBody = ({
                   <button
                     type="button"
                     className="relative z-10"
-                    onClick={() => handleReject(restaurant.id)}
+                    onClick={() => handleReject(shipper.id)}
                   >
                     <RedCross className="md:h-10 md:w-10" />
                   </button>
@@ -261,113 +181,6 @@ const AdminRestaurantsBody = ({
                     </Dialog.Title>
                     <div className="mt-2">
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <Listbox value={selected} onChange={setSelected}>
-                          {({ open }) => (
-                            <div className="relative">
-                              <Listbox.Label className="font-medium">
-                                * Category:
-                              </Listbox.Label>
-                              <Listbox.Button
-                                className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                                  open ? "ring-2 ring-virparyasMainBlue" : ""
-                                }`}
-                              >
-                                <span className="truncate">
-                                  {selected?.name}
-                                </span>
-                                <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
-                                  <DropDownIcon />
-                                </span>
-                              </Listbox.Button>
-                              {restaurantTypes && (
-                                <Transition
-                                  as={Fragment}
-                                  leave="transition ease-in duration-100"
-                                  leaveFrom="opacity-100"
-                                  leaveTo="opacity-0"
-                                >
-                                  <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                                    {restaurantTypes.map((restaurantType) => (
-                                      <Listbox.Option
-                                        key={restaurantType.id}
-                                        className={({ active }) =>
-                                          `relative cursor-default select-none text-viparyasDarkBlue ${
-                                            active
-                                              ? "bg-[#E9E9FF]"
-                                              : "text-gray-900"
-                                          }`
-                                        }
-                                        value={restaurantType}
-                                      >
-                                        {({ selected }) => (
-                                          <span
-                                            className={`block truncate py-2 px-4 ${
-                                              selected
-                                                ? "bg-virparyasMainBlue font-semibold text-white"
-                                                : ""
-                                            }`}
-                                          >
-                                            {restaurantType.name}
-                                          </span>
-                                        )}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox.Options>
-                                </Transition>
-                              )}
-                            </div>
-                          )}
-                        </Listbox>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="restaurantName"
-                            className="truncate font-medium"
-                          >
-                            * Restaurant Name:
-                          </label>
-                          <input
-                            type="text"
-                            id="restaurantName"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            defaultValue={selectedRestaurant?.name}
-                            ref={restaurantNameRef}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="address"
-                            className="truncate font-medium"
-                          >
-                            Address:
-                          </label>
-                          <input
-                            type="text"
-                            id="address"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            defaultValue={selectedRestaurant?.address}
-                            ref={addressRef}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="additionalAddress"
-                            className="truncate font-medium"
-                          >
-                            Additional Address:
-                          </label>
-                          <input
-                            type="text"
-                            id="additionalAddress"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            defaultValue={
-                              selectedRestaurant?.additionalAddress || ""
-                            }
-                            ref={additionalAddressRef}
-                          />
-                        </div>
                         <div className="flex gap-4">
                           <div className="flex flex-col">
                             <label
@@ -381,7 +194,7 @@ const AdminRestaurantsBody = ({
                               id="firstName"
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
-                              defaultValue={selectedRestaurant?.firstName}
+                              defaultValue={selectedShipper?.firstName}
                               ref={firstNameRef}
                             />
                           </div>
@@ -397,8 +210,145 @@ const AdminRestaurantsBody = ({
                               id="lastName"
                               className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                               placeholder="Email..."
-                              defaultValue={selectedRestaurant?.lastName}
+                              defaultValue={selectedShipper?.lastName}
                               ref={lastNameRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <label
+                            htmlFor="restaurantName"
+                            className="truncate font-medium"
+                          >
+                            * Date of birth:
+                          </label>
+                          <div className="grid grid-cols-3">
+                            <Listbox
+                              value={selectedDay}
+                              onChange={setSelectedDay}
+                            >
+                              {({ open }) => (
+                                <div className="relative">
+                                  <Listbox.Button
+                                    className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                                      open
+                                        ? "ring-2 ring-virparyasMainBlue"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span className="truncate">
+                                      {selectedDay?.date}
+                                    </span>
+                                    <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                                      <DropDownIcon />
+                                    </span>
+                                  </Listbox.Button>
+                                  {days && (
+                                    <Transition
+                                      as={Fragment}
+                                      leave="transition ease-in duration-100"
+                                      leaveFrom="opacity-100"
+                                      leaveTo="opacity-0"
+                                    >
+                                      <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                        {days.map((day) => (
+                                          <Listbox.Option
+                                            key={day.id}
+                                            className={({ active }) =>
+                                              `relative cursor-default select-none text-viparyasDarkBlue ${
+                                                active
+                                                  ? "bg-[#E9E9FF]"
+                                                  : "text-gray-900"
+                                              }`
+                                            }
+                                            value={day}
+                                          >
+                                            {({ selected }) => (
+                                              <span
+                                                className={`block truncate py-2 px-4 ${
+                                                  selected
+                                                    ? "bg-virparyasMainBlue font-semibold text-white"
+                                                    : ""
+                                                }`}
+                                              >
+                                                {day.date}
+                                              </span>
+                                            )}
+                                          </Listbox.Option>
+                                        ))}
+                                      </Listbox.Options>
+                                    </Transition>
+                                  )}
+                                </div>
+                              )}
+                            </Listbox>
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <label
+                            htmlFor="address"
+                            className="truncate font-medium"
+                          >
+                            Address:
+                          </label>
+                          <input
+                            type="text"
+                            id="address"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            placeholder="Email..."
+                            // defaultValue={selectedRestaurant?.address}
+                            // ref={addressRef}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <label
+                            htmlFor="additionalAddress"
+                            className="truncate font-medium"
+                          >
+                            Additional Address:
+                          </label>
+                          <input
+                            type="text"
+                            id="additionalAddress"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            placeholder="Email..."
+                            // defaultValue={
+                            //   selectedRestaurant?.additionalAddress || ""
+                            // }
+                            // ref={additionalAddressRef}
+                          />
+                        </div>
+                        <div className="flex gap-4">
+                          <div className="flex flex-col">
+                            <label
+                              htmlFor="firstName"
+                              className="truncate font-medium"
+                            >
+                              First name:
+                            </label>
+                            <input
+                              type="text"
+                              id="firstName"
+                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              placeholder="Email..."
+                              //   defaultValue={selectedRestaurant?.firstName}
+                              //   ref={firstNameRef}
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <label
+                              htmlFor="lastName"
+                              className="truncate font-medium"
+                            >
+                              Last name:
+                            </label>
+                            <input
+                              type="text"
+                              id="lastName"
+                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              placeholder="Email..."
+                              //   defaultValue={selectedRestaurant?.lastName}
+                              //   ref={lastNameRef}
                             />
                           </div>
                         </div>
@@ -414,8 +364,8 @@ const AdminRestaurantsBody = ({
                             id="phone"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            defaultValue={selectedRestaurant?.phoneNumber}
-                            ref={phoneRef}
+                            // defaultValue={selectedRestaurant?.phoneNumber}
+                            // ref={phoneRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -430,7 +380,7 @@ const AdminRestaurantsBody = ({
                             id="email"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue disabled:bg-white disabled:text-gray-500"
                             placeholder="Email..."
-                            defaultValue={selectedRestaurant?.user?.email || ""}
+                            // defaultValue={selectedRestaurant?.user?.email || ""}
                             disabled
                           />
                         </div>
@@ -478,9 +428,9 @@ const AdminRestaurantsBody = ({
                       <button
                         type="button"
                         className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
-                        onClick={() =>
-                          handleEditRestaurant(selectedRestaurant?.id || "")
-                        }
+                        // onClick={() =>
+                        //   handleEditRestaurant(selectedRestaurant?.id || "")
+                        // }
                       >
                         Confirm
                       </button>
@@ -496,4 +446,4 @@ const AdminRestaurantsBody = ({
   );
 };
 
-export default AdminRestaurantsBody;
+export default AdminShippersBody;

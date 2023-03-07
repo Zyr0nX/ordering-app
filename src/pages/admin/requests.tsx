@@ -1,11 +1,17 @@
-import { type GetServerSidePropsContext, type NextPage } from "next";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSidePropsContext,
+  type NextPage,
+} from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
 import AdminRequestsBody from "~/components/ui/AdminRequestsBody";
 import { getServerAuthSession } from "~/server/auth";
 
-const Index: NextPage = () => {
+const Requests: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = () => {
   return (
     <Admin>
       <>
@@ -16,10 +22,9 @@ const Index: NextPage = () => {
   );
 };
 
-export const getServerSideProps = async (context: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getServerAuthSession(context);
 
   if (!session || session.user.role !== "ADMIN") {
@@ -38,4 +43,4 @@ export const getServerSideProps = async (context: {
   };
 };
 
-export default Index;
+export default Requests;
