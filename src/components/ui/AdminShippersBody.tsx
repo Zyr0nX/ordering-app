@@ -9,8 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment, useRef, useState } from "react";
 import { api } from "~/utils/api";
-import days from "~/utils/day.json";
+import dates from "~/utils/dates.json";
 import getBase64 from "~/utils/getBase64";
+import months from "~/utils/months.json";
+import years from "~/utils/years.json";
+
 
 const AdminShippersBody = ({
   shippers,
@@ -24,7 +27,9 @@ const AdminShippersBody = ({
 
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const [selectedDay, setSelectedDay] = useState(days[0]);
+  const [selectedDate, setSelectedDate] = useState(dates[0]);
+  const [selectedMonth, setSelectedMonth] = useState(months[0])
+  const [selectedYear, setSelectedYear] = useState(years[30]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -222,10 +227,10 @@ const AdminShippersBody = ({
                           >
                             * Date of birth:
                           </label>
-                          <div className="grid grid-cols-3">
+                          <div className="grid grid-cols-3 gap-4">
                             <Listbox
-                              value={selectedDay}
-                              onChange={setSelectedDay}
+                              value={selectedDate}
+                              onChange={setSelectedDate}
                             >
                               {({ open }) => (
                                 <div className="relative">
@@ -237,21 +242,21 @@ const AdminShippersBody = ({
                                     }`}
                                   >
                                     <span className="truncate">
-                                      {selectedDay?.date}
+                                      {selectedDate?.date}
                                     </span>
                                     <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
                                       <DropDownIcon />
                                     </span>
                                   </Listbox.Button>
-                                  {days && (
+                                  {dates && (
                                     <Transition
                                       as={Fragment}
                                       leave="transition ease-in duration-100"
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                                        {days.map((day) => (
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                        {dates.map((day) => (
                                           <Listbox.Option
                                             key={day.id}
                                             className={({ active }) =>
@@ -272,6 +277,124 @@ const AdminShippersBody = ({
                                                 }`}
                                               >
                                                 {day.date}
+                                              </span>
+                                            )}
+                                          </Listbox.Option>
+                                        ))}
+                                      </Listbox.Options>
+                                    </Transition>
+                                  )}
+                                </div>
+                              )}
+                            </Listbox>
+                            <Listbox
+                              value={selectedMonth}
+                              onChange={setSelectedMonth}
+                            >
+                              {({ open }) => (
+                                <div className="relative">
+                                  <Listbox.Button
+                                    className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                                      open
+                                        ? "ring-2 ring-virparyasMainBlue"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span className="truncate">
+                                      {selectedMonth?.month}
+                                    </span>
+                                    <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                                      <DropDownIcon />
+                                    </span>
+                                  </Listbox.Button>
+                                  {months && (
+                                    <Transition
+                                      as={Fragment}
+                                      leave="transition ease-in duration-100"
+                                      leaveFrom="opacity-100"
+                                      leaveTo="opacity-0"
+                                    >
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                        {months.map((month) => (
+                                          <Listbox.Option
+                                            key={month.id}
+                                            className={({ active }) =>
+                                              `relative cursor-default select-none text-viparyasDarkBlue ${
+                                                active
+                                                  ? "bg-[#E9E9FF]"
+                                                  : "text-gray-900"
+                                              }`
+                                            }
+                                            value={month}
+                                          >
+                                            {({ selected }) => (
+                                              <span
+                                                className={`block truncate py-2 px-4 ${
+                                                  selected
+                                                    ? "bg-virparyasMainBlue font-semibold text-white"
+                                                    : ""
+                                                }`}
+                                              >
+                                                {month.month}
+                                              </span>
+                                            )}
+                                          </Listbox.Option>
+                                        ))}
+                                      </Listbox.Options>
+                                    </Transition>
+                                  )}
+                                </div>
+                              )}
+                            </Listbox>
+                            <Listbox
+                              value={selectedYear}
+                              onChange={setSelectedYear}
+                            >
+                              {({ open }) => (
+                                <div className="relative">
+                                  <Listbox.Button
+                                    className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                                      open
+                                        ? "ring-2 ring-virparyasMainBlue"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span className="truncate">
+                                      {selectedYear?.year}
+                                    </span>
+                                    <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                                      <DropDownIcon />
+                                    </span>
+                                  </Listbox.Button>
+                                  {years && (
+                                    <Transition
+                                      as={Fragment}
+                                      leave="transition ease-in duration-100"
+                                      leaveFrom="opacity-100"
+                                      leaveTo="opacity-0"
+                                    >
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                        {years.map((year) => (
+                                          <Listbox.Option
+                                            key={year.id}
+                                            className={({ active }) =>
+                                              `relative cursor-default select-none text-viparyasDarkBlue ${
+                                                active
+                                                  ? "bg-[#E9E9FF]"
+                                                  : "text-gray-900"
+                                              }`
+                                            }
+                                            value={year}
+                                          >
+                                            {({ selected }) => (
+                                              <span
+                                                className={`block truncate py-2 px-4 ${
+                                                  selected
+                                                    ? "bg-virparyasMainBlue font-semibold text-white"
+                                                    : ""
+                                                }`}
+                                              >
+                                                {year.year}
                                               </span>
                                             )}
                                           </Listbox.Option>
