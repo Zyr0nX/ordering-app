@@ -136,7 +136,7 @@ model Shipper {
   dateOfBirth DateTime
   ssn         String
   phone       String
-  avatar      String
+  avatar      String?
   approved    Approve  @default(PENDING)
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id])

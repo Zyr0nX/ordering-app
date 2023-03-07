@@ -24,6 +24,8 @@ const AdminShippersBody = ({
 }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
+  const ssnRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -59,6 +61,34 @@ const AdminShippersBody = ({
     }
   );
 
+  const editShipperMutation = api.admin.editShipper.useMutation({
+    onMutate: async (newData) => {
+      await utils.admin.getApprovedShippers.cancel();
+      const prevData = utils.admin.getApprovedShippers.getData();
+      utils.admin.getApprovedShippers.setData(undefined, (old) => {
+        return old?.map((shipper) => {
+          if (shipper.id === newData.shipperId) {
+            return {
+              ...shipper,
+              firstName: newData.firstname,
+              lastName: newData.lastname,
+              dateOfBirth: newData.dateofbirth,
+              phoneNumber: newData.phonenumber,
+              ssn: newData.ssn,
+              avatar: newData.avatar as string,
+            };
+          } else {
+            return shipper;
+          }
+        });
+      });
+      return { prevData };
+    },
+    onSettled: async () => {
+      await utils.admin.getApprovedShippers.invalidate();
+    },
+  });
+
   const rejectShipperMutation = api.admin.rejectShipper.useMutation({
     onMutate: async (newData) => {
       await utils.admin.getApprovedShippers.cancel();
@@ -83,6 +113,22 @@ const AdminShippersBody = ({
     rejectShipperMutation.mutate({ shipperId: id });
   };
 
+  const handleEditShipper = (id: string) => {
+    editShipperMutation.mutate({
+      shipperId: id,
+      firstname: firstNameRef.current?.value as string,
+      lastname: lastNameRef.current?.value as string,
+      phonenumber: phoneRef.current?.value as string,
+      ssn: ssnRef.current?.value as string,
+      dateofbirth: new Date(
+        `${selectedYear?.year as string}-${selectedMonth?.month as string}-${
+          selectedDate?.date as string
+        }`
+      ),
+      avatar: image,
+    });
+  };
+
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const base64 = await getBase64(e.target.files[0]);
@@ -97,6 +143,9 @@ const AdminShippersBody = ({
   ) => {
     openModal();
     setSelectedShipper(shipper);
+    setSelectedDate(dates[shipper.dateOfBirth.getDate() - 1]);
+    setSelectedMonth(months[shipper.dateOfBirth.getMonth()]);
+    setSelectedYear(years[shipper.dateOfBirth.getFullYear() - 1970]);
     setImage(shipper.avatar);
   };
 
@@ -255,7 +304,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
                                         {dates.map((day) => (
                                           <Listbox.Option
                                             key={day.id}
@@ -314,7 +363,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
                                         {months.map((month) => (
                                           <Listbox.Option
                                             key={month.id}
@@ -373,7 +422,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
                                         {years.map((year) => (
                                           <Listbox.Option
                                             key={year.id}
@@ -412,15 +461,15 @@ const AdminShippersBody = ({
                             htmlFor="address"
                             className="truncate font-medium"
                           >
-                            Address:
+                            SSN:
                           </label>
                           <input
                             type="text"
                             id="address"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            // defaultValue={selectedRestaurant?.address}
-                            // ref={addressRef}
+                            defaultValue={selectedShipper?.ssn}
+                            ref={ssnRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -428,67 +477,17 @@ const AdminShippersBody = ({
                             htmlFor="additionalAddress"
                             className="truncate font-medium"
                           >
-                            Additional Address:
+                            Phone:
                           </label>
                           <input
                             type="text"
                             id="additionalAddress"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            // defaultValue={
-                            //   selectedRestaurant?.additionalAddress || ""
-                            // }
-                            // ref={additionalAddressRef}
-                          />
-                        </div>
-                        <div className="flex gap-4">
-                          <div className="flex flex-col">
-                            <label
-                              htmlFor="firstName"
-                              className="truncate font-medium"
-                            >
-                              First name:
-                            </label>
-                            <input
-                              type="text"
-                              id="firstName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                              placeholder="Email..."
-                              //   defaultValue={selectedRestaurant?.firstName}
-                              //   ref={firstNameRef}
-                            />
-                          </div>
-                          <div className="flex flex-col">
-                            <label
-                              htmlFor="lastName"
-                              className="truncate font-medium"
-                            >
-                              Last name:
-                            </label>
-                            <input
-                              type="text"
-                              id="lastName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                              placeholder="Email..."
-                              //   defaultValue={selectedRestaurant?.lastName}
-                              //   ref={lastNameRef}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="phone"
-                            className="truncate font-medium"
-                          >
-                            Phone number:
-                          </label>
-                          <input
-                            type="text"
-                            id="phone"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            placeholder="Email..."
-                            // defaultValue={selectedRestaurant?.phoneNumber}
-                            // ref={phoneRef}
+                            defaultValue={
+                               selectedShipper?.phone
+                             }
+                            ref={phoneRef}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -503,7 +502,7 @@ const AdminShippersBody = ({
                             id="email"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue disabled:bg-white disabled:text-gray-500"
                             placeholder="Email..."
-                            // defaultValue={selectedRestaurant?.user?.email || ""}
+                            defaultValue={selectedShipper?.user?.email || ""}
                             disabled
                           />
                         </div>
@@ -512,13 +511,13 @@ const AdminShippersBody = ({
                             htmlFor="brandImage"
                             className="truncate font-medium"
                           >
-                            Brand image:
+                            Avatar:
                           </label>
                           <div className="relative h-[125px] w-full overflow-hidden rounded-xl">
                             <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
                               <CloudIcon />
                               <p className="font-medium text-white">
-                                Upload a new brand image
+                                Upload a new avatar
                               </p>
                             </div>
                             <input
@@ -551,9 +550,9 @@ const AdminShippersBody = ({
                       <button
                         type="button"
                         className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
-                        // onClick={() =>
-                        //   handleEditRestaurant(selectedRestaurant?.id || "")
-                        // }
+                        onClick={() =>
+                           handleEditShipper(selectedShipper?.id || "")
+                         }
                       >
                         Confirm
                       </button>

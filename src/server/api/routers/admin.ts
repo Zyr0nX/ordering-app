@@ -123,4 +123,34 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
+
+  editShipper: adminProtectedProcedure
+    
+    .input(
+      z.object({
+        shipperId: z.string().cuid(),
+        firstname: z.string(),
+        lastname: z.string(),
+        ssn: z.string(),
+        phonenumber: z.string(),
+        avatar: z.string().url().nullable(),
+        dateofbirth: z.date(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.shipper.update({
+        data: {
+          firstName: input.firstname,
+          lastName: input.lastname,
+          ssn: input.ssn,
+          phone: input.phonenumber,
+          avatar: input.avatar,
+          dateOfBirth: input.dateofbirth,
+        },
+        where: {
+          id: input.shipperId,
+        },
+      });
+    }
+  ),
 });
