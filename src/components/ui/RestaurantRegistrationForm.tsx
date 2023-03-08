@@ -4,6 +4,7 @@ import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
+import Image from "next/image";
 
 const RestaurantRegistrationForm = ({ country }: { country: string }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -183,7 +184,7 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
             {phonePrefix && (
               <Listbox value={phonePrefix} onChange={setPhonePrefix}>
                 {({ open }) => (
-                  <div className="relative">
+                  <div className="relative w-24 shrink-0">
                     <Listbox.Button
                       className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                         open ? "ring-2 ring-virparyasMainBlue" : ""
@@ -214,12 +215,13 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
                             >
                               {({ selected }) => (
                                 <span
-                                  className={`block truncate py-2 px-4 ${
+                                  className={`truncate py-2 px-4 flex gap-2 ${
                                     selected
                                       ? "bg-virparyasMainBlue font-semibold text-white"
                                       : ""
                                   }`}
                                 >
+                                  <Image src={country.flag} width={20} height={10} alt="flag"></Image>
                                   {country.dialCode}
                                 </span>
                               )}
@@ -232,8 +234,7 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
                 )}
               </Listbox>
             )}
-          </div>
-          <input
+            <input
             type="text"
             id="phone"
             className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
@@ -244,6 +245,8 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
             placeholder="Phone..."
             ref={phoneRef}
           />
+          </div>
+          
         </div>
         <div className="flex flex-col">
           <label htmlFor="email" className="font-medium">
