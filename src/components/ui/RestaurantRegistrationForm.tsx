@@ -3,9 +3,9 @@ import { Listbox, Transition } from "@headlessui/react";
 import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
-import { type CountryCodes } from "~/utils/types";
+import countries from "~/utils/countries.json";
 
-const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
+const RestaurantRegistrationForm = ({ country }: { country: string }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -24,7 +24,6 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
   const [validAdditionAddress, setValidAdditionAddress] = useState(false);
   const [validCategory, setValidCategory] = useState(false);
 
-  const [phonePrefix, setPhonePrefix] = useState<string | null>(null);
   const [restaurantTypes, setRestaurantTypes] = useState<
     | {
         id: string;
@@ -41,12 +40,11 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
     | undefined
   >(undefined);
 
-  const registrationMutation = api.restaurant.registration.useMutation();
+  const [phonePrefix, setPhonePrefix] = useState(
+    countries.find((c) => c.isoCode === country)
+  );
 
-  api.external.phonePrefix.useQuery(country, {
-    enabled: !!country,
-    onSuccess: (data) => setPhonePrefix(data),
-  });
+  const registrationMutation = api.restaurant.registration.useMutation();
 
   api.restaurantType.getAll.useQuery(undefined, {
     onSuccess: (data) => {
@@ -134,7 +132,7 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
       additionaladdress: additionAddresRef.current?.value,
       firstname: firstNameRef.current?.value as string,
       lastname: lastNameRef.current?.value as string,
-      phonenumber: `${phonePrefix || ""}${phoneRef.current?.value as string}`,
+      phonenumber: `${phonePrefix?.dialCode || ""}${phoneRef.current?.value as string}`,
       email: emailRef.current?.value as string,
       restaurantTypeId: selected?.id,
     });
@@ -179,8 +177,62 @@ const RestaurantRegistrationForm = ({ country }: { country: CountryCodes }) => {
         </div>
         <div className="flex flex-col">
           <label htmlFor="phone" className="font-medium">
-            * Phone {phonePrefix}:
+            * Phone:
           </label>
+          <div className="flex gap-2">
+            {phonePrefix && (
+              <Listbox value={phonePrefix} onChange={setPhonePrefix}>
+                {({ open }) => (
+                  <div className="relative">
+                    <Listbox.Button
+                      className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                        open ? "ring-2 ring-virparyasMainBlue" : ""
+                      }`}
+                    >
+                      <span className="truncate">{phonePrefix?.dialCode}</span>
+                      <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                        <DropDownIcon />
+                      </span>
+                    </Listbox.Button>
+                    {countries && (
+                      <Transition
+                        as={Fragment}
+                        leave="transition ease-in duration-100"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
+                      >
+                        <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                          {countries.map((country) => (
+                            <Listbox.Option
+                              key={country.name}
+                              className={({ active }) =>
+                                `relative cursor-default select-none text-viparyasDarkBlue ${
+                                  active ? "bg-[#E9E9FF]" : "text-gray-900"
+                                }`
+                              }
+                              value={country}
+                            >
+                              {({ selected }) => (
+                                <span
+                                  className={`block truncate py-2 px-4 ${
+                                    selected
+                                      ? "bg-virparyasMainBlue font-semibold text-white"
+                                      : ""
+                                  }`}
+                                >
+                                  {country.dialCode}
+                                </span>
+                              )}
+                            </Listbox.Option>
+                          ))}
+                        </Listbox.Options>
+                      </Transition>
+                    )}
+                  </div>
+                )}
+              </Listbox>
+            )}
+          </div>
           <input
             type="text"
             id="phone"

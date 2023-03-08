@@ -125,7 +125,7 @@ export const adminRouter = createTRPCRouter({
     }),
 
   editShipper: adminProtectedProcedure
-    
+
     .input(
       z.object({
         shipperId: z.string().cuid(),
@@ -151,6 +151,27 @@ export const adminRouter = createTRPCRouter({
           id: input.shipperId,
         },
       });
-    }
-  ),
+    }),
+  getUsers: adminProtectedProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.user.findMany();
+  }),
+  editUser: adminProtectedProcedure
+    .input(
+      z.object({
+        userId: z.string().cuid(),
+        name: z.string(),
+        image: z.string().url().nullable(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.update({
+        data: {
+          name: input.name,
+          image: input.image,
+        },
+        where: {
+          id: input.userId,
+        },
+      });
+    }),
 });
