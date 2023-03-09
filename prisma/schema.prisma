@@ -91,17 +91,19 @@ model RestaurantType {
 }
 
 model Food {
-  id           String     @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
   description  String
-  price        Float      @db.Float
+  price        Float         @db.Float
   calories     Int
   image        String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
   Cart         Cart[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  FoodOptions  FoodOptions[]
+  MaxOption    Int          @default(0)
 
   @@index([restaurantId])
 }
@@ -142,6 +144,16 @@ model Shipper {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model FoodOptions {
+  id     String @id @default(cuid())
+  name   String
+  foodId String
+  food   Food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  price Float  @db.Float
+
+  @@index([foodId])
 }
 
 enum Role {

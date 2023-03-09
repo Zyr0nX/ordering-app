@@ -1,3 +1,4 @@
+import { Food } from "@prisma/client";
 import React from "react";
 import RestaurantDetailBody from "~/components/ui/RestaurantDetailBody";
 import RestaurantDetailHeader from "~/components/ui/RestaurantDetailHeader";
@@ -19,13 +20,7 @@ const RestarantDetail = ({
     name: string;
     brandImage: string | null;
   } | null;
-  food: {
-    image: string;
-    id: string;
-    name: string;
-    price: number;
-    description: string;
-  }[];
+  food: Food[];
 }) => {
   return (
     <>
@@ -75,13 +70,6 @@ export const getServerSideProps = async ({
   const food = await prisma.food.findMany({
     where: {
       restaurantId: id,
-    },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      image: true,
-      description: true,
     },
   });
 
