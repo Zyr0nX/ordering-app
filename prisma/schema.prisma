@@ -50,6 +50,8 @@ model User {
   Cart          Cart?
   Favorite      Favorite[]
   Shipper       Shipper?
+
+  @@index([id])
 }
 
 model VerificationToken {
@@ -99,24 +101,33 @@ model Food {
   image        String
   restaurantId String
   restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
-  Cart         Cart[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   FoodOptions  FoodOptions[]
-  MaxOption    Int          @default(0)
+  MaxOption    Int           @default(0)
+  CartItem     CartItem[]
 
   @@index([restaurantId])
 }
 
 model Cart {
-  id       String @id @default(cuid())
-  userId   String @unique
-  foodId   String
-  quantity Int
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  food     Food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  id       String     @id @default(cuid())
+  userId   String     @unique
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CartItem CartItem[]
+}
 
-  @@unique([userId, foodId])
+model CartItem {
+  id        String   @id @default(cuid())
+  foodId    String
+  food      Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cartId])
   @@index([foodId])
 }
 
@@ -151,7 +162,7 @@ model FoodOptions {
   name   String
   foodId String
   food   Food   @relation(fields: [foodId], references: [id], onDelete: Cascade)
-  price Float  @db.Float
+  price  Float  @db.Float
 
   @@index([foodId])
 }

@@ -1,17 +1,19 @@
 import AccountIcon from "../icons/AccountIcon";
 import BackArrowIcon from "../icons/BackArrowIcon";
-import { signOut } from "next-auth/react";
 import React from "react";
+import { useRouter } from "next/router";
 
-const AdminCommonHeader = () => {
+
+const GuestCommonHeader = () => {
+  const router = useRouter()
   return (
     <div className="flex items-center justify-between bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80 p-6 text-white">
-      <button onClick={() => void signOut()}>
+      <button onClick={() => router.back()}>
         <BackArrowIcon className="h-6 w-6 fill-white" />
       </button>
       <div>
         <p className="text-center text-2xl font-bold">
-          Restaurants Registration
+          Cart
         </p>
       </div>
       <button>
@@ -21,4 +23,4 @@ const AdminCommonHeader = () => {
   );
 };
 
-export default AdminCommonHeader;
+export default GuestCommonHeader;
