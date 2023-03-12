@@ -1,16 +1,21 @@
-import { type Food } from "@prisma/client";
-import React from "react";
 import FoodCard from "../common/FoodCard";
+import { type FoodOption, type FoodOptionItem, type Food } from "@prisma/client";
+import React from "react";
+
 
 const RestaurantDetailBody = ({
   food,
 }: {
-  food: Food[];
+  food: (Food & {
+    FoodOption: (FoodOption & {
+      FoodOptionItem: FoodOptionItem[];
+    })[];
+  })[];
 }) => {
   const [quantity, setQuantity] = React.useState(0);
 
   return (
-    <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2">
       {food.map((item) => (
         <FoodCard food={item} key={item.id} />
       ))}

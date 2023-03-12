@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
+
 interface CommonDialogProps {
   label?: string;
   children: React.ReactNode;
@@ -8,7 +9,7 @@ interface CommonDialogProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-const CommonDialog: React.FC<CommonDialogProps> = ({
+const FoodOptionDialog: React.FC<CommonDialogProps> = ({
   children,
   label,
   isOpen,
@@ -34,7 +35,7 @@ const CommonDialog: React.FC<CommonDialogProps> = ({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-center justify-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -44,13 +45,13 @@ const CommonDialog: React.FC<CommonDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all md:w-3/4">
+              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground text-virparyasMainBlue transition-all md:w-3/4">
                 {label && (
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     {label}
                   </Dialog.Title>
                 )}
-                <div className="mt-4">{children}</div>
+                {children}
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -60,4 +61,4 @@ const CommonDialog: React.FC<CommonDialogProps> = ({
   );
 };
 
-export default CommonDialog;
+export default FoodOptionDialog;

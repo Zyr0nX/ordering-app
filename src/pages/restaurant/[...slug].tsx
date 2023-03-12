@@ -1,26 +1,12 @@
-import { Food } from "@prisma/client";
+import { type InferGetServerSidePropsType, type NextPage } from "next";
 import React from "react";
 import RestaurantDetailBody from "~/components/ui/RestaurantDetailBody";
 import RestaurantDetailHeader from "~/components/ui/RestaurantDetailHeader";
 import { prisma } from "~/server/db";
 
-const RestarantDetail = ({
+const RestarantDetail: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   restaurant,
   food,
-}: {
-  restaurant: {
-    address: string;
-    food: {
-      image: string;
-      id: string;
-      name: string;
-      price: number;
-    }[];
-    id: string;
-    name: string;
-    brandImage: string | null;
-  } | null;
-  food: Food[];
 }) => {
   return (
     <>
@@ -51,25 +37,18 @@ export const getServerSideProps = async ({
     where: {
       id,
     },
-    select: {
-      id: true,
-      name: true,
-      address: true,
-      brandImage: true,
-      food: {
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          image: true,
-        },
-      },
-    },
   });
 
   const food = await prisma.food.findMany({
     where: {
       restaurantId: id,
+    },
+    include: {
+      FoodOption: {
+        include: {
+          FoodOptionItem: true
+        },
+      },
     },
   });
 

@@ -1,22 +1,13 @@
 import BackArrowIcon from "../icons/BackArrowIcon";
 import CartIcon from "../icons/CartIcon";
 import React from "react";
+import { type Restaurant } from "@prisma/client";
+
 
 const RestaurantDetailHeader = ({
   restaurant,
 }: {
-  restaurant: {
-    address: string;
-    food: {
-      image: string;
-      id: string;
-      name: string;
-      price: number;
-    }[];
-    id: string;
-    name: string;
-    brandImage: string | null;
-  } | null;
+  restaurant: Restaurant | null;
 }) => {
   return (
     <div
