@@ -1,14 +1,17 @@
 import FoodCard from "../common/FoodCard";
-import { type FoodOption, type FoodOptionItem, type Food } from "@prisma/client";
+import {
+  type FoodOption,
+  type FoodOptionItem,
+  type Food,
+} from "@prisma/client";
 import React from "react";
-
 
 const RestaurantDetailBody = ({
   food,
 }: {
   food: (Food & {
-    FoodOption: (FoodOption & {
-      FoodOptionItem: FoodOptionItem[];
+    foodOption: (FoodOption & {
+      foodOptionItem: FoodOptionItem[];
     })[];
   })[];
 }) => {

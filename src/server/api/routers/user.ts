@@ -42,36 +42,4 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
-  addToCart: protectedProcedure
-    .input(
-      z.object({
-        foodId: z.string().cuid(),
-        quantity: z.number().min(1),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.cart.create({
-        data: {
-          userId: ctx.session.user.id,
-          foodId: input.foodId,
-          quantity: input.quantity,
-        },
-      });
-    }),
-  removeFromCart: protectedProcedure
-    .input(
-      z.object({
-        foodId: z.string().cuid(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.cart.delete({
-        where: {
-          userId_foodId: {
-            userId: ctx.session.user.id,
-            foodId: input.foodId,
-          },
-        },
-      });
-    }),
 });

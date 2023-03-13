@@ -46,10 +46,10 @@ model User {
   role          Role
   accounts      Account[]
   sessions      Session[]
-  Restaurant    Restaurant?
-  Cart          Cart?
-  Favorite      Favorite[]
-  Shipper       Shipper?
+  restaurant    Restaurant?
+  cartItem      CartItem[]
+  favorite      Favorite[]
+  shipper       Shipper?
 
   @@index([id])
 }
@@ -79,7 +79,7 @@ model Restaurant {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   restaurantTypeId  String?
-  Favorite          Favorite[]
+  favorite          Favorite[]
 
   @@index([restaurantTypeId])
 }
@@ -103,32 +103,26 @@ model Food {
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  FoodOption  FoodOption[]
-  MaxOption    Int          @default(0)
-  CartItem     CartItem[]
+  foodOption   FoodOption[]
+  maxOption    Int          @default(0)
+  cartItem     CartItem[]
 
   @@index([restaurantId])
 }
 
-model Cart {
-  id       String     @id @default(cuid())
-  userId   String     @unique
-  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  CartItem CartItem[]
-}
-
 model CartItem {
-  id        String   @id @default(cuid())
-  foodId    String
-  food      Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
-  cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String           @id @default(cuid())
+  foodId     String
+  food       Food             @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  quantity   Int
+  foodOption FoodOptionItem[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  userId     String
+  user       User             @relation(fields: [userId], references: [id])
 
-  @@index([cartId])
   @@index([foodId])
+  @@index([userId])
 }
 
 model Favorite {
@@ -163,7 +157,7 @@ model FoodOption {
   foodId         String
   food           Food             @relation(fields: [foodId], references: [id], onDelete: Cascade)
   maxOption      Int
-  FoodOptionItem FoodOptionItem[]
+  foodOptionItem FoodOptionItem[]
 
   @@index([foodId])
 }
@@ -174,6 +168,7 @@ model FoodOptionItem {
   foodOptionId String
   foodOption   FoodOption @relation(fields: [foodOptionId], references: [id], onDelete: Cascade)
   price        Float      @db.Float
+  cartItem     CartItem[]
 
   @@index([foodOptionId])
 }

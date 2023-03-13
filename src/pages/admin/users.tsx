@@ -1,13 +1,18 @@
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from 'next';
-import React from 'react';
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
+import React from "react";
 import Admin from "~/components/layouts/Admin";
-import AdminCommonHeader from '~/components/ui/AdminCommonHeader';
-import AdminUsersBody from '~/components/ui/AdminUsersBody';
-import { getServerAuthSession } from '~/server/auth';
+import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
+import AdminUsersBody from "~/components/ui/AdminUsersBody";
+import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-
-const Users: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ users }) => {
+const Users: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ users }) => {
   return (
     <Admin>
       <>
@@ -15,8 +20,8 @@ const Users: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = 
         <AdminUsersBody users={users} />
       </>
     </Admin>
-  )
-}
+  );
+};
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -36,7 +41,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      users
+      users,
     },
   };
 };

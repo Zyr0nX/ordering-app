@@ -6,53 +6,83 @@ export const cartRouter = createTRPCRouter({
     .input(
       z.object({
         foodId: z.string().cuid(),
+        foodOptionids: z.array(z.string().cuid()),
         quantity: z.number(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.cart.create({
-        data: {
+      const isExist = await ctx.prisma.cartItem.findFirst({
+        where: {
           foodId: input.foodId,
-          quantity: input.quantity,
-          userId: ctx.session?.user?.id as string,
+          foodOption: {
+            every: {
+              id: {
+                in: input.foodOptionids,
+              },
+            },
+          },
         },
       });
+
+      if (isExist) {
+        await ctx.prisma.cartItem.update({
+          where: {
+            id: isExist.id,
+          },
+          data: {
+            quantity: {
+              increment: input.quantity,
+            },
+          },
+        });
+      } else {
+        await ctx.prisma.cartItem.create({
+          data: {
+            foodId: input.foodId,
+            foodOption: {
+              connect: input.foodOptionids.map((id) => ({ id })),
+            },
+            quantity: input.quantity,
+            userId: ctx.session?.user?.id as string,
+          },
+        });
+      }
     }),
-  getItems: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.cart.findMany({
-      where: {
-        userId: ctx.session?.user?.id as string,
-      },
-    });
-  }),
-  deleteItem: publicProcedure
-    .input(
-      z.object({
-        id: z.string().cuid(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.cart.delete({
-        where: {
-          id: input.id,
-        },
-      });
-    }),
-  updateItem: publicProcedure
-    .input(
-      z.object({
-        id: z.string().cuid(),
-        quantity: z.number(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.cart.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          quantity: input.quantity,
-        },
-      });
-    }),
+  // getItems: publicProcedure.query(async ({ ctx }) => {
+  //   return await ctx.prisma.cart.findMany({
+  //     where: {
+  //       userId: ctx.session?.user?.id as string,
+  //     },
+  //   });
+  // }),
+  // deleteItem: publicProcedure
+  //   .input(
+  //     z.object({
+  //       id: z.string().cuid(),
+  //     })
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     await ctx.prisma.cart.delete({
+  //       where: {
+  //         id: input.id,
+  //       },
+  //     });
+  //   }),
+  // updateItem: publicProcedure
+  //   .input(
+  //     z.object({
+  //       id: z.string().cuid(),
+  //       quantity: z.number(),
+  //     })
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     await ctx.prisma.cart.update({
+  //       where: {
+  //         id: input.id,
+  //       },
+  //       data: {
+  //         quantity: input.quantity,
+  //       },
+  //     });
+  //   }),
 });

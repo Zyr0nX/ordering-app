@@ -1,10 +1,10 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
+import Image from "next/image";
 import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
-import Image from "next/image";
 
 const RestaurantRegistrationForm = ({ country }: { country: string }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -133,7 +133,9 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
       additionaladdress: additionAddresRef.current?.value,
       firstname: firstNameRef.current?.value as string,
       lastname: lastNameRef.current?.value as string,
-      phonenumber: `${phonePrefix?.dialCode || ""}${phoneRef.current?.value as string}`,
+      phonenumber: `${phonePrefix?.dialCode || ""}${
+        phoneRef.current?.value as string
+      }`,
       email: emailRef.current?.value as string,
       restaurantTypeId: selected?.id,
     });
@@ -215,13 +217,18 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
                             >
                               {({ selected }) => (
                                 <span
-                                  className={`truncate py-2 px-4 flex gap-2 ${
+                                  className={`flex gap-2 truncate py-2 px-4 ${
                                     selected
                                       ? "bg-virparyasMainBlue font-semibold text-white"
                                       : ""
                                   }`}
                                 >
-                                  <Image src={country.flag} width={20} height={10} alt="flag"></Image>
+                                  <Image
+                                    src={country.flag}
+                                    width={20}
+                                    height={10}
+                                    alt="flag"
+                                  ></Image>
                                   {country.dialCode}
                                 </span>
                               )}
@@ -235,18 +242,17 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
               </Listbox>
             )}
             <input
-            type="text"
-            id="phone"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-            //   ${
-            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-            //   }
+              type="text"
+              id="phone"
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
+              //   ${
+              //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
+              //   }
 
-            placeholder="Phone..."
-            ref={phoneRef}
-          />
+              placeholder="Phone..."
+              ref={phoneRef}
+            />
           </div>
-          
         </div>
         <div className="flex flex-col">
           <label htmlFor="email" className="font-medium">

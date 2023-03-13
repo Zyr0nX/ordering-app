@@ -30,7 +30,7 @@ export const getServerSideProps = async (
       approved: "APPROVED",
     },
     include: {
-      Favorite: {
+      favorite: {
         where: {
           userId: session?.user.id,
         },

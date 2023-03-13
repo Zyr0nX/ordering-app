@@ -1,4 +1,8 @@
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
 import CartBody from "~/components/ui/CartBody";
@@ -6,7 +10,9 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-const Cart: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({cart}) => {
+const Cart: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ cart }) => {
   return (
     <Guest>
       <>
@@ -23,20 +29,17 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const cart = await prisma.cart.findUnique({
+  const cart = await prisma.cartItem.findMany({
     where: {
       userId: session?.user.id,
     },
     include: {
-      CartItem: {
+      food: {
         include: {
-          food: {
-            include: {
-              restaurant: true,
-            },
-          }
-        }
-      }
+          restaurant: true,
+        },
+      },
+      foodOption: true,
     },
   });
   return {

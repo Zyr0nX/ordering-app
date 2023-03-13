@@ -1,43 +1,35 @@
+import CheckmarkIcon from "../icons/CheckmarkIcon";
 import { Switch } from "@headlessui/react";
-import { type FoodOptionItem } from "@prisma/client";
 import React, { useState } from "react";
 
+interface CheckboxProps {
+  handleChange: () => void;
+  label?: string;
+}
 
-const Checkbox = ({
-  foodOptionItem,
-  listFoodOptionItem,
-}: {
-  foodOptionItem: FoodOptionItem;
-  listFoodOptionItem: FoodOptionItem[];
-}) => {
+const Checkbox: React.FC<CheckboxProps> = ({ handleChange, label }) => {
   const [enabled, setEnabled] = useState(false);
 
-  const handleChange = () => {
-    if (enabled) {
-      listFoodOptionItem = listFoodOptionItem.filter(
-        (item) => item.id !== foodOptionItem.id
-      );
-    } else {
-      listFoodOptionItem.push(foodOptionItem);
-    }
-    setEnabled(!enabled);
-  };
-
   return (
-    <Switch
-      checked={enabled}
-      onChange={handleChange}
-      className={`${
-        enabled ? "bg-blue-600" : "bg-gray-200"
-      } relative inline-flex h-6 w-11 items-center rounded-full`}
-    >
-      <span className="sr-only">Enable notifications</span>
-      <span
+    <Switch.Group as="div" className="flex items-center gap-2">
+      <Switch
+        onClick={handleChange}
+        checked={enabled}
+        onChange={setEnabled}
         className={`${
-          enabled ? "translate-x-6" : "translate-x-1"
-        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-      />
-    </Switch>
+          enabled
+            ? "bg-viparyasDarkBlue"
+            : "border-2 border-virparyasMainBlue bg-transparent"
+        } flex h-5 w-5 items-center justify-center focus-within:outline-none`}
+      >
+        {enabled && <CheckmarkIcon />}
+      </Switch>
+      {label && (
+        <Switch.Label className={`font-roboto ${enabled ? "font-bold" : ""}`}>
+          {label}
+        </Switch.Label>
+      )}
+    </Switch.Group>
   );
 };
 

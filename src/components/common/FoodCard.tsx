@@ -1,27 +1,58 @@
 import Checkbox from "./Checkbox";
+import CommonButton from "./CommonButton";
 import FoodOptionDialog from "./FoodOptionDialog";
-import { type FoodOption, type FoodOptionItem, type Food } from "@prisma/client";
+import {
+  type FoodOption,
+  type FoodOptionItem,
+  type Food,
+} from "@prisma/client";
 import Image from "next/image";
-import React, { useState } from "react";
-
-
-interface FoodOptionItemStates {
-  FoodOptionItem: (FoodOptionItem & { isChecked: boolean });
-}
-
+import React, { Fragment, useState } from "react";
+import { api } from "~/utils/api";
 
 const FoodCard = ({
   food,
 }: {
   food: Food & {
-    FoodOption: (FoodOption & {
-      FoodOptionItem: FoodOptionItem[];
+    foodOption: (FoodOption & {
+      foodOptionItem: FoodOptionItem[];
     })[];
   };
 }) => {
-  let listFoodOptionItem: FoodOptionItem[] = [];
+  const [listFoodOptionItem, setListFoodOptionItem] = useState<
+    FoodOptionItem[]
+  >([]);
 
-  console.log(listFoodOptionItem);
+  const [totalPrice, setTotalPrice] = useState(food.price);
+
+  const handleFoodOptionItem = (item: FoodOptionItem) => {
+    if (listFoodOptionItem.includes(item)) {
+      setListFoodOptionItem(listFoodOptionItem.filter((i) => i !== item));
+      setTotalPrice(totalPrice - item.price);
+    } else {
+      setListFoodOptionItem((prevState) => [...prevState, item]);
+      setTotalPrice(totalPrice + item.price);
+    }
+  };
+
+  const resetState = () => {
+    setTimeout(() => {
+      setTotalPrice(food.price);
+    }, 300);
+    setListFoodOptionItem([]);
+    setIsOpen(false);
+  };
+
+  const addToCartMutation = api.cart.addItems.useMutation();
+
+  const AddToCart = () => {
+    addToCartMutation.mutate({
+      foodId: food.id,
+      quantity: 1,
+      foodOptionids: listFoodOptionItem.map((item) => item.id),
+    });
+    resetState();
+  };
 
   const [isOpen, setIsOpen] = useState(false);
   return (
@@ -48,7 +79,11 @@ const FoodCard = ({
           </div>
         </div>
       </div>
-      <FoodOptionDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+      <FoodOptionDialog
+        isOpen={isOpen}
+        onClose={resetState}
+        setIsOpen={setIsOpen}
+      >
         <div
           className="h-28 bg-black/50 p-4 text-white"
           style={{
@@ -62,18 +97,32 @@ const FoodCard = ({
             <p className="mt-1 text-sm">${food.price.toString()}</p>
           </div>
         </div>
-        <div className="m-4 flex flex-col gap-4">
-          {food.FoodOption.map((option) => (
+        <div className="flex flex-col gap-4 bg-white p-4">
+          {food.foodOption.map((option) => (
             <div key={option.id} className="text-virparyasMainBlue">
-              <p className="text-lg font-semibold">{option.name}</p>
-              {option.FoodOptionItem.map((item) => (
-                <div className="flex gap-2" key={item.id}>
-                  <Checkbox foodOptionItem={item} listFoodOptionItem={listFoodOptionItem} />
-                  <p>{item.name}</p>
-                </div>
-              ))}
+              <p className="mb-2 text-lg font-bold">{option.name}</p>
+              <div className="flex flex-col gap-2">
+                {option.foodOptionItem.map((item) => (
+                  <Fragment key={item.id}>
+                    <div className="flex justify-between">
+                      <Checkbox
+                        label={item.name}
+                        handleChange={() => handleFoodOptionItem(item)}
+                      />
+                      <p>${item.price.toFixed(2)}</p>
+                    </div>
+                    <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
+                  </Fragment>
+                ))}
+              </div>
             </div>
           ))}
+        </div>
+        <div className="bg-white px-8 pb-4">
+          <CommonButton
+            text={`Add to Cart - $${totalPrice.toFixed(2)}`}
+            onClick={AddToCart}
+          />
         </div>
       </FoodOptionDialog>
     </>

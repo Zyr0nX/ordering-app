@@ -10,12 +10,7 @@ import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
 import getBase64 from "~/utils/getBase64";
 
-
-const AdminUsersBody = ({
-  users,
-}: {
-  users: User[]
-}) => {
+const AdminUsersBody = ({ users }: { users: User[] }) => {
   const nameRef = useRef<HTMLInputElement>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
@@ -164,7 +159,7 @@ const AdminUsersBody = ({
             >
               <div className="fixed inset-0 bg-black bg-opacity-25" />
             </Transition.Child>
-            
+
             <div className="fixed inset-0 overflow-y-auto">
               <div className="flex min-h-full items-center justify-center p-4">
                 <Transition.Child

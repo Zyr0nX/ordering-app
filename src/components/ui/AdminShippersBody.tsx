@@ -14,7 +14,6 @@ import getBase64 from "~/utils/getBase64";
 import months from "~/utils/months.json";
 import years from "~/utils/years.json";
 
-
 const AdminShippersBody = ({
   shippers,
 }: {
@@ -30,7 +29,7 @@ const AdminShippersBody = ({
   const searchRef = useRef<HTMLInputElement>(null);
 
   const [selectedDate, setSelectedDate] = useState(dates[0]);
-  const [selectedMonth, setSelectedMonth] = useState(months[0])
+  const [selectedMonth, setSelectedMonth] = useState(months[0]);
   const [selectedYear, setSelectedYear] = useState(years[30]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -304,7 +303,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
+                                      <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                                         {dates.map((day) => (
                                           <Listbox.Option
                                             key={day.id}
@@ -363,7 +362,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
+                                      <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                                         {months.map((month) => (
                                           <Listbox.Option
                                             key={month.id}
@@ -422,7 +421,7 @@ const AdminShippersBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none z-20">
+                                      <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                                         {years.map((year) => (
                                           <Listbox.Option
                                             key={year.id}
@@ -484,9 +483,7 @@ const AdminShippersBody = ({
                             id="additionalAddress"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            defaultValue={
-                               selectedShipper?.phone
-                             }
+                            defaultValue={selectedShipper?.phone}
                             ref={phoneRef}
                           />
                         </div>
@@ -551,8 +548,8 @@ const AdminShippersBody = ({
                         type="button"
                         className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
                         onClick={() =>
-                           handleEditShipper(selectedShipper?.id || "")
-                         }
+                          handleEditShipper(selectedShipper?.id || "")
+                        }
                       >
                         Confirm
                       </button>

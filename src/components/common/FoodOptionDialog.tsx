@@ -1,11 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 
-
 interface CommonDialogProps {
   label?: string;
   children: React.ReactNode;
   isOpen: boolean;
+  onClose: () => void;
   setIsOpen: (isOpen: boolean) => void;
 }
 
@@ -13,15 +13,11 @@ const FoodOptionDialog: React.FC<CommonDialogProps> = ({
   children,
   label,
   isOpen,
-  setIsOpen,
+  onClose,
 }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-10"
-        onClose={() => setIsOpen(false)}
-      >
+      <Dialog as="div" className="relative z-10" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

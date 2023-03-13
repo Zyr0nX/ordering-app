@@ -4,10 +4,9 @@ import RestaurantDetailBody from "~/components/ui/RestaurantDetailBody";
 import RestaurantDetailHeader from "~/components/ui/RestaurantDetailHeader";
 import { prisma } from "~/server/db";
 
-const RestarantDetail: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
-  restaurant,
-  food,
-}) => {
+const RestarantDetail: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ restaurant, food }) => {
   return (
     <>
       <RestaurantDetailHeader restaurant={restaurant} />
@@ -44,9 +43,9 @@ export const getServerSideProps = async ({
       restaurantId: id,
     },
     include: {
-      FoodOption: {
+      foodOption: {
         include: {
-          FoodOptionItem: true
+          foodOptionItem: true,
         },
       },
     },

@@ -11,11 +11,7 @@ export const getServerSideProps = ({ query }: { query: string }) => {
   };
 };
 
-const RestaurantRegistration = ({
-  query,
-}: {
-  query: { country: string };
-}) => {
+const RestaurantRegistration = ({ query }: { query: { country: string } }) => {
   return (
     <Guest>
       <>

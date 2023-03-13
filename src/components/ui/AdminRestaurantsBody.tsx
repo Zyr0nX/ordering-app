@@ -183,7 +183,7 @@ const AdminRestaurantsBody = ({
         />
         <div
           className="flex items-center bg-virparyasMainBlue px-4"
-          onClick={handleSearch}
+          // onClick={handleSearch}
         >
           <SearchIcon />
         </div>

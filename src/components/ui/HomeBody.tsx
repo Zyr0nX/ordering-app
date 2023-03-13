@@ -9,17 +9,16 @@ const HomeBody = ({
   restaurants,
 }: {
   restaurants: (Restaurant & {
-    Favorite: Favorite[];
+    favorite: Favorite[];
   })[];
 }) => {
   const handleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log("Favorite");
   };
 
   const getFavorites = () => {
     return restaurants.filter((restaurant) => {
-      if (restaurant.Favorite.length > 0) {
+      if (restaurant.favorite.length > 0) {
         return true;
       }
       return false;
@@ -119,7 +118,7 @@ const HomeBody = ({
                 <div className="p-2">
                   <HeartIcon
                     className={
-                      restaurant.Favorite.length > 0
+                      restaurant.favorite.length > 0
                         ? "fill-virparyasMainBlue"
                         : ""
                     }
