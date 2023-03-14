@@ -15,7 +15,7 @@ const RestaurantRegistration = ({ query }: { query: { country: string } }) => {
   return (
     <Guest>
       <>
-        <GuestCommonHeader />
+        <GuestCommonHeader text="Restaurant Registration" />
         <RestaurantRegistrationForm country={query.country} />
       </>
     </Guest>

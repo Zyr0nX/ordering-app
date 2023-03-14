@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
+
 export const orderRouter = createTRPCRouter({
   createOrder: publicProcedure
     .input(
@@ -24,10 +25,12 @@ export const orderRouter = createTRPCRouter({
                 },
             },
         });
+        
         if (new Set(cartItem.map((item) => item.food.restaurantId)).size > 1) {
             throw new Error("Cart items are not from the same restaurant");
         }
-        await ctx.prisma.order.create({
+        console.log(cartItem);
+        const order = await ctx.prisma.order.create({
             data: {
                 cartItem: {
                     connect: cartItem.map((item) => ({
@@ -37,5 +40,7 @@ export const orderRouter = createTRPCRouter({
                 userId: ctx.session?.user.id as string,
             }
         });
+
+        return order.id;
     }),
 });

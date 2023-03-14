@@ -11,16 +11,43 @@ export const cartRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (input.quantity <= 0) {
+        throw new Error("Quantity must be greater than 0");
+      }
+
+      const isFoodOptionValid = await ctx.prisma.foodOptionItem.findMany({
+        where: {
+          id: {
+            in: input.foodOptionids,
+          },
+          foodOption: {
+            foodId: input.foodId,
+          },
+        },
+      });
+
+      // console.log(isFoodOptionValid);
+
+      // if (isFoodOptionValid.length !== input.foodOptionids.length) {
+      //   throw new Error("Invalid food option");
+      // }
+
       const existCartItem = await ctx.prisma.cartItem.findFirst({
         where: {
           foodId: input.foodId,
           foodOption: {
             every: {
+              // AND: input.foodOptionids.map((id) => ({
+              //   id: {
+              //     in: id,
+              //   },
+              // })),
               id: {
                 in: input.foodOptionids,
               },
             },
           },
+          orderId: null,
         },
       });
 

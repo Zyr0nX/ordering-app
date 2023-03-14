@@ -1,16 +1,12 @@
 import CommonButton from "./CommonButton";
 import ItemCart from "./ItemCart";
-import {
-  type CartItem,
-  type Food,
-  type Restaurant,
-  type FoodOptionItem,
-} from "@prisma/client";
+import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
+
 
 const CartCard = ({
   item,
@@ -31,8 +27,14 @@ const CartCard = ({
 
   const removeItemsMutation = api.order.createOrder.useMutation();
 
-  const handleCheckout = () => {
-    removeItemsMutation.mutate({cartItemIds: cardItems.map((item) => item.id)});
+  const handleCheckout = async () => {
+    const orderId = await removeItemsMutation.mutateAsync({
+      cartItemIds: cardItems.map((item) => item.id),
+    });
+    await router.push({
+      pathname: "/checkout",
+      query: { orderId },
+    });
   };
 
   if (cardItems.length === 0) return null;
@@ -69,7 +71,7 @@ const CartCard = ({
                 />
               ))}
             </ul>
-            <CommonButton text="Checkout" onClick={handleCheckout} />
+            <CommonButton text="Checkout" onClick={() => void handleCheckout()} />
           </div>
         </div>
       </div>

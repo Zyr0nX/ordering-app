@@ -16,7 +16,7 @@ const Cart: NextPage<
   return (
     <Guest>
       <>
-        <GuestCommonHeader />
+        <GuestCommonHeader text="Cart" />
         <CartBody cart={cart} />
       </>
     </Guest>
