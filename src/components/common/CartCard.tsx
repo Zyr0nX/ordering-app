@@ -1,48 +1,79 @@
+import CommonButton from "./CommonButton";
+import ItemCart from "./ItemCart";
 import {
   type CartItem,
   type Food,
   type Restaurant,
   type FoodOptionItem,
 } from "@prisma/client";
-import React from "react";
+import Image from "next/image";
+import React, { useState } from "react";
 
 const CartCard = ({
-  cart,
+  item,
 }: {
-  cart: (CartItem & {
-    food: Food & {
-      restaurant: Restaurant;
-    };
-    foodOption: FoodOptionItem[];
-  })[];
+  item: {
+    restaurant: Restaurant;
+    cart: (CartItem & {
+      food: Food & {
+        restaurant: Restaurant;
+      };
+      foodOption: FoodOptionItem[];
+    })[];
+  };
 }) => {
+  const [quantities, setQuantities] = useState(
+    item.cart.reduce((acc, item) => {
+      return { ...acc, [item.id]: item.quantity };
+    }, {})
+  );
+  const [totalPrice, setTotalPrice] = useState(
+    item.cart.reduce((acc, item) => {
+      return (
+        acc +
+        (item.food.price +
+          item.foodOption
+            .map((option) => option.price)
+            .reduce((a, b) => a + b, 0) *
+            item.quantity)
+      );
+    }, 0)
+  );
+
+  const price = item.cart.reduce((acc, item) => {
+    return (
+      acc +
+      (item.food.price +
+        item.foodOption
+          .map((option) => option.price)
+          .reduce((a, b) => a + b, 0) *
+          item.quantity)
+    );
+  }, 0);
   return (
-    <div className="overflow-hidden rounded-2xl shadow-lg">
-      <div
-        className="w-full bg-black/50 p-4 text-white"
-        style={{
-          background:
-            "linear-gradient(#00000080, #00000080), url(https://res.cloudinary.com/dkxjgboi8/image/upload/v1677952239/photo-1504674900247-0877df9cc836_dieukj.jpg) no-repeat center center/cover",
-        }}
-      >
-        <p className="mt-4 text-2xl font-bold">Sabrina’s Cafe</p>
-        <p className="mt-1 text-xs">123 33th Street, Philadelphia, PA 19104</p>
+    <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+      <div className="relative w-full bg-black/50 p-4 text-white">
+        <Image
+          src={item.restaurant.brandImage || ""}
+          fill
+          alt="Restaurant Image"
+          className="object-cover brightness-50"
+          priority
+        />
+        <div className="relative z-10">
+          <p className="mt-4 text-2xl font-bold">{item.restaurant.name}</p>
+          <p className="mt-1 text-xs">{item.restaurant.address}</p>
+        </div>
       </div>
       <div>
-        <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue">
-          <div className="mx-4 my-2 flex justify-between">
-            <ul className="list-decimal">
-              {cart.map((item) => (
-                <li className="marker:text-sm marker:font-bold" key={item.id}>
-                  <p className="font-bold">{item.food.name}</p>
-                  <p>
-                    {item.foodOption.map((option) => (
-                      <span key={option.id}>{option.name}, </span>
-                    ))}
-                  </p>
-                </li>
+        <div className="m-4 text-virparyasMainBlue">
+          <div className="mx-4 my-2 flex flex-col gap-4">
+            <ul className="flex list-decimal flex-col gap-2">
+              {item.cart.map((item) => (
+                <ItemCart item={item} key={item.id} />
               ))}
             </ul>
+            <CommonButton text={`Checkout - $${totalPrice.toFixed(2)}`} />
           </div>
         </div>
       </div>

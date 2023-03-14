@@ -11,7 +11,7 @@ export const cartRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const isExist = await ctx.prisma.cartItem.findFirst({
+      const existCartItem = await ctx.prisma.cartItem.findFirst({
         where: {
           foodId: input.foodId,
           foodOption: {
@@ -24,10 +24,10 @@ export const cartRouter = createTRPCRouter({
         },
       });
 
-      if (isExist) {
+      if (existCartItem) {
         await ctx.prisma.cartItem.update({
           where: {
-            id: isExist.id,
+            id: existCartItem.id,
           },
           data: {
             quantity: {
@@ -48,41 +48,22 @@ export const cartRouter = createTRPCRouter({
         });
       }
     }),
-  // getItems: publicProcedure.query(async ({ ctx }) => {
-  //   return await ctx.prisma.cart.findMany({
-  //     where: {
-  //       userId: ctx.session?.user?.id as string,
-  //     },
-  //   });
-  // }),
-  // deleteItem: publicProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.string().cuid(),
-  //     })
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     await ctx.prisma.cart.delete({
-  //       where: {
-  //         id: input.id,
-  //       },
-  //     });
-  //   }),
-  // updateItem: publicProcedure
-  //   .input(
-  //     z.object({
-  //       id: z.string().cuid(),
-  //       quantity: z.number(),
-  //     })
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     await ctx.prisma.cart.update({
-  //       where: {
-  //         id: input.id,
-  //       },
-  //       data: {
-  //         quantity: input.quantity,
-  //       },
-  //     });
-  //   }),
+  updateItemQuantity: publicProcedure
+    .input(
+      z.object({
+        cartItemId: z.string().cuid(),
+        quantity: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.cartItem.update({
+        where: {
+          id: input.cartItemId,
+        },
+        data: {
+          quantity: input.quantity,
+        },
+      });
+    }
+  ),
 });

@@ -104,7 +104,7 @@ model Food {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   foodOption   FoodOption[]
-  maxOption    Int          @default(0)
+  quantity     Int
   cartItem     CartItem[]
 
   @@index([restaurantId])
