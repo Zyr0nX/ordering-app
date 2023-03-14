@@ -64,6 +64,33 @@ export const cartRouter = createTRPCRouter({
           quantity: input.quantity,
         },
       });
-    }
-  ),
+    }),
+  removeItem: publicProcedure
+    .input(
+      z.object({
+        cartItemId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.cartItem.delete({
+        where: {
+          id: input.cartItemId,
+        },
+      });
+    }),
+  removeItems: publicProcedure
+    .input(
+      z.object({
+        cartItemIds: z.array(z.string().cuid()),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.cartItem.deleteMany({
+        where: {
+          id: {
+            in: input.cartItemIds,
+          },
+        },
+      });
+    }),
 });

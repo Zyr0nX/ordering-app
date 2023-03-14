@@ -1,11 +1,13 @@
 import CartCard from "../common/CartCard";
+import CommonButton from "../common/CommonButton";
+import NoCartIcon from "../icons/NoCartIcon";
 import {
   type CartItem,
   type Food,
   type Restaurant,
   type FoodOptionItem,
 } from "@prisma/client";
-import React from "react";
+import Link from "next/link";
 
 const CartBody = ({
   cart,
@@ -26,8 +28,28 @@ const CartBody = ({
       return {
         restaurant,
         cart: cart.filter((item) => item.food.restaurant.id === restaurant.id),
-        };
-});
+      };
+    });
+
+  if (cartList.length === 0) {
+    return (
+      <div className="m-4 flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue">
+        <NoCartIcon />
+        <div className="flex flex-col items-center">
+          <h2 className="text-xl font-semibold">
+            Your cart is currently empty
+          </h2>
+          <p className="text-xs font-light">
+            but we have plenty of options for you to choose from
+          </p>
+        </div>
+
+        <Link href="/" className="w-full">
+          <CommonButton text="Continue Shopping" />
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="m-4 flex flex-col gap-4">
       {cartList.map((item) => (

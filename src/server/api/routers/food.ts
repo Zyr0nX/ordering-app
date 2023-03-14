@@ -11,6 +11,7 @@ export const foodRouter = createTRPCRouter({
         calories: z.number(),
         image: z.string(),
         restaurantId: z.string().cuid(),
+        quantity: z.number(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -22,6 +23,7 @@ export const foodRouter = createTRPCRouter({
           calories: input.calories,
           image: input.image,
           restaurantId: input.restaurantId,
+          quantity: input.quantity,
         },
       });
     }),

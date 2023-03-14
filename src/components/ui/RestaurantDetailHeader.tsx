@@ -2,6 +2,7 @@ import BackArrowIcon from "../icons/BackArrowIcon";
 import CartIcon from "../icons/CartIcon";
 import { type Restaurant } from "@prisma/client";
 import React from "react";
+import Link from "next/link";
 
 const RestaurantDetailHeader = ({
   restaurant,
@@ -21,9 +22,9 @@ const RestaurantDetailHeader = ({
         <div>
           <BackArrowIcon className="fill-white" />
         </div>
-        <div>
+        <Link href="/cart">
           <CartIcon />
-        </div>
+        </Link>
       </div>
       <div className="mt-8">
         <h1 className="text-2xl font-bold">{restaurant?.name}</h1>

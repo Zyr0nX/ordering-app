@@ -7,7 +7,10 @@ import {
   type FoodOptionItem,
 } from "@prisma/client";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { api } from "~/utils/api";
 
 const CartCard = ({
   item,
@@ -22,58 +25,51 @@ const CartCard = ({
     })[];
   };
 }) => {
-  const [quantities, setQuantities] = useState(
-    item.cart.reduce((acc, item) => {
-      return { ...acc, [item.id]: item.quantity };
-    }, {})
-  );
-  const [totalPrice, setTotalPrice] = useState(
-    item.cart.reduce((acc, item) => {
-      return (
-        acc +
-        (item.food.price +
-          item.foodOption
-            .map((option) => option.price)
-            .reduce((a, b) => a + b, 0) *
-            item.quantity)
-      );
-    }, 0)
-  );
+  const router = useRouter();
 
-  const price = item.cart.reduce((acc, item) => {
-    return (
-      acc +
-      (item.food.price +
-        item.foodOption
-          .map((option) => option.price)
-          .reduce((a, b) => a + b, 0) *
-          item.quantity)
-    );
-  }, 0);
+  const [cardItems, setCardItems] = useState(item.cart);
+
+  const removeItemsMutation = api.order.createOrder.useMutation();
+
+  const handleCheckout = () => {
+    removeItemsMutation.mutate({cartItemIds: cardItems.map((item) => item.id)});
+  };
+
+  if (cardItems.length === 0) return null;
+
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
-      <div className="relative w-full bg-black/50 p-4 text-white">
-        <Image
-          src={item.restaurant.brandImage || ""}
-          fill
-          alt="Restaurant Image"
-          className="object-cover brightness-50"
-          priority
-        />
-        <div className="relative z-10">
-          <p className="mt-4 text-2xl font-bold">{item.restaurant.name}</p>
-          <p className="mt-1 text-xs">{item.restaurant.address}</p>
-        </div>
+      <div className="relative overflow-hidden p-4 text-white">
+        <Link
+          href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
+        >
+          <Image
+            src={item.restaurant.brandImage || ""}
+            fill
+            alt="Restaurant Image"
+            className="object-cover brightness-50"
+            priority
+          />
+          <div className="relative">
+            <p className="mt-4 text-2xl font-bold">{item.restaurant.name}</p>
+            <p className="mt-1 text-xs">{item.restaurant.address}</p>
+          </div>
+        </Link>
       </div>
+
       <div>
         <div className="m-4 text-virparyasMainBlue">
           <div className="mx-4 my-2 flex flex-col gap-4">
             <ul className="flex list-decimal flex-col gap-2">
-              {item.cart.map((item) => (
-                <ItemCart item={item} key={item.id} />
+              {cardItems.map((cardItem) => (
+                <ItemCart
+                  cardItem={cardItem}
+                  key={cardItem.id}
+                  setCardItems={setCardItems}
+                />
               ))}
             </ul>
-            <CommonButton text={`Checkout - $${totalPrice.toFixed(2)}`} />
+            <CommonButton text="Checkout" onClick={handleCheckout} />
           </div>
         </div>
       </div>

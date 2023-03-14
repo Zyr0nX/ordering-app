@@ -44,12 +44,14 @@ model User {
   emailVerified DateTime?
   image         String?
   role          Role
+  address       String?
   accounts      Account[]
   sessions      Session[]
   restaurant    Restaurant?
   cartItem      CartItem[]
   favorite      Favorite[]
   shipper       Shipper?
+  Order         Order[]
 
   @@index([id])
 }
@@ -120,9 +122,12 @@ model CartItem {
   updatedAt  DateTime         @updatedAt
   userId     String
   user       User             @relation(fields: [userId], references: [id])
+  Order      Order?           @relation(fields: [orderId], references: [id])
+  orderId    String?
 
   @@index([foodId])
   @@index([userId])
+  @@index([orderId])
 }
 
 model Favorite {
@@ -149,6 +154,7 @@ model Shipper {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  Order       Order[]
 }
 
 model FoodOption {
@@ -173,6 +179,21 @@ model FoodOptionItem {
   @@index([foodOptionId])
 }
 
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItem  CartItem[]
+  shipperId String?
+  shipper   Shipper?    @relation(fields: [shipperId], references: [id])
+  status    OrderStatus @default(NOT_PAID)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([shipperId])
+}
+
 enum Role {
   USER
   RESTAURANT
@@ -184,4 +205,17 @@ enum Approve {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum OrderStatus {
+  NOT_PAID
+  PAID
+  PREPARING
+  DELIVERING
+  DELIVERED
+}
+
+enum CartStatus {
+  NOT_ORDERED
+  ORDERED
 }
