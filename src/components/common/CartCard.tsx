@@ -25,10 +25,10 @@ const CartCard = ({
 
   const [cardItems, setCardItems] = useState(item.cart);
 
-  const removeItemsMutation = api.order.createOrder.useMutation();
+  const createOrderMutation = api.order.createOrder.useMutation();
 
   const handleCheckout = async () => {
-    const orderId = await removeItemsMutation.mutateAsync({
+    const orderId = await createOrderMutation.mutateAsync({
       cartItemIds: cardItems.map((item) => item.id),
     });
     await router.push({

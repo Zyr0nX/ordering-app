@@ -26,29 +26,27 @@ export const cartRouter = createTRPCRouter({
         },
       });
 
-      // console.log(isFoodOptionValid);
+      if (isFoodOptionValid.length !== input.foodOptionids.length) {
+        throw new Error("Invalid food option");
+      }
 
-      // if (isFoodOptionValid.length !== input.foodOptionids.length) {
-      //   throw new Error("Invalid food option");
-      // }
-
-      const existCartItem = await ctx.prisma.cartItem.findFirst({
+      const existCartItems = await ctx.prisma.cartItem.findMany({
         where: {
           foodId: input.foodId,
-          foodOption: {
-            every: {
-              // AND: input.foodOptionids.map((id) => ({
-              //   id: {
-              //     in: id,
-              //   },
-              // })),
-              id: {
-                in: input.foodOptionids,
-              },
-            },
-          },
+          userId: ctx.session?.user?.id as string,
           orderId: null,
         },
+        include: {
+          foodOption: true,
+        },
+      });
+
+      const existCartItem = existCartItems.find((item) => {
+        const foodOptionIds = item.foodOption.map((option) => option.id);
+        return (
+          foodOptionIds.length === input.foodOptionids.length &&
+          foodOptionIds.every((id) => input.foodOptionids.includes(id))
+        );
       });
 
       if (existCartItem) {
