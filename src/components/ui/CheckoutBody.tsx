@@ -32,16 +32,20 @@ const CheckoutBody = ({
   const strapiMutation = api.stripe.createCheckoutSession.useMutation();
 
   const handleCheckout = async () => {
-    const { checkoutUrl } = await strapiMutation.mutateAsync(
-      cart.map((item) => ({
+    localStorage.setItem("cart", JSON.stringify(cart));
+    const { checkoutUrl } = await strapiMutation.mutateAsync({
+      items: cart.map((item) => ({
         name: item.food.name,
         description: item.foodOption.map((option) => option.name).join(", "),
         image: item.food.image,
         amount: item.quantity,
         quantity: item.quantity,
-        price: item.food.price + item.foodOption.reduce((acc, item) => acc + item.price, 0),
-      }))
-    );
+        price:
+          item.food.price +
+          item.foodOption.reduce((acc, item) => acc + item.price, 0),
+      })),
+      restaurantId: restaurant?.id as string,
+    });
     if (checkoutUrl) {
       void router.push(checkoutUrl);
     }

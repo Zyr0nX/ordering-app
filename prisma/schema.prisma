@@ -85,6 +85,7 @@ model Restaurant {
   updatedAt         DateTime        @updatedAt
   restaurantTypeId  String?
   favorite          Favorite[]
+  Order             Order[]
 
   @@index([restaurantTypeId])
 }
@@ -180,18 +181,21 @@ model FoodOptionItem {
 }
 
 model Order {
-  id        String      @id @default(cuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     Json
-  shipperId String?
-  shipper   Shipper?    @relation(fields: [shipperId], references: [id])
-  status    OrderStatus @default(NOT_PAID)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        Json
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  shipperId    String?
+  shipper      Shipper?    @relation(fields: [shipperId], references: [id])
+  status       OrderStatus @default(NOT_PAID)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   @@index([userId])
   @@index([shipperId])
+  @@index([restaurantId])
 }
 
 model StripeEvent {

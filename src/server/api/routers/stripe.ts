@@ -3,20 +3,22 @@ import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
 
-
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
     .input(
-      z.array(
-        z.object({
-          name: z.string(),
-          description: z.string(),
-          image: z.string().url(),
-          amount: z.number(),
-          quantity: z.number(),
-          price: z.number(),
-        })
-      )
+      z.object({
+        items: z.array(
+          z.object({
+            name: z.string(),
+            description: z.string(),
+            image: z.string().url(),
+            amount: z.number(),
+            quantity: z.number(),
+            price: z.number(),
+          })
+        ),
+        restaurantId: z.string().cuid(),
+      })
     )
     .mutation(async ({ ctx, input }) => {
       const { stripe, session, prisma, req } = ctx;
@@ -37,11 +39,14 @@ export const stripeRouter = createTRPCRouter({
           : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
 
       const checkoutSession = await stripe.checkout.sessions.create({
+        metadata: {
+          restaurantId: input.restaurantId,
+        },
         customer: customerId,
         client_reference_id: session.user?.id,
         payment_method_types: ["card"],
         mode: "payment",
-        line_items: input.map((item) => ({
+        line_items: input.items.map((item) => ({
           price_data: {
             currency: "usd",
             product_data: {
@@ -53,14 +58,21 @@ export const stripeRouter = createTRPCRouter({
           },
           quantity: item.quantity,
         })),
-
-        success_url: `${baseUrl}/dashboard?checkoutSuccess=true`,
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              display_name: "Shipping fee",
+              type: "fixed_amount",
+              fixed_amount: {
+                amount: 500,
+                currency: "usd",
+              },
+            },
+          },
+        ],
+        success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/dashboard?checkoutCanceled=true`,
       });
-
-      if (checkoutSession.payment_status === "paid") {
-        //TODO: handle paid
-      }
 
       if (!checkoutSession) {
         throw new Error("Could not create checkout session");
@@ -98,4 +110,25 @@ export const stripeRouter = createTRPCRouter({
 
     return { billingPortalUrl: stripeBillingPortalSession.url };
   }),
+  getCheckoutSession: protectedProcedure
+    .input(
+      z.object({
+        sessionId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { stripe } = ctx;
+
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        input.sessionId,
+        {
+          expand: ["payment_intent", "line_items.data.price.product"],
+        }
+      );
+      if (!checkoutSession) {
+        throw new Error("Could not find checkout session");
+      }
+
+      return checkoutSession;
+    }),
 });

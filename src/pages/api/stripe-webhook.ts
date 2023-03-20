@@ -1,14 +1,11 @@
-import { stripe } from "~/server/stripe"
-import {
-  handleInvoicePaid,
-  handleSubscriptionCanceled,
-  handleSubscriptionCreatedOrUpdated,
-} from "../../server/stripe/stripe-webhook-handlers";
+import { handleInvoicePaid, handlePaymentIntentSucceeded, handleSubscriptionCanceled, handleSubscriptionCreatedOrUpdated } from "../../server/stripe/stripe-webhook-handlers";
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Stripe from "stripe";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
+import { stripe } from "~/server/stripe";
+
 
 // Stripe requires the raw body to construct the event.
 export const config = {
@@ -34,6 +31,13 @@ export default async function handler(
 
       // Handle the event
       switch (event.type) {
+        case "payment_intent.succeeded":
+          handlePaymentIntentSucceeded({
+            event,
+            stripe,
+            prisma,
+          })
+          break;
         case "invoice.paid":
           // Used to provision services after the trial has ended.
           // The status of the invoice will show up as paid. Store the status in your database to reference when a user accesses your service to avoid hitting rate limits.
