@@ -7,6 +7,7 @@ import { restaurantTypeRouter } from "./routers/restaurantType";
 import { spamRouter } from "./routers/spam";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { orderRouter } from "./routers/order";
+import { stripeRouter } from "./routers/stripe";
 
 /**
  * This is the primary router for your server.
@@ -21,7 +22,8 @@ export const appRouter = createTRPCRouter({
   external: externalRouter,
   spam: spamRouter,
   restaurantType: restaurantTypeRouter,
-  order: orderRouter
+  order: orderRouter,
+  stripe: stripeRouter,
 });
 
 // export type definition of API

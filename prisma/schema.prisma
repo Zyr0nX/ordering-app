@@ -38,20 +38,23 @@ model Session {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  name          String?
-  email         String?     @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role
-  address       String?
-  accounts      Account[]
-  sessions      Session[]
-  restaurant    Restaurant?
-  cartItem      CartItem[]
-  favorite      Favorite[]
-  shipper       Shipper?
-  Order         Order[]
+  id                       String                    @id @default(cuid())
+  name                     String?
+  email                    String?                   @unique
+  emailVerified            DateTime?
+  image                    String?
+  role                     Role
+  address                  String?
+  accounts                 Account[]
+  sessions                 Session[]
+  restaurant               Restaurant?
+  cartItem                 CartItem[]
+  favorite                 Favorite[]
+  shipper                  Shipper?
+  Order                    Order[]
+  stripeCustomerId         String?
+  stripeSubscriptionId     String?
+  stripeSubscriptionStatus StripeSubscriptionStatus?
 
   @@index([id])
 }
@@ -122,12 +125,9 @@ model CartItem {
   updatedAt  DateTime         @updatedAt
   userId     String
   user       User             @relation(fields: [userId], references: [id])
-  Order      Order?           @relation(fields: [orderId], references: [id])
-  orderId    String?
 
   @@index([foodId])
   @@index([userId])
-  @@index([orderId])
 }
 
 model Favorite {
@@ -183,7 +183,7 @@ model Order {
   id        String      @id @default(cuid())
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cartItem  CartItem[]
+  items     Json
   shipperId String?
   shipper   Shipper?    @relation(fields: [shipperId], references: [id])
   status    OrderStatus @default(NOT_PAID)
@@ -192,6 +192,19 @@ model Order {
 
   @@index([userId])
   @@index([shipperId])
+}
+
+model StripeEvent {
+  id               String   @id @unique
+  api_version      String?
+  data             Json
+  request          Json?
+  type             String
+  object           String
+  account          String?
+  created          DateTime
+  livemode         Boolean
+  pending_webhooks Int
 }
 
 enum Role {
@@ -218,4 +231,15 @@ enum OrderStatus {
 enum CartStatus {
   NOT_ORDERED
   ORDERED
+}
+
+enum StripeSubscriptionStatus {
+  incomplete
+  incomplete_expired
+  trialing
+  active
+  past_due
+  canceled
+  unpaid
+  paused
 }

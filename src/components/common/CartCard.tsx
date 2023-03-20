@@ -25,17 +25,31 @@ const CartCard = ({
 
   const [cardItems, setCardItems] = useState(item.cart);
 
-  const createOrderMutation = api.order.createOrder.useMutation();
+  // const createOrderMutation = api.order.createOrder.useMutation();
 
-  const handleCheckout = async () => {
-    const orderId = await createOrderMutation.mutateAsync({
-      cartItemIds: cardItems.map((item) => item.id),
-    });
-    await router.push({
-      pathname: "/checkout",
-      query: { orderId },
-    });
-  };
+  // const createDraftOrder = async () => {
+  //   const order = {
+  //     restaurantId: item.restaurant.id,
+  //     cartItem: cardItems.map((item) => ({
+  //       foodId: item.food.id,
+  //       foodOptionItemId: item.foodOption.map((item) => item.id),
+  //       quantity: item.quantity,
+  //     })),
+  //   }
+  //    await router.push({
+  //     pathname: "/checkout",
+  //     query: { data: JSON.stringify(order) },
+  //   }, "/checkout");
+  // }
+  // const handleCheckout = async () => {
+  //   const orderId = await createOrderMutation.mutateAsync({
+  //     cartItemIds: cardItems.map((item) => item.id),
+  //   });
+  //   await router.push({
+  //     pathname: "/checkout",
+  //     query: { orderId },
+  //   });
+  // };
 
   if (cardItems.length === 0) return null;
 
@@ -71,7 +85,10 @@ const CartCard = ({
                 />
               ))}
             </ul>
-            <CommonButton text="Checkout" onClick={() => void handleCheckout()} />
+            <Link href={{pathname: "/checkout", query: { id: item.restaurant.id}}} className="flex w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white">
+              Checkout
+            </Link>
+            {/* <CommonButton text="Checkout" onClick={() => void createDraftOrder()} /> */}
           </div>
         </div>
       </div>

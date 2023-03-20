@@ -34,7 +34,6 @@ export const cartRouter = createTRPCRouter({
         where: {
           foodId: input.foodId,
           userId: ctx.session?.user?.id as string,
-          orderId: null,
         },
         include: {
           foodOption: true,

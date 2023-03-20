@@ -1,0 +1,101 @@
+import { z } from "zod";
+import { env } from "~/env.mjs";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
+
+
+export const stripeRouter = createTRPCRouter({
+  createCheckoutSession: protectedProcedure
+    .input(
+      z.array(
+        z.object({
+          name: z.string(),
+          description: z.string(),
+          image: z.string().url(),
+          amount: z.number(),
+          quantity: z.number(),
+          price: z.number(),
+        })
+      )
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { stripe, session, prisma, req } = ctx;
+
+      const customerId = await getOrCreateStripeCustomerIdForUser({
+        prisma,
+        stripe,
+        userId: session.user?.id,
+      });
+
+      if (!customerId) {
+        throw new Error("Could not create customer");
+      }
+
+      const baseUrl =
+        env.NODE_ENV === "development"
+          ? `http://${req.headers.host ?? "localhost:3000"}`
+          : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
+
+      const checkoutSession = await stripe.checkout.sessions.create({
+        customer: customerId,
+        client_reference_id: session.user?.id,
+        payment_method_types: ["card"],
+        mode: "payment",
+        line_items: input.map((item) => ({
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: item.name,
+              description: item.description,
+              images: item.image ? [item.image] : undefined,
+            },
+            unit_amount: parseInt((item.price * 100).toFixed(0)),
+          },
+          quantity: item.quantity,
+        })),
+
+        success_url: `${baseUrl}/dashboard?checkoutSuccess=true`,
+        cancel_url: `${baseUrl}/dashboard?checkoutCanceled=true`,
+      });
+
+      if (checkoutSession.payment_status === "paid") {
+        //TODO: handle paid
+      }
+
+      if (!checkoutSession) {
+        throw new Error("Could not create checkout session");
+      }
+
+      return { checkoutUrl: checkoutSession.url };
+    }),
+  createBillingPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
+    const { stripe, session, prisma, req } = ctx;
+
+    const customerId = await getOrCreateStripeCustomerIdForUser({
+      prisma,
+      stripe,
+      userId: session.user?.id,
+    });
+
+    if (!customerId) {
+      throw new Error("Could not create customer");
+    }
+
+    const baseUrl =
+      env.NODE_ENV === "development"
+        ? `http://${req.headers.host ?? "localhost:3000"}`
+        : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
+
+    const stripeBillingPortalSession =
+      await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${baseUrl}/dashboard`,
+      });
+
+    if (!stripeBillingPortalSession) {
+      throw new Error("Could not create billing portal session");
+    }
+
+    return { billingPortalUrl: stripeBillingPortalSession.url };
+  }),
+});

@@ -32,7 +32,6 @@ export const getServerSideProps = async (
   const cart = await prisma.cartItem.findMany({
     where: {
       userId: session?.user.id,
-      orderId: null,
     },
     include: {
       food: {
