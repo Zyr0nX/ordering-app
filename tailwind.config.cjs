@@ -18,6 +18,8 @@ module.exports = {
         virparyasRed: "#DA4343",
         virparyasLightBlue: "#00B6DE",
         virparyasGreen: "#2C9A44",
+        virparyasPurple: "#8F34C7",
+        virparyasSeparator: "#E0E0E0",
       },
     },
     plugins: [require("@headlessui/tailwindcss")],

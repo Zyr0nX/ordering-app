@@ -40,7 +40,7 @@ export const getServerSideProps = async (
 
   const order = await prisma.order.findFirst({
     where: {
-      id: orderId as string,
+      id: Number(orderId),
       userId: session?.user.id,
     },
     include: {

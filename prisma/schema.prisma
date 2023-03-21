@@ -45,13 +45,15 @@ model User {
   image                    String?
   role                     Role
   address                  String?
+  additionalAddress        String?
+  phoneNumber              String?
   accounts                 Account[]
   sessions                 Session[]
   restaurant               Restaurant?
   cartItem                 CartItem[]
   favorite                 Favorite[]
   shipper                  Shipper?
-  Order                    Order[]
+  order                    Order[]
   stripeCustomerId         String?
   stripeSubscriptionId     String?
   stripeSubscriptionStatus StripeSubscriptionStatus?
@@ -85,7 +87,7 @@ model Restaurant {
   updatedAt         DateTime        @updatedAt
   restaurantTypeId  String?
   favorite          Favorite[]
-  Order             Order[]
+  order             Order[]
 
   @@index([restaurantTypeId])
 }
@@ -155,7 +157,7 @@ model Shipper {
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Order       Order[]
+  order       Order[]
 }
 
 model FoodOption {
@@ -181,7 +183,7 @@ model FoodOptionItem {
 }
 
 model Order {
-  id           String      @id @default(cuid())
+  id           Int         @id @default(autoincrement())
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   restaurantId String
@@ -201,7 +203,7 @@ model Order {
 
 model OrderFood {
   id         String @id @default(cuid())
-  orderId    String
+  orderId    Int
   order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   foodName   String
   foodOption String
@@ -240,7 +242,10 @@ enum Approve {
 enum OrderStatus {
   PLACED
   PREPARING
+  REJECTED_BY_RESTAURANT
+  READY_FOR_PICKUP
   DELIVERING
+  REJECTED_BY_SHIPPER
   DELIVERED
 }
 
