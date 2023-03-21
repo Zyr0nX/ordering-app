@@ -1,12 +1,16 @@
 import CommonButton from "./CommonButton";
 import ItemCart from "./ItemCart";
-import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
+import {
+  type CartItem,
+  type Food,
+  type Restaurant,
+  type FoodOptionItem,
+} from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
-
 
 const CartCard = ({
   item,
@@ -85,7 +89,13 @@ const CartCard = ({
                 />
               ))}
             </ul>
-            <Link href={{pathname: "/checkout", query: { id: item.restaurant.id}}} className="flex w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white">
+            <Link
+              href={{
+                pathname: "/checkout",
+                query: { id: item.restaurant.id },
+              }}
+              className="flex w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+            >
               Checkout
             </Link>
             {/* <CommonButton text="Checkout" onClick={() => void createDraftOrder()} /> */}

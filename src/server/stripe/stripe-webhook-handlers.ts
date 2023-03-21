@@ -1,7 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import type Stripe from "stripe";
 
-
 // retrieves a Stripe customer id for a given user if it exists or creates a new one
 export const getOrCreateStripeCustomerIdForUser = async ({
   stripe,
@@ -132,7 +131,6 @@ export const handlePaymentIntentSucceeded = ({
 }) => {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
   const userId = paymentIntent.metadata.userId;
-  console.log(event);
   // update user with payment intent data
   // await prisma.user.update({
   //   where: {
@@ -143,4 +141,4 @@ export const handlePaymentIntentSucceeded = ({
   //     stripePaymentIntentStatus: paymentIntent.status,
   //   },
   // });
-}
+};

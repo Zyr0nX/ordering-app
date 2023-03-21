@@ -1,28 +1,29 @@
 import CommonButton from "../common/CommonButton";
 import {
+  type User,
   type CartItem,
   type Food,
   type FoodOptionItem,
-  type Order,
   type Restaurant,
 } from "@prisma/client";
 import { useRouter } from "next/router";
-import React from "react";
 import { api } from "~/utils/api";
 
 const CheckoutBody = ({
-  cart,
+  user,
 }: {
-  cart: (CartItem & {
-    food: Food & {
-      restaurant: Restaurant;
-    };
-    foodOption: FoodOptionItem[];
-  })[];
+  user: User & {
+    cartItem: (CartItem & {
+      food: Food & {
+        restaurant: Restaurant;
+      };
+      foodOption: FoodOptionItem[];
+    })[];
+  };
 }) => {
-  const restaurant = cart[0]?.food.restaurant;
+  const restaurant = user.cartItem[0]?.food.restaurant;
 
-  const total = cart.reduce(
+  const total = user.cartItem.reduce(
     (acc, item) => acc + item.food.price * item.quantity,
     0
   );
@@ -32,9 +33,10 @@ const CheckoutBody = ({
   const strapiMutation = api.stripe.createCheckoutSession.useMutation();
 
   const handleCheckout = async () => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("cart", JSON.stringify(user.cartItem));
     const { checkoutUrl } = await strapiMutation.mutateAsync({
-      items: cart.map((item) => ({
+      items: user.cartItem.map((item) => ({
+        id: item.foodId,
         name: item.food.name,
         description: item.foodOption.map((option) => option.name).join(", "),
         image: item.food.image,
@@ -45,6 +47,7 @@ const CheckoutBody = ({
           item.foodOption.reduce((acc, item) => acc + item.price, 0),
       })),
       restaurantId: restaurant?.id as string,
+      deliveryAddress: user.address || "",
     });
     if (checkoutUrl) {
       void router.push(checkoutUrl);
@@ -68,7 +71,7 @@ const CheckoutBody = ({
           </div>
           <div className="h-0.5 w-full bg-virparyasBackground" />
           <ul className="flex list-decimal flex-col gap-2">
-            {cart.map((cardItem) => (
+            {user.cartItem.map((cardItem) => (
               <li className="marker:text-sm marker:font-bold" key={cardItem.id}>
                 <div className="flex justify-between font-bold">
                   <p>{cardItem.food.name}</p>

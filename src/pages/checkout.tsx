@@ -1,4 +1,8 @@
-import { type InferGetServerSidePropsType, type GetServerSidePropsContext, type NextPage } from "next";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSidePropsContext,
+  type NextPage,
+} from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
@@ -7,13 +11,14 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-const Checkout: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ cart }) => {
-  console.log(cart);
+const Checkout: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ user }) => {
   return (
     <Guest>
       <>
         <GuestCommonHeader text="Checkout" />
-        <CheckoutBody cart={cart} />
+        <CheckoutBody user={user} />
       </>
     </Guest>
   );
@@ -37,26 +42,34 @@ export const getServerSideProps = async (
 
   const session = await getServerAuthSession(context);
 
-  const cart = await prisma.cartItem.findMany({
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  const user = await prisma.user.findUnique({
     where: {
-      userId: session?.user.id,
-      food: {
-        restaurant: {
-          id: id as string,
-        },
-      }
+      id: session.user.id,
     },
     include: {
-      food: {
+      cartItem: {
         include: {
-          restaurant: true,
+          food: {
+            include: {
+              restaurant: true,
+            },
+          },
+          foodOption: true,
         },
       },
-      foodOption: true,
     },
-  })
+  });
 
-  if (!cart) {
+  if (!user) {
     return {
       redirect: {
         destination: "/",
@@ -67,10 +80,10 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      cart,
+      user,
     },
-  }
-}
+  };
+};
 
 // export const getServerSideProps = async (
 //   context: GetServerSidePropsContext

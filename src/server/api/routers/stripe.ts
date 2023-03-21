@@ -9,6 +9,7 @@ export const stripeRouter = createTRPCRouter({
       z.object({
         items: z.array(
           z.object({
+            id: z.string().cuid(),
             name: z.string(),
             description: z.string(),
             image: z.string().url(),
@@ -18,6 +19,7 @@ export const stripeRouter = createTRPCRouter({
           })
         ),
         restaurantId: z.string().cuid(),
+        deliveryAddress: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -41,6 +43,7 @@ export const stripeRouter = createTRPCRouter({
       const checkoutSession = await stripe.checkout.sessions.create({
         metadata: {
           restaurantId: input.restaurantId,
+          deliveryAddress: input.deliveryAddress,
         },
         customer: customerId,
         client_reference_id: session.user?.id,
@@ -71,7 +74,7 @@ export const stripeRouter = createTRPCRouter({
           },
         ],
         success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/dashboard?checkoutCanceled=true`,
+        cancel_url: req.headers.referer,
       });
 
       if (!checkoutSession) {

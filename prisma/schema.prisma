@@ -184,18 +184,31 @@ model Order {
   id           String      @id @default(cuid())
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items        Json
   restaurantId String
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
   shipperId    String?
   shipper      Shipper?    @relation(fields: [shipperId], references: [id])
-  status       OrderStatus @default(NOT_PAID)
+  shippingFee  Float       @db.Float
+  status       OrderStatus @default(PLACED)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  orderFood    OrderFood[]
 
   @@index([userId])
   @@index([shipperId])
   @@index([restaurantId])
+}
+
+model OrderFood {
+  id         String @id @default(cuid())
+  orderId    String
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  foodName   String
+  foodOption String
+  price      Float  @db.Float
+  quantity   Int
+
+  @@index([orderId])
 }
 
 model StripeEvent {
@@ -225,8 +238,7 @@ enum Approve {
 }
 
 enum OrderStatus {
-  NOT_PAID
-  PAID
+  PLACED
   PREPARING
   DELIVERING
   DELIVERED

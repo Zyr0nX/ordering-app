@@ -29,7 +29,6 @@ import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe";
 
-
 type CreateContextOptions = {
   session: Session | null;
   req: NextApiRequest;
@@ -53,7 +52,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     prisma,
     stripe,
     req,
-    res
+    res,
   };
 };
 
@@ -72,7 +71,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   return createInnerTRPCContext({
     session,
     req,
-    res
+    res,
   });
 };
 

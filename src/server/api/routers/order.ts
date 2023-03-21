@@ -1,37 +1,36 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-
 export const orderRouter = createTRPCRouter({
-  create: publicProcedure
-    .input(
-      z.object({
-        items: z.array(
-          z.object({
-            food: z.string(),
-            quantity: z.number().min(1),
-            foodOption: z.string().optional(),
-          })
-        ),
-        restaurantid: z.string().cuid(),
-        payment_id: z.string().optional(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { prisma, session } = ctx;
+  // create: publicProcedure
+  //   .input(
+  //     z.object({
+  //       items: z.array(
+  //         z.object({
+  //           food: z.string(),
+  //           quantity: z.number().min(1),
+  //           foodOption: z.string().optional(),
+  //         })
+  //       ),
+  //       restaurantid: z.string().cuid(),
+  //       payment_id: z.string().optional(),
+  //     })
+  //   )
+  //   .mutation(async ({ ctx, input }) => {
+  //     const { prisma, session } = ctx;
 
-      const cartItems = await prisma.order.create({
-        data: {
-          items: input.items.map((item) => ({
-            food: item.food,
-            quantity: item.quantity,
-            foodOption: item.foodOption,
-          })),
-          userId: session?.user.id as string,
-          restaurantId: input.restaurantid,
-        },
-      });
-    }),
+  //     const cartItems = await prisma.order.create({
+  //       data: {
+  //         items: input.items.map((item) => ({
+  //           food: item.food,
+  //           quantity: item.quantity,
+  //           foodOption: item.foodOption,
+  //         })),
+  //         userId: session?.user.id as string,
+  //         restaurantId: input.restaurantid,
+  //       },
+  //     });
+  //   }),
 
   //   createOrder: publicProcedure
   //     .input(
