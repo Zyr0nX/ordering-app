@@ -8,21 +8,7 @@ import { api } from "~/utils/api";
 import AddFood from "../common/AddFood";
 
 
-const ManageRestaurantMenuBody = ({
-  orderList,
-}: {
-  orderList: (Order & {
-    user: User;
-    orderFood: OrderFood[];
-  })[];
-}) => {
-  const ordersQuery = api.order.getPlacedAndPreparingOrders.useQuery(
-    undefined,
-    {
-      initialData: orderList,
-      refetchInterval: 5000,
-    }
-  );
+const ManageRestaurantMenuBody = () => {
   return (
     <div className="m-4 text-virparyasMainBlue">
       <div className="flex justify-center">

@@ -1,12 +1,18 @@
+import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState, useEffect, useCallback } from "react";
+import { createId } from "@paralleldrive/cuid2";
+import { nanoid } from "nanoid";
+import React, { Fragment, useState } from "react";
 
-interface FoodCategory {
+
+export interface FoodCategory {
+  id: string;
   name: string;
   options: FoodOption[];
 }
 
-interface FoodOption {
+export interface FoodOption {
+  id: string
   name: string;
   price: number;
 }
@@ -18,63 +24,33 @@ const AddFood = () => {
   const addFoodCategory = () =>
     setFoodCategories((foodCategories) => [
       ...foodCategories,
-      { name: "", options: [{ name: "", price: 0 }] },
+      { id: createId(), name: "", options: [{ id: createId(), name: "", price: 0 }] },
     ]);
 
-  const addFoodOption = useCallback(
-    (index: number) =>
-      setFoodCategories((foodCategories: FoodCategory[]) => {
-        const newFoodCategories = [...foodCategories];
-        (newFoodCategories[index] as FoodCategory).options = [
-          ...(newFoodCategories[index] as FoodCategory).options,
-          { name: "", price: 0 },
-        ];
-        return newFoodCategories;
-      }),
-    []
-  );
+  const addFoodOption = (index: number) =>
+    setFoodCategories((foodCategories: FoodCategory[]) => {
+      const newFoodCategories = [...foodCategories];
+      (newFoodCategories[index] as FoodCategory).options = [
+        ...(newFoodCategories[index] as FoodCategory).options,
+        { id: createId(), name: "", price: 0 },
+      ];
+      return newFoodCategories;
+    });
 
-  const handleFoodOptionNameChange = useCallback(
-    (index: number, optionIndex: number, value: string) =>
-        setFoodCategories((foodCategories: FoodCategory[]) => {
-            const newFoodCategories = [...foodCategories];
-            (
-                (newFoodCategories[index] as FoodCategory).options[
-                    optionIndex
-                ] as FoodOption
-            ).name = value;
-            return newFoodCategories;
-        }),
-    []
-    );
+  
 
-  console.log(foodCategories);
-  const handleFoodOptionPriceChange = useCallback(
-    (index: number, optionIndex: number, value: number) =>
-      setFoodCategories((foodCategories: FoodCategory[]) => {
-        const newFoodCategories = [...foodCategories];
-        (
-          (newFoodCategories[index] as FoodCategory).options[
-            optionIndex
-          ] as FoodOption
-        ).price = value;
-        return newFoodCategories;
-      }),
-    []
-  );
-
-    useEffect(() => {
-      foodCategories.forEach((foodCategory, index) => {
-        const lastFoodOption = foodCategory.options[
-          foodCategory.options.length - 1
-        ] as FoodOption;
-        if (lastFoodOption.name !== "" && lastFoodOption.price !== 0) {
-          addFoodOption(index);
-        } else {
-          foodCategory.options.pop();
-        }
-      });
-    }, [foodCategories, addFoodOption]);
+  // useEffect(() => {
+  //   foodCategories.forEach((foodCategory, index) => {
+  //     const lastFoodOption = foodCategory.options[
+  //       foodCategory.options.length - 1
+  //     ] as FoodOption;
+  //     if (lastFoodOption.name !== "" && lastFoodOption.price !== 0) {
+  //       addFoodOption(index);
+  //     } else {
+  //       foodCategory.options.pop();
+  //     }
+  //   });
+  // }, [foodCategories, addFoodOption]);
 
   return (
     <>
@@ -173,63 +149,7 @@ const AddFood = () => {
                       </div>
                       <div className="h-0.5 bg-virparyasSeparator" />
                       {foodCategories.map((foodCategory, index) => (
-                        <div
-                          className="relative flex flex-col gap-2"
-                          key={Math.random()}
-                        >
-                          <div className="flex flex-col">
-                            <label
-                              htmlFor="restaurantName"
-                              className="font-medium"
-                            >
-                              * Customization category:
-                            </label>
-                            <input
-                              type="text"
-                              id="restaurantName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                              placeholder="Email..."
-                            />
-                            <div className="absolute top-6 left-4 bottom-5 -z-10 w-1 bg-virparyasMainBlue"></div>
-                          </div>
-                          {foodCategory.options.map(
-                            (foodOption, optionIndex) => (
-                              <div
-                                className="relative ml-8 flex gap-2"
-                                key={Math.random()}
-                              >
-                                <input
-                                  type="text"
-                                  id="restaurantName"
-                                  className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                                  placeholder="Name..."
-                                  onChange={(e) =>
-                                    handleFoodOptionNameChange(
-                                      index,
-                                      optionIndex,
-                                      e.target.value
-                                    )
-                                  }
-                                />
-                                <input
-                                  type="number"
-                                  id="restaurantName"
-                                  className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                                  placeholder="Price..."
-                                  onChange={(e) =>
-                                    handleFoodOptionPriceChange(
-                                      index,
-                                      optionIndex,
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                />
-
-                                <div className="absolute right-0 -left-4 top-5 -z-10 h-1 bg-virparyasMainBlue"></div>
-                              </div>
-                            )
-                          )}
-                        </div>
+                        <FoodOptionInput foodCategory={foodCategory} index={index} key={foodCategory.id} setFoodCategories={setFoodCategories} foodCategories={foodCategories} />
                       ))}
 
                       <button className="font-medium" onClick={addFoodCategory}>

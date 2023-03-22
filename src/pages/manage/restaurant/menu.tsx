@@ -10,44 +10,15 @@ import ManageRestaurantMenuBody from "~/components/ui/ManageRestaurantMenuBody";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-const Requests: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ orderList }) => {
+const Requests = () => {
   return (
     <Restaurant>
       <>
         <ManageRestaurantHeader title="Menu" />
-        <ManageRestaurantMenuBody orderList={orderList} />
+        <ManageRestaurantMenuBody />
       </>
     </Restaurant>
   );
 };
 
 export default Requests;
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const session = await getServerAuthSession(context);
-
-  const orderList = await prisma.order.findMany({
-    where: {
-      restaurant: {
-        userId: session?.user.id,
-      },
-      status: {
-        in: ["PLACED", "PREPARING"],
-      },
-    },
-    include: {
-      user: true,
-      orderFood: true,
-    },
-  });
-
-  return {
-    props: {
-      orderList,
-    },
-  };
-};
