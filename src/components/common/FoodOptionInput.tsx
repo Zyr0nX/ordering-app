@@ -61,12 +61,21 @@ const FoodOptionInput = ({
         .price !== 0
     ) {
       setFoodCategories((foodCategories: FoodCategory[]) => {
-        const newFoodCategories = [...foodCategories];
-        (newFoodCategories[index] as FoodCategory).options.push({
-          id: createId(),
-          name: "",
-          price: 0,
-        });
+        const newFoodCategories = foodCategories.map(
+          (foodCategory: FoodCategory, i: number) => {
+            if (i === index) {
+              const newOptions = [
+                ...foodCategory.options,
+                { id: createId(), name: "", price: 0 },
+              ];
+              return {
+                ...foodCategory,
+                options: newOptions,
+              };
+            }
+            return foodCategory;
+          }
+        );
         return newFoodCategories;
       });
     }
@@ -87,10 +96,13 @@ const FoodOptionInput = ({
     ) {
       setFoodCategories((foodCategories: FoodCategory[]) => {
         const newFoodCategories = [...foodCategories];
-        const options = (
-          newFoodCategories[index] as FoodCategory
-        ).options.slice(0, -1);
-        (newFoodCategories[index] as FoodCategory).options = options;
+        const foodCategoryToUpdate = newFoodCategories[index] as FoodCategory;
+        const options = foodCategoryToUpdate.options.slice(0, -1);
+        const updatedFoodCategory = {
+          ...foodCategoryToUpdate,
+          options,
+        };
+        newFoodCategories[index] = updatedFoodCategory;
         return newFoodCategories;
       });
     }
