@@ -12,7 +12,7 @@ const Home: NextPage<
   return (
     <Guest>
       <>
-        <HomeHeader />
+        {/* <HomeHeader /> */}
         <HomeBody cuisines={cuisines} restaurants={restaurants} />
       </>
     </Guest>
