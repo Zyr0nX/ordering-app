@@ -59,9 +59,10 @@ const CartCard = ({
 
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
-      <div className="relative overflow-hidden p-4 text-white">
+      <div className="overflow-hidden p-4 text-white">
         <Link
           href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
+          className="relative"
         >
           <Image
             src={item.restaurant.brandImage || ""}

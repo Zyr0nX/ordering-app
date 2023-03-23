@@ -4,12 +4,13 @@ import RestaurantDetailBody from "~/components/ui/RestaurantDetailBody";
 import RestaurantDetailHeader from "~/components/ui/RestaurantDetailHeader";
 import { prisma } from "~/server/db";
 
+
 const RestarantDetail: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ restaurant, food }) => {
+> = ({ restaurant, food, rating }) => {
   return (
     <>
-      <RestaurantDetailHeader restaurant={restaurant} />
+      <RestaurantDetailHeader restaurant={restaurant} rating={rating} />
       <RestaurantDetailBody food={food} />
     </>
   );
@@ -32,29 +33,41 @@ export const getServerSideProps = async ({
       },
     };
   }
-  const restaurant = await prisma.restaurant.findUnique({
-    where: {
-      id,
-    },
-  });
 
-  const food = await prisma.food.findMany({
-    where: {
-      restaurantId: id,
-    },
-    include: {
-      foodOption: {
-        include: {
-          foodOptionItem: true,
+
+  const [restaurant, food, rating] = await Promise.all([
+    prisma.restaurant.findUnique({
+      where: {
+        id,
+      },
+    }),
+    prisma.food.findMany({
+      where: {
+        restaurantId: id,
+      },
+      include: {
+        foodOption: {
+          include: {
+            foodOptionItem: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.order.aggregate({
+      _avg: {
+        restaurantRating: true,
+      },
+      where: {
+        restaurantId: id,
+      },
+    }),
+  ]);
 
   return {
     props: {
       restaurant,
       food,
+      rating: rating._avg.restaurantRating,
     },
   };
 };

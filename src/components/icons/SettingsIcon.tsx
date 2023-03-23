@@ -26,7 +26,7 @@ const SettingsIcon: React.FC<HtmlHTMLAttributes<HTMLOrSVGElement>> = ({
           width="67.5869"
           height="70.9111"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
           <feFlood flood-opacity="0" result="BackgroundImageFix" />
           <feColorMatrix

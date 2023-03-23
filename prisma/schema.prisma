@@ -70,22 +70,22 @@ model VerificationToken {
 }
 
 model Restaurant {
-  id                String          @id @default(cuid())
+  id                String     @id @default(cuid())
   name              String
   address           String
   additionalAddress String?
   firstName         String
   lastName          String
   phoneNumber       String
-  approved          Approve         @default(PENDING)
-  userId            String          @unique
+  approved          Approve    @default(PENDING)
+  userId            String     @unique
   food              Food[]
-  cuisine    Cuisine? @relation(fields: [cuisineId], references: [id])
+  cuisine           Cuisine?   @relation(fields: [cuisineId], references: [id])
   brandImage        String?
-  user              User            @relation(fields: [userId], references: [id])
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  cuisineId  String?
+  user              User       @relation(fields: [userId], references: [id])
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  cuisineId         String?
   favorite          Favorite[]
   order             Order[]
 
@@ -181,18 +181,20 @@ model FoodOptionItem {
 }
 
 model Order {
-  id           Int         @id @default(autoincrement())
-  userId       String
-  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  restaurantId String
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
-  shipperId    String?
-  shipper      Shipper?    @relation(fields: [shipperId], references: [id])
-  shippingFee  Float       @db.Float
-  status       OrderStatus @default(PLACED)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  orderFood    OrderFood[]
+  id               Int         @id @default(autoincrement())
+  userId           String
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantId     String
+  restaurant       Restaurant  @relation(fields: [restaurantId], references: [id])
+  shipperId        String?
+  shipper          Shipper?    @relation(fields: [shipperId], references: [id])
+  shippingFee      Float       @db.Float
+  restaurantRating Int?
+  shipperRating    Int?
+  status           OrderStatus @default(PLACED)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  orderFood        OrderFood[]
 
   @@index([userId])
   @@index([shipperId])
