@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -46,7 +47,7 @@ export const adminRouter = createTRPCRouter({
               email: true,
             },
           },
-          restaurantType: {
+          cuisine: {
             select: {
               name: true,
             },
@@ -62,7 +63,7 @@ export const adminRouter = createTRPCRouter({
       },
       include: {
         user: true,
-        restaurantType: true,
+        cuisine: true,
       },
     });
   }),
@@ -76,7 +77,7 @@ export const adminRouter = createTRPCRouter({
         firstname: z.string(),
         lastname: z.string(),
         phonenumber: z.string(),
-        restaurantTypeId: z.string().cuid(),
+        cuisineId: z.string().cuid(),
         brandImage: z.string().url().nullish(),
       })
     )
@@ -89,7 +90,7 @@ export const adminRouter = createTRPCRouter({
           firstName: input.firstname,
           lastName: input.lastname,
           phoneNumber: input.phonenumber,
-          restaurantTypeId: input.restaurantTypeId,
+          cuisineId: input.cuisineId,
           brandImage: input.brandImage,
         },
         where: {

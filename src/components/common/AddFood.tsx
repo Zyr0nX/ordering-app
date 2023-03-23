@@ -1,9 +1,9 @@
+import CommonImageInput from "./CommonImageInput";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
-import { nanoid } from "nanoid";
-import React, { Fragment, useState } from "react";
-
+import React, { Fragment, useState, useRef } from "react";
+import { api } from "~/utils/api";
 
 export interface FoodCategory {
   id: string;
@@ -12,45 +12,58 @@ export interface FoodCategory {
 }
 
 export interface FoodOption {
-  id: string
+  id: string;
   name: string;
   price: number;
 }
 
 const AddFood = () => {
+  const nameRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const quantityRef = useRef<HTMLInputElement>(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [foodCategories, setFoodCategories] = useState<FoodCategory[]>([]);
 
   const addFoodCategory = () =>
     setFoodCategories((foodCategories) => [
       ...foodCategories,
-      { id: createId(), name: "", options: [{ id: createId(), name: "", price: 0 }] },
+      {
+        id: createId(),
+        name: "",
+        options: [{ id: createId(), name: "", price: 0 }],
+      },
     ]);
 
-  const addFoodOption = (index: number) =>
-    setFoodCategories((foodCategories: FoodCategory[]) => {
-      const newFoodCategories = [...foodCategories];
-      (newFoodCategories[index] as FoodCategory).options = [
-        ...(newFoodCategories[index] as FoodCategory).options,
-        { id: createId(), name: "", price: 0 },
-      ];
-      return newFoodCategories;
+  const [image, setImage] = useState<string>("");
+
+  const createFoodMutation = api.food.create.useMutation();
+
+  const handleAddFood = () => {
+    const name = nameRef.current?.value;
+    const price = Number(priceRef.current?.value);
+    const quantity = Number(quantityRef.current?.value);
+    const description = descriptionRef.current?.value;
+
+    if (!name || !price || !quantity) {
+      return;
+    }
+
+    createFoodMutation.mutate({
+      name,
+      description,
+      price,
+      quantity,
+      image,
+      categories: foodCategories.map((foodCategory) => ({
+        ...foodCategory,
+        options: foodCategory.options.filter((option) => option.name),
+      })),
     });
 
-  
-
-  // useEffect(() => {
-  //   foodCategories.forEach((foodCategory, index) => {
-  //     const lastFoodOption = foodCategory.options[
-  //       foodCategory.options.length - 1
-  //     ] as FoodOption;
-  //     if (lastFoodOption.name !== "" && lastFoodOption.price !== 0) {
-  //       addFoodOption(index);
-  //     } else {
-  //       foodCategory.options.pop();
-  //     }
-  //   });
-  // }, [foodCategories, addFoodOption]);
+    setIsOpen(false);
+  };
 
   return (
     <>
@@ -93,63 +106,66 @@ const AddFood = () => {
                   <div className="mt-2">
                     <div className="grid grid-cols-1 gap-4">
                       <div className="flex flex-col">
-                        <label htmlFor="firstName" className="font-medium">
-                          * Food name:
+                        <label htmlFor="name" className="font-medium">
+                          * Name:
                         </label>
                         <input
                           type="text"
-                          id="firstName"
+                          id="name"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Item name..."
+                          placeholder="Name..."
+                          ref={nameRef}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label htmlFor="lastName" className="font-medium">
-                          * Food price:
+                        <label htmlFor="price" className="font-medium">
+                          * Price:
                         </label>
                         <input
                           type="text"
-                          id="lastName"
+                          id="price"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Email..."
+                          placeholder="Price..."
+                          ref={priceRef}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label htmlFor="phone" className="font-medium">
-                          * Food quantity:
+                        <label htmlFor="quantity" className="font-medium">
+                          * Quantity:
                         </label>
                         <input
                           type="text"
-                          id="phone"
+                          id="quantity"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Email..."
+                          placeholder="Quantity..."
+                          ref={quantityRef}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label htmlFor="email" className="font-medium">
-                          Food description:
+                        <label htmlFor="description" className="font-medium">
+                          Description:
                         </label>
-                        <input
-                          type="email"
-                          id="email"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Email..."
+                        <textarea
+                          id="description"
+                          className="h-20 w-full rounded-xl px-4 placeholder:leading-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          placeholder="Description..."
+                          ref={descriptionRef}
                         />
                       </div>
-                      <div className="flex flex-col">
-                        <label htmlFor="restaurantName" className="font-medium">
-                          * Food image:
-                        </label>
-                        <input
-                          type="text"
-                          id="restaurantName"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Email..."
-                        />
-                      </div>
+                      <CommonImageInput
+                        image={image}
+                        setImage={setImage}
+                        label="* Image"
+                      />
                       <div className="h-0.5 bg-virparyasSeparator" />
                       {foodCategories.map((foodCategory, index) => (
-                        <FoodOptionInput foodCategory={foodCategory} index={index} key={foodCategory.id} setFoodCategories={setFoodCategories} foodCategories={foodCategories} />
+                        <FoodOptionInput
+                          foodCategory={foodCategory}
+                          index={index}
+                          key={foodCategory.id}
+                          setFoodCategories={setFoodCategories}
+                          foodCategories={foodCategories}
+                        />
                       ))}
 
                       <button className="font-medium" onClick={addFoodCategory}>
@@ -157,6 +173,13 @@ const AddFood = () => {
                       </button>
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
+                    onClick={handleAddFood}
+                  >
+                    Confirm
+                  </button>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

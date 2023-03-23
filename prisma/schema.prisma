@@ -80,32 +80,30 @@ model Restaurant {
   approved          Approve         @default(PENDING)
   userId            String          @unique
   food              Food[]
-  restaurantType    RestaurantType? @relation(fields: [restaurantTypeId], references: [id])
+  cuisine    Cuisine? @relation(fields: [cuisineId], references: [id])
   brandImage        String?
   user              User            @relation(fields: [userId], references: [id])
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  restaurantTypeId  String?
+  cuisineId  String?
   favorite          Favorite[]
   order             Order[]
 
-  @@index([restaurantTypeId])
+  @@index([cuisineId])
 }
 
-model RestaurantType {
+model Cuisine {
   id         String       @id @default(cuid())
   name       String
+  image      String
   restaurant Restaurant[]
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
 }
 
 model Food {
   id           String       @id @default(cuid())
   name         String
-  description  String
+  description  String?
   price        Float        @db.Float
-  calories     Int
   image        String
   restaurantId String
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])

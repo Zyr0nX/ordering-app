@@ -47,7 +47,7 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
 
   const registrationMutation = api.restaurant.registration.useMutation();
 
-  api.restaurantType.getAll.useQuery(undefined, {
+  api.cuisine.getAll.useQuery(undefined, {
     onSuccess: (data) => {
       setRestaurantTypes(data);
       setSelected(data[1]);

@@ -11,7 +11,7 @@ const AdminRequestsBody = () => {
       user: {
         email: string | null;
       };
-      restaurantType: {
+      cuisine: {
         name: string;
       } | null;
     })[]
@@ -24,7 +24,7 @@ const AdminRequestsBody = () => {
       user: {
         email: string | null;
       };
-      restaurantType: {
+      cuisine: {
         name: string;
       } | null;
     }
@@ -66,7 +66,7 @@ const AdminRequestsBody = () => {
       user: {
         email: string | null;
       };
-      restaurantType: {
+      cuisine: {
         name: string;
       } | null;
     }
@@ -242,7 +242,7 @@ const AdminRequestsBody = () => {
                             id="category"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            value={selectedRestaurant?.restaurantType?.name}
+                            value={selectedRestaurant?.cuisine?.name}
                           />
                         </div>
                       </p>

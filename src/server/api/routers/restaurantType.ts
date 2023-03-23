@@ -1,8 +1,8 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const restaurantTypeRouter = createTRPCRouter({
+export const cuisineRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.restaurantType.findMany({
+    return ctx.prisma.cuisine.findMany({
       select: {
         id: true,
         name: true,

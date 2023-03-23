@@ -2,7 +2,6 @@ import { type FoodOption, type FoodCategory } from "./AddFood";
 import { createId } from "@paralleldrive/cuid2";
 import React, { useEffect } from "react";
 
-
 const FoodOptionInput = ({
   foodCategory,
   index,
@@ -56,9 +55,7 @@ const FoodOptionInput = ({
     if (
       foodCategory.options.length > 0 &&
       (foodCategory.options[foodCategory.options.length - 1] as FoodOption)
-        .name !== "" &&
-      (foodCategory.options[foodCategory.options.length - 1] as FoodOption)
-        .price !== 0
+        .name !== ""
     ) {
       setFoodCategories((foodCategories: FoodCategory[]) => {
         const newFoodCategories = foodCategories.map(
@@ -141,7 +138,7 @@ const FoodOptionInput = ({
             id="restaurantName"
             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
             placeholder="Price..."
-            value={foodOption.price}
+            value={Number(foodOption.price).toString()}
             onChange={(e) =>
               handleFoodOptionPriceChange(
                 index,

@@ -8,12 +8,12 @@ import { prisma } from "~/server/db";
 
 const Home: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ restaurants }) => {
+> = ({ cuisines, restaurants }) => {
   return (
     <Guest>
       <>
         <HomeHeader />
-        <HomeBody restaurants={restaurants} />
+        <HomeBody cuisines={cuisines} restaurants={restaurants} />
       </>
     </Guest>
   );
@@ -25,20 +25,27 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const restaurants = await prisma.restaurant.findMany({
-    where: {
-      approved: "APPROVED",
-    },
-    include: {
-      favorite: {
-        where: {
-          userId: session?.user.id,
-        },
+
+  const [cuisines, restaurants] = await Promise.all([
+    prisma.cuisine.findMany(),
+    prisma.restaurant.findMany({
+      where: {
+        approved: "APPROVED",
       },
-    },
-  });
+      include: {
+        favorite: {
+          where: {
+            userId: session?.user.id,
+          },
+        },
+        cuisine: true,
+      },
+    }),
+  ]);
+
   return {
     props: {
+      cuisines,
       restaurants,
     },
   };

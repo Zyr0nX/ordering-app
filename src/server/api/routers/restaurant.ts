@@ -31,7 +31,7 @@ export const restaurantRouter = createTRPCRouter({
           lastName: input.lastname,
           phoneNumber: input.phonenumber,
           userId: ctx.session?.user?.id,
-          restaurantTypeId: input.restaurantTypeId,
+          cuisineId: input.restaurantTypeId,
         },
       });
     }),
@@ -58,7 +58,7 @@ export const restaurantRouter = createTRPCRouter({
           lastName: input.lastname,
           phoneNumber: input.phonenumber,
           userId: ctx.session?.user?.id as string,
-          restaurantTypeId: input.restaurantTypeId,
+          cuisineId: input.restaurantTypeId,
         },
       });
     }),
@@ -131,9 +131,24 @@ export const restaurantRouter = createTRPCRouter({
         name: true,
         address: true,
         brandImage: true,
-        restaurantType: {
+        cuisine: {
           select: {
             name: true,
+          },
+        },
+      },
+    });
+    return restaurants;
+  }),
+  getRestaurantForUser: publicProcedure.query(async ({ ctx }) => {
+    const restaurants = await ctx.prisma.restaurant.findMany({
+      where: {
+        approved: "APPROVED",
+      },
+      include: {
+        favorite: {
+          where: {
+            userId: ctx.session?.user.id,
           },
         },
       },

@@ -8,24 +8,21 @@ import RedCross from "../icons/RedCross";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
 import { Transition, Listbox } from "@headlessui/react";
-import {
-  type Restaurant,
-  type User,
-  type RestaurantType,
-} from "@prisma/client";
+import { type Restaurant, type User, type Cuisine } from "@prisma/client";
 import fuzzysort from "fuzzysort";
 import React, { Fragment, useState, useRef, useEffect } from "react";
 import { api } from "~/utils/api";
 
 const AdminRestaurantsBody = ({
   restaurants,
-  restaurantTypes,
+  cuisines,
 }: {
   restaurants: (Restaurant & {
     user: User;
-    restaurantType: RestaurantType | null;
+    cuisine: Cuisine | null;
   })[];
-  restaurantTypes: RestaurantType[];
+
+  cuisines: Cuisine[];
 }) => {
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -43,13 +40,13 @@ const AdminRestaurantsBody = ({
   const [selectedRestaurant, setSelectedRestaurant] = useState<
     Restaurant & {
       user: User;
-      restaurantType: RestaurantType | null;
+      cuisine: Cuisine | null;
     }
   >();
 
   const [image, setImage] = useState<string | null>(null);
 
-  const [selected, setSelected] = useState<RestaurantType | null>(null);
+  const [selected, setSelected] = useState<Cuisine | null>(null);
 
   const utils = api.useContext();
 
@@ -90,11 +87,10 @@ const AdminRestaurantsBody = ({
               phoneNumber: newData.phonenumber,
               additionalAddress: newData.additionaladdress as string,
               brandImage: newData.brandImage as string,
-              restaurantType: {
-                id: newData.restaurantTypeId,
+              cuisine: {
+                id: newData.cuisineId,
                 name: selected?.name as string,
-                updatedAt: new Date(),
-                createdAt: new Date(),
+                image: "",
               },
             };
           } else {
@@ -147,7 +143,7 @@ const AdminRestaurantsBody = ({
       restaurantId: id,
       name: restaurantNameRef.current?.value as string,
       address: addressRef.current?.value as string,
-      restaurantTypeId: selected?.id as string,
+      cuisineId: selected?.id as string,
       firstname: firstNameRef.current?.value as string,
       lastname: lastNameRef.current?.value as string,
       phonenumber: phoneNumberRef.current?.value as string,
@@ -159,15 +155,13 @@ const AdminRestaurantsBody = ({
   const handleSelect = (
     restaurant: Restaurant & {
       user: User;
-      restaurantType: RestaurantType | null;
+      cuisine: Cuisine | null;
     }
   ) => {
     setIsOpen(true);
     setSelectedRestaurant(restaurant);
     setSelected(
-      restaurantTypes.find(
-        (type) => type.id === restaurant.restaurantType?.id
-      ) ?? null
+      cuisines.find((cuisine) => cuisine.id === restaurant.cuisineId) ?? null
     );
     setImage(restaurant.brandImage);
   };
@@ -254,7 +248,7 @@ const AdminRestaurantsBody = ({
                           <DropDownIcon />
                         </span>
                       </Listbox.Button>
-                      {restaurantTypes && (
+                      {cuisines && (
                         <Transition
                           as={Fragment}
                           leave="transition ease-in duration-100"
@@ -262,15 +256,15 @@ const AdminRestaurantsBody = ({
                           leaveTo="opacity-0"
                         >
                           <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                            {restaurantTypes.map((restaurantType) => (
+                            {cuisines.map((cuisine) => (
                               <Listbox.Option
-                                key={restaurantType.id}
+                                key={cuisine.id}
                                 className={({ active }) =>
                                   `relative cursor-default select-none text-viparyasDarkBlue ${
                                     active ? "bg-[#E9E9FF]" : "text-gray-900"
                                   }`
                                 }
-                                value={restaurantType}
+                                value={cuisine}
                               >
                                 {({ selected }) => (
                                   <span
@@ -280,7 +274,7 @@ const AdminRestaurantsBody = ({
                                         : ""
                                     }`}
                                   >
-                                    {restaurantType.name}
+                                    {cuisine.name}
                                   </span>
                                 )}
                               </Listbox.Option>

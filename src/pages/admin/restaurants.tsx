@@ -1,8 +1,4 @@
-import {
-  type GetServerSidePropsContext,
-  type NextPage,
-  type InferGetServerSidePropsType,
-} from "next";
+import { type GetServerSidePropsContext, type NextPage, type InferGetServerSidePropsType } from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
@@ -10,16 +6,17 @@ import AdminRestaurantsBody from "~/components/ui/AdminRestaurantsBody";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
+
 const Restaurants: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ restaurants, restaurantTypes }) => {
+> = ({ restaurants, cuisines }) => {
   return (
     <Admin>
       <>
         <AdminCommonHeader title="Restaurants" />
         <AdminRestaurantsBody
           restaurants={restaurants}
-          restaurantTypes={restaurantTypes}
+          cuisines={cuisines}
         />
       </>
     </Admin>
@@ -40,22 +37,23 @@ export const getServerSideProps = async (
     };
   }
 
-  const restaurants = await prisma.restaurant.findMany({
-    where: {
-      approved: "APPROVED",
-    },
-    include: {
-      restaurantType: true,
-      user: true,
-    },
-  });
-
-  const restaurantTypes = await prisma.restaurantType.findMany();
+  const [restaurants, cuisines] = await Promise.all([
+    prisma.restaurant.findMany({
+      where: {
+        approved: "APPROVED",
+      },
+      include: {
+        cuisine: true,
+        user: true,
+      },
+    }),
+    prisma.cuisine.findMany(),
+  ]);
 
   return {
     props: {
       restaurants,
-      restaurantTypes,
+      cuisines,
     },
   };
 };

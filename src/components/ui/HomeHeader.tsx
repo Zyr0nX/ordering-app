@@ -1,6 +1,8 @@
 import AccountIcon from "../icons/AccountIcon";
+import CartIcon from "../icons/CartIcon";
 import HouseIcon from "../icons/HouseIcon";
 import SearchIcon from "../icons/SearchIcon";
+import Link from "next/link";
 import React from "react";
 
 const HomeHeader = () => {
@@ -13,8 +15,13 @@ const HomeHeader = () => {
             123 34th St
           </p>
         </div>
-        <div>
-          <AccountIcon />
+        <div className="flex items-center gap-4">
+          <Link href="/signin">
+            <AccountIcon />
+          </Link>
+          <Link href="/cart">
+            <CartIcon />
+          </Link>
         </div>
       </div>
       <div>
