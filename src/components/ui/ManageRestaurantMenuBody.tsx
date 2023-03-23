@@ -1,4 +1,5 @@
 import AddFood from "../common/AddFood";
+import FoodList from "../common/FoodList";
 import RestaurantPendingOrder from "../common/RestaurantPendingOrder";
 import GreenCheckmark from "../icons/GreenCheckmark";
 import RedCross from "../icons/RedCross";
@@ -14,7 +15,6 @@ import {
 } from "@prisma/client";
 import React, { Fragment } from "react";
 import { api } from "~/utils/api";
-import FoodList from "../common/FoodList";
 
 const ManageRestaurantMenuBody = ({
   menu,

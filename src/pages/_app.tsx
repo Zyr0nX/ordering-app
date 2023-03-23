@@ -1,4 +1,4 @@
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics } from "@vercel/analytics/react";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
@@ -6,7 +6,6 @@ import { Roboto } from "next/font/google";
 import NextNProgress from "nextjs-progressbar";
 import "~/styles/globals.css";
 import { api } from "~/utils/api";
-
 
 const roboto = Roboto({
   subsets: ["latin"],

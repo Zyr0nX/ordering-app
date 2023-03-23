@@ -3,13 +3,13 @@ import RedCross from "../icons/RedCross";
 import { type FoodCategory } from "./AddFood";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
+import { createId } from "@paralleldrive/cuid2";
 import {
   type Food,
   type FoodOption,
   type FoodOptionItem,
 } from "@prisma/client";
 import { Fragment, useState } from "react";
-import { createId } from "@paralleldrive/cuid2";
 
 const FoodList = ({
   food,
@@ -22,20 +22,26 @@ const FoodList = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [foodCategories, setFoodCategories] = useState<FoodCategory[]>(food.foodOption.map((foodOption) => ({
-    id: foodOption.id,
-    name: foodOption.name,
-    options: foodOption.foodOptionItem.map((foodOptionItem) => ({
-      id: foodOptionItem.id,
-      name: foodOptionItem.name,
-      price: foodOptionItem.price,
-    })),
-  })));
+  const [foodCategories, setFoodCategories] = useState<FoodCategory[]>(
+    food.foodOption.map((foodOption) => ({
+      id: foodOption.id,
+      name: foodOption.name,
+      options: foodOption.foodOptionItem.map((foodOptionItem) => ({
+        id: foodOptionItem.id,
+        name: foodOptionItem.name,
+        price: foodOptionItem.price,
+      })),
+    }))
+  );
 
   const addFoodCategory = () =>
     setFoodCategories((foodCategories) => [
       ...foodCategories,
-      { id: createId(), name: "", options: [{ id: createId(), name: "", price: 0 }] },
+      {
+        id: createId(),
+        name: "",
+        options: [{ id: createId(), name: "", price: 0 }],
+      },
     ]);
 
   return (
@@ -152,7 +158,13 @@ const FoodList = ({
                       </div>
                       <div className="h-0.5 bg-virparyasSeparator" />
                       {foodCategories.map((foodCategory, index) => (
-                        <FoodOptionInput foodCategory={foodCategory} index={index} key={foodCategory.id} setFoodCategories={setFoodCategories} foodCategories={foodCategories} />
+                        <FoodOptionInput
+                          foodCategory={foodCategory}
+                          index={index}
+                          key={foodCategory.id}
+                          setFoodCategories={setFoodCategories}
+                          foodCategories={foodCategories}
+                        />
                       ))}
 
                       <button className="font-medium" onClick={addFoodCategory}>

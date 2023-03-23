@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(

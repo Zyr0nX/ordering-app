@@ -1,6 +1,5 @@
 import React, { type HtmlHTMLAttributes } from "react";
 
-
 const AccountIcon: React.FC<HtmlHTMLAttributes<HTMLOrSVGElement>> = ({
   ...props
 }) => {

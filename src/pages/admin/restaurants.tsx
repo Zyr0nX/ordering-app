@@ -1,11 +1,14 @@
-import { type GetServerSidePropsContext, type NextPage, type InferGetServerSidePropsType } from "next";
+import {
+  type GetServerSidePropsContext,
+  type NextPage,
+  type InferGetServerSidePropsType,
+} from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
 import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
 import AdminRestaurantsBody from "~/components/ui/AdminRestaurantsBody";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
-
 
 const Restaurants: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
@@ -14,10 +17,7 @@ const Restaurants: NextPage<
     <Admin>
       <>
         <AdminCommonHeader title="Restaurants" />
-        <AdminRestaurantsBody
-          restaurants={restaurants}
-          cuisines={cuisines}
-        />
+        <AdminRestaurantsBody restaurants={restaurants} cuisines={cuisines} />
       </>
     </Admin>
   );

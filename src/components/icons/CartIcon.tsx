@@ -1,6 +1,5 @@
 import React, { type HtmlHTMLAttributes } from "react";
 
-
 const CartIcon: React.FC<HtmlHTMLAttributes<HTMLOrSVGElement>> = ({
   ...props
 }) => {

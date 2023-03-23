@@ -3,6 +3,7 @@ import CartIcon from "../icons/CartIcon";
 import HeartIcon from "../icons/HeartIcon";
 import HouseIcon from "../icons/HouseIcon";
 import SearchIcon from "../icons/SearchIcon";
+import SleepIcon from "../icons/SleepIcon";
 import { createId } from "@paralleldrive/cuid2";
 import { type Restaurant, type Favorite, type Cuisine } from "@prisma/client";
 import fuzzysort from "fuzzysort";
@@ -10,9 +11,8 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { api } from "~/utils/api";
 import { useRef } from "react";
-
+import { api } from "~/utils/api";
 
 const HomeBody = ({
   cuisines,
@@ -135,33 +135,89 @@ const HomeBody = ({
 
   const handleSelectCuisine = (cuisine: Cuisine) => {
     if (selectedCuisine?.id === cuisine.id) {
-      setRestaurantList(restaurantQuery.data);
+      setRestaurantList(() => {
+        if (searchRef.current?.value === "") {
+          return restaurantQuery.data;
+        } else {
+          const result = fuzzysort.go(
+            searchRef.current?.value as string,
+            restaurantQuery.data,
+            {
+              keys: ["name"],
+            }
+          );
+          return result.map((restaurant) => {
+            return restaurant.obj;
+          });
+        }
+      });
       setSelectedCuisine(null);
       return;
     }
-    setRestaurantList(
-      restaurantQuery.data.filter((restaurant) => {
-        if (restaurant.cuisineId === cuisine.id) {
-          return true;
-        }
-        return false;
-      })
-    );
+    setRestaurantList(() => {
+      if (searchRef.current?.value === "") {
+        return restaurantQuery.data.filter((restaurant) => {
+          if (restaurant.cuisineId === cuisine.id) {
+            return true;
+          }
+          return false;
+        });
+      } else {
+        const result = fuzzysort.go(
+          searchRef.current?.value as string,
+          restaurantQuery.data,
+          {
+            keys: ["name"],
+          }
+        );
+        return result
+          .map((restaurant) => {
+            return restaurant.obj;
+          })
+          .filter((restaurant) => {
+            if (restaurant.cuisineId === cuisine.id) {
+              return true;
+            }
+            return false;
+          });
+      }
+    });
     setSelectedCuisine(cuisine);
   };
 
   const handleSearch = (query: string) => {
     if (query === "") {
-      setRestaurantList(restaurantQuery.data);
+      setRestaurantList(() => {
+        if (selectedCuisine) {
+          return restaurantQuery.data.filter((restaurant) => {
+            if (restaurant.cuisineId === selectedCuisine.id) {
+              return true;
+            }
+            return false;
+          });
+        }
+        return restaurantQuery.data;
+      });
+
       return;
     }
     const result = fuzzysort.go(query, restaurantQuery.data, {
       keys: ["name"],
     });
     setRestaurantList(
-      result.map((restaurant) => {
-        return restaurant.obj;
-      })
+      result
+        .map((restaurant) => {
+          return restaurant.obj;
+        })
+        .filter((restaurant) => {
+          if (selectedCuisine) {
+            if (restaurant.cuisineId === selectedCuisine.id) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        })
     );
   };
 
@@ -232,47 +288,91 @@ const HomeBody = ({
             ))}
           </div>
         </div>
-        <div className="flex grow flex-col gap-4">
-          {restaurantList.filter((restaurant) => {
-            if (restaurant.favorite.length > 0) {
-              return true;
-            }
-            return false;
-          }).length > 0 && (
-            <div>
-              <p className="mb-4 text-xl font-bold">Favorites</p>
-              <div className="grid grid-flow-col grid-rows-1 gap-4 overflow-x-scroll md:grid-cols-3 md:grid-rows-none md:overflow-x-visible">
-                {restaurantList
-                  .filter((restaurant) => {
-                    if (restaurant.favorite.length > 0) {
-                      return true;
-                    }
-                    return false;
-                  })
-                  .map((restaurant) => (
-                    <div
-                      className="relative w-64 overflow-hidden rounded-2xl bg-white md:w-full"
-                      key={restaurant.id}
-                    >
-                      <Link
-                        href={`/restaurant/${restaurant.name}/${restaurant.id}`}
-                        className="relative"
+        {restaurantList.length > 0 ? (
+          <div className="flex grow flex-col gap-4">
+            {restaurantList.filter((restaurant) => {
+              if (restaurant.favorite.length > 0) {
+                return true;
+              }
+              return false;
+            }).length > 0 && (
+              <div>
+                <p className="mb-4 text-xl font-bold">Favorites</p>
+                <div className="grid grid-flow-col grid-rows-1 gap-4 overflow-x-scroll md:grid-cols-3 md:grid-rows-none md:overflow-x-visible">
+                  {restaurantList
+                    .filter((restaurant) => {
+                      if (restaurant.favorite.length > 0) {
+                        return true;
+                      }
+                      return false;
+                    })
+                    .map((restaurant) => (
+                      <div
+                        className="relative w-64 overflow-hidden rounded-2xl bg-white md:w-full"
+                        key={restaurant.id}
                       >
-                        <div className="relative h-28">
-                          <Image
-                            src={restaurant.brandImage || ""}
-                            fill
-                            alt="Restaurant Image"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="py-3 px-4">
-                          <p className="text-xl font-semibold">
-                            {restaurant.name}
-                          </p>
-                          <p className="text-xs">$2 - $10 Delivery Fee</p>
-                        </div>
-                      </Link>
+                        <Link
+                          href={`/restaurant/${restaurant.name}/${restaurant.id}`}
+                          className="relative"
+                        >
+                          <div className="relative h-28">
+                            <Image
+                              src={restaurant.brandImage || ""}
+                              fill
+                              alt="Restaurant Image"
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="py-3 px-4">
+                            <p className="text-xl font-semibold">
+                              {restaurant.name}
+                            </p>
+                            <p className="text-xs">$2 - $10 Delivery Fee</p>
+                          </div>
+                        </Link>
+                        <button
+                          type="button"
+                          className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+                          onClick={() => handleUnfavorite(restaurant.id)}
+                        >
+                          <HeartIcon className="fill-virparyasMainBlue" />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <p className="mb-4 text-xl font-bold">
+                {!selectedCuisine ? "Recommeded for you" : selectedCuisine.name}
+              </p>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {restaurantList.map((restaurant) => (
+                  <div
+                    className="relative overflow-hidden rounded-2xl bg-white"
+                    key={restaurant.id}
+                  >
+                    <Link
+                      href={`/restaurant/${restaurant.name}/${restaurant.id}`}
+                      className="relative"
+                    >
+                      <div className="relative h-36">
+                        <Image
+                          src={restaurant.brandImage || ""}
+                          fill
+                          alt="Restaurant Image"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="py-3 px-4">
+                        <p className="text-xl font-semibold">
+                          {restaurant.name}
+                        </p>
+                        <p className="text-xs">$2 - $10 Delivery Fee</p>
+                      </div>
+                    </Link>
+                    {restaurant.favorite.length > 0 ? (
                       <button
                         type="button"
                         className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
@@ -280,61 +380,30 @@ const HomeBody = ({
                       >
                         <HeartIcon className="fill-virparyasMainBlue" />
                       </button>
-                    </div>
-                  ))}
+                    ) : (
+                      <button
+                        type="button"
+                        className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+                        onClick={() => handleFavorite(restaurant.id)}
+                      >
+                        <HeartIcon />
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-
-          <div>
-            <p className="mb-4 text-xl font-bold">
-              {!selectedCuisine ? "Recommeded for you" : selectedCuisine.name}
-            </p>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {restaurantList.map((restaurant) => (
-                <div
-                  className="relative overflow-hidden rounded-2xl bg-white"
-                  key={restaurant.id}
-                >
-                  <Link
-                    href={`/restaurant/${restaurant.name}/${restaurant.id}`}
-                    className="relative"
-                  >
-                    <div className="relative h-36">
-                      <Image
-                        src={restaurant.brandImage || ""}
-                        fill
-                        alt="Restaurant Image"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="py-3 px-4">
-                      <p className="text-xl font-semibold">{restaurant.name}</p>
-                      <p className="text-xs">$2 - $10 Delivery Fee</p>
-                    </div>
-                  </Link>
-                  {restaurant.favorite.length > 0 ? (
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-                      onClick={() => handleUnfavorite(restaurant.id)}
-                    >
-                      <HeartIcon className="fill-virparyasMainBlue" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-                      onClick={() => handleFavorite(restaurant.id)}
-                    >
-                      <HeartIcon />
-                    </button>
-                  )}
-                </div>
-              ))}
+          </div>
+        ) : (
+          <div className="grow">
+            <div className="mx-auto mt-12 flex flex-col items-center gap-4 rounded-2xl bg-white p-8 md:w-96 md:p-12">
+              <SleepIcon />
+              <p className="text-center text-xl font-bold">
+                Sorry, we couldn&apos;t find what you&apos;re looking for
+              </p>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   );
