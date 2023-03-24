@@ -25,8 +25,6 @@ const CartCard = ({
     })[];
   };
 }) => {
-  const router = useRouter();
-
   const [cardItems, setCardItems] = useState(item.cart);
 
   // const createOrderMutation = api.order.createOrder.useMutation();
@@ -59,28 +57,28 @@ const CartCard = ({
 
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
-      <div className="overflow-hidden p-4 text-white">
-        <Link
-          href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
-          className="relative"
-        >
-          <Image
-            src={item.restaurant.brandImage || ""}
-            fill
-            alt="Restaurant Image"
-            className="object-cover brightness-50"
-            priority
-          />
-          <div className="relative">
-            <p className="mt-4 text-2xl font-bold">{item.restaurant.name}</p>
-            <p className="mt-1 text-xs">{item.restaurant.address}</p>
-          </div>
-        </Link>
-      </div>
+      <Link
+        href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
+        className="relative overflow-hidden text-white"
+      >
+        <Image
+          src={item.restaurant.brandImage || ""}
+          fill
+          alt="Restaurant Image"
+          className="object-cover brightness-50"
+          priority
+        />
+        <div className="relative p-4 md:p-6">
+          <p className="mt-4 text-2xl font-bold md:mt-12 md:text-4xl">
+            {item.restaurant.name}
+          </p>
+          <p className="mt-1 text-xs md:text-base">{item.restaurant.address}</p>
+        </div>
+      </Link>
 
       <div>
-        <div className="m-4 text-virparyasMainBlue">
-          <div className="mx-4 my-2 flex flex-col gap-4">
+        <div className="m-4 text-virparyasMainBlue md:m-6">
+          <div className="mx-4 my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
               {cardItems.map((cardItem) => (
                 <ItemCart
@@ -90,15 +88,18 @@ const CartCard = ({
                 />
               ))}
             </ul>
-            <Link
-              href={{
-                pathname: "/checkout",
-                query: { id: item.restaurant.id },
-              }}
-              className="flex w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
-            >
-              Checkout
-            </Link>
+            <div className="flex justify-center">
+              <Link
+                href={{
+                  pathname: "/checkout",
+                  query: { id: item.restaurant.id },
+                }}
+                className="grow flex max-w-xs items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+              >
+                Checkout
+              </Link>
+            </div>
+
             {/* <CommonButton text="Checkout" onClick={() => void createDraftOrder()} /> */}
           </div>
         </div>

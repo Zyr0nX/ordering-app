@@ -22,6 +22,9 @@ module.exports = {
         virparyasSeparator: "#E0E0E0",
       },
     },
-    plugins: [require("@headlessui/tailwindcss")],
   },
+  plugins: [
+    require("@headlessui/tailwindcss"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };

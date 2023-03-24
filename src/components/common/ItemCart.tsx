@@ -77,13 +77,13 @@ const ItemCart = ({
     quantity;
 
   return (
-    <li className="marker:text-sm marker:font-bold">
-      <div className="flex justify-between font-bold">
+    <li className="marker:font-bold md:marker:text-lg">
+      <div className="flex justify-between font-bold md:text-lg">
         <p>{cardItem.food.name}</p>
         <p>${price.toFixed(2)}</p>
       </div>
 
-      <p className="my-1 text-sm font-light">
+      <p className="my-1 text-sm font-light md:font-normal">
         {cardItem.foodOption.map((option) => option.name).join(", ")}
       </p>
       <div className="flex items-center gap-4">

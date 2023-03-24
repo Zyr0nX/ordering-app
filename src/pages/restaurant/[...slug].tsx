@@ -36,6 +36,7 @@ export const getServerSideProps = async ({
 
 
   const [restaurant, food, rating] = await Promise.all([
+    //get restaurant rating by restaurantRating
     prisma.restaurant.findUnique({
       where: {
         id,

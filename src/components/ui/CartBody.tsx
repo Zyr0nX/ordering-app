@@ -51,7 +51,7 @@ const CartBody = ({
     );
   }
   return (
-    <div className="m-4 flex flex-col gap-4">
+    <div className="mx-4 my-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:mx-32 md:my-8 md:gap-8">
       {cartList.map((item) => (
         <CartCard item={item} key={item.restaurant.id} />
       ))}
