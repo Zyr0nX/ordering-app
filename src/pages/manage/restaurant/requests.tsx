@@ -33,7 +33,7 @@ export const getServerSideProps = async (
   const orderList = await prisma.order.findMany({
     where: {
       restaurant: {
-        userId: session?.user.id,
+        userId: session?.user.id || "",
       },
       status: {
         in: ["PLACED", "PREPARING"],

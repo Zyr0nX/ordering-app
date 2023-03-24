@@ -35,7 +35,7 @@ export const getServerSideProps = async (
       include: {
         favorite: {
           where: {
-            userId: session?.user.id,
+            userId: session?.user.id || "",
           },
         },
         cuisine: true,

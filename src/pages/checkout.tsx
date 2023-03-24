@@ -1,4 +1,8 @@
-import { type InferGetServerSidePropsType, type GetServerSidePropsContext, type NextPage } from "next";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSidePropsContext,
+  type NextPage,
+} from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
@@ -7,7 +11,6 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-
 const Checkout: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ user, country }) => {
@@ -15,7 +18,7 @@ const Checkout: NextPage<
     <Guest>
       <>
         <GuestCommonHeader text="Checkout" />
-        <CheckoutBody user={user} country={country}/>
+        <CheckoutBody user={user} country={country} />
       </>
     </Guest>
   );

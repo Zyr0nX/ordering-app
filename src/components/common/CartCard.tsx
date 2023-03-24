@@ -94,7 +94,7 @@ const CartCard = ({
                   pathname: "/checkout",
                   query: { id: item.restaurant.id },
                 }}
-                className="grow flex max-w-xs items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+                className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
               >
                 Checkout
               </Link>

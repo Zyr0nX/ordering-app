@@ -16,7 +16,7 @@ export const foodRouter = createTRPCRouter({
     const food = await ctx.prisma.food.findMany({
       where: {
         restaurant: {
-          userId: ctx.session?.user.id,
+          userId: ctx.session?.user.id || "",
         },
       },
       include: {
@@ -109,7 +109,7 @@ export const foodRouter = createTRPCRouter({
           quantity: input.quantity,
           restaurant: {
             connect: {
-              userId: ctx.session?.user.id,
+              userId: ctx.session?.user.id || "",
             },
           },
           foodOption: {

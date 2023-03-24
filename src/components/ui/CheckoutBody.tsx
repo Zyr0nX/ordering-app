@@ -112,9 +112,9 @@ const CheckoutBody = ({
   return (
     <>
       <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue md:mx-32 md:my-8 md:flex-row md:gap-8">
-        <div className="relative h-fit shrink-0 rounded-2xl bg-white p-4 shadow-md md:w-96 flex flex-col md:gap-4 md:p-8">
+        <div className="relative flex h-fit shrink-0 flex-col rounded-2xl bg-white p-4 shadow-md md:w-96 md:gap-4 md:p-8">
           <p className="text-xl font-bold md:text-3xl">Shipping address</p>
-          <div className="text-sm md:text-lg flex flex-col md:gap-0.5">
+          <div className="flex flex-col text-sm md:gap-0.5 md:text-lg">
             <p>{cartQuery.data?.name}</p>
             <p>{cartQuery.data?.address}</p>
             <p>{cartQuery.data?.additionalAddress}</p>
@@ -139,7 +139,10 @@ const CheckoutBody = ({
             <div className="h-0.5 w-full bg-virparyasBackground" />
             <ul className="flex list-decimal flex-col gap-2 pl-4 md:gap-4">
               {cartQuery.data?.cartItem.map((cardItem) => (
-                <li className="marker:font-bold marker:md:text-xl" key={cardItem.id}>
+                <li
+                  className="marker:font-bold marker:md:text-xl"
+                  key={cardItem.id}
+                >
                   <div className="flex justify-between font-bold md:text-xl">
                     <p>{cardItem.food.name}</p>
                     <p>
@@ -235,7 +238,7 @@ const CheckoutBody = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 md:p-12 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all md:p-12">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit Infomation
                   </Dialog.Title>

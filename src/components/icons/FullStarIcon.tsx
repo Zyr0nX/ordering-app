@@ -1,6 +1,5 @@
 import React, { type HtmlHTMLAttributes } from "react";
 
-
 const FullStarIcon: React.FC<HtmlHTMLAttributes<HTMLOrSVGElement>> = ({
   ...props
 }) => {

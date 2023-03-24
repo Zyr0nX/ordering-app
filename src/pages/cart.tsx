@@ -29,9 +29,10 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
+  console.log(session?.user.id, "session");
   const cart = await prisma.cartItem.findMany({
     where: {
-      userId: session?.user.id,
+      userId: session?.user.id || "",
     },
     include: {
       food: {
@@ -42,6 +43,7 @@ export const getServerSideProps = async (
       foodOption: true,
     },
   });
+  console.log(cart);
   return {
     props: {
       cart,

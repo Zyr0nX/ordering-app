@@ -148,7 +148,7 @@ export const restaurantRouter = createTRPCRouter({
       include: {
         favorite: {
           where: {
-            userId: ctx.session?.user.id,
+            userId: ctx.session?.user.id || "",
           },
         },
       },

@@ -4,7 +4,6 @@ import RestaurantDetailBody from "~/components/ui/RestaurantDetailBody";
 import RestaurantDetailHeader from "~/components/ui/RestaurantDetailHeader";
 import { prisma } from "~/server/db";
 
-
 const RestarantDetail: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ restaurant, food, rating }) => {
@@ -33,7 +32,6 @@ export const getServerSideProps = async ({
       },
     };
   }
-
 
   const [restaurant, food, rating] = await Promise.all([
     //get restaurant rating by restaurantRating

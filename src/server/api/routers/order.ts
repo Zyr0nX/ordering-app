@@ -6,7 +6,7 @@ export const orderRouter = createTRPCRouter({
     const orders = await ctx.prisma.order.findMany({
       where: {
         restaurant: {
-          userId: ctx.session?.user.id,
+          userId: ctx.session?.user.id || "",
         },
         status: {
           in: ["PLACED", "PREPARING"],
@@ -30,7 +30,7 @@ export const orderRouter = createTRPCRouter({
         where: {
           id: input.orderId,
           restaurant: {
-            userId: ctx.session?.user.id,
+            userId: ctx.session?.user.id || "",
           },
         },
         data: {
@@ -50,7 +50,7 @@ export const orderRouter = createTRPCRouter({
         where: {
           id: input.orderId,
           restaurant: {
-            userId: ctx.session?.user.id,
+            userId: ctx.session?.user.id || "",
           },
         },
         data: {
@@ -70,7 +70,7 @@ export const orderRouter = createTRPCRouter({
         where: {
           id: input.orderId,
           restaurant: {
-            userId: ctx.session?.user.id,
+            userId: ctx.session?.user.id || "",
           },
         },
         data: {

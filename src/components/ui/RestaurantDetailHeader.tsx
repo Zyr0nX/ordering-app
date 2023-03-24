@@ -27,7 +27,7 @@ const RestaurantDetailHeader = ({
         className="object-cover brightness-50"
         priority
       />
-      <div className="relative p-4 text-white md:p-8 w-full">
+      <div className="relative w-full p-4 text-white md:p-8">
         <div className="flex w-full items-center justify-between md:absolute md:w-[calc(100%-4rem)]">
           <Link href="/">
             <BackArrowIcon className="fill-white md:h-10 md:w-10" />
@@ -43,7 +43,9 @@ const RestaurantDetailHeader = ({
         </div>
         <div className="mt-4 md:mx-32 md:mt-2">
           <h1 className="text-2xl font-bold md:text-5xl">{restaurant?.name}</h1>
-          <p className="mt-2 text-sm md:text-2xl">10am - 10pm, $2 - $10 Delivery Fee</p>
+          <p className="mt-2 text-sm md:text-2xl">
+            10am - 10pm, $2 - $10 Delivery Fee
+          </p>
           <p className="mt-1 text-xs md:text-base">{restaurant?.address}</p>
           <div className="mt-2 flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => {

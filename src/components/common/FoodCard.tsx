@@ -2,11 +2,14 @@ import Checkbox from "./Checkbox";
 import CommonButton from "./CommonButton";
 import FoodOptionDialog from "./FoodOptionDialog";
 import Loading from "./Loading";
-import { type FoodOption, type FoodOptionItem, type Food } from "@prisma/client";
+import {
+  type FoodOption,
+  type FoodOptionItem,
+  type Food,
+} from "@prisma/client";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
-
 
 const FoodCard = ({
   food,
