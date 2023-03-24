@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   protectedProcedure,
   createTRPCRouter,
-  publicProcedure,
 } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
@@ -36,4 +35,27 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
+  updateInfo: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        address: z.string(),
+        additionalAddress: z.string().nullish(),
+        phoneNumber: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          name: input.name,
+          address: input.address,
+          additionalAddress: input.additionalAddress,
+          phoneNumber: input.phoneNumber,
+        },
+      });
+    }
+  ),
 });

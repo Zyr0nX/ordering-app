@@ -15,8 +15,6 @@ const RestaurantDetailBody = ({
     })[];
   })[];
 }) => {
-  const [quantity, setQuantity] = React.useState(0);
-
   return (
     <div className="grid grid-cols-1 gap-4 p-4 lg:grid-cols-3 sm:grid-cols-2 md:py-10 md:px-20" >
       {food.map((item) => (
