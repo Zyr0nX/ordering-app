@@ -83,7 +83,7 @@ const CheckoutBody = ({
   const updateUserMutation = api.user.updateInfo.useMutation({
     onMutate: async (newUser) => {
       await utils.user.getCart.cancel();
-      utils.user.getCart.setData(undefined, (old) => {
+      utils.user.getCart.setData({ restaurantId: router.query.id as string}, (old) => {
         if (old) {
           return {
             ...old,
