@@ -54,25 +54,37 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  getCart: protectedProcedure.query(async ({ ctx }) => {
-    const cart = await ctx.prisma.user.findUnique({
-      where: {
-        id: ctx.session.user.id,
-      },
-      include: {
-        cartItem: {
-          include: {
-            food: {
-              include: {
-                restaurant: true,
+  getCart: protectedProcedure
+    .input(
+      z.object({
+        restaurantId: z.string().cuid(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const cart = await ctx.prisma.user.findFirst({
+        where: {
+          id: ctx.session.user.id,
+        },
+        include: {
+          cartItem: {
+            where: {
+              food: {
+                restaurantId: input.restaurantId,
               },
             },
-            foodOption: true,
+
+            include: {
+              food: {
+                include: {
+                  restaurant: true,
+                },
+              },
+              foodOption: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return cart;
-  }),
+      return cart;
+    }),
 });

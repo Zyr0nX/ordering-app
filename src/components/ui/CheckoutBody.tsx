@@ -30,6 +30,8 @@ const CheckoutBody = ({
   };
   country: string;
 }) => {
+  const router = useRouter();
+
   const nameRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLInputElement>(null);
   const additionalAddressRef = useRef<HTMLInputElement>(null);
@@ -37,9 +39,12 @@ const CheckoutBody = ({
 
   const restaurant = user.cartItem[0]?.food.restaurant;
 
-  const cartQuery = api.user.getCart.useQuery(undefined, {
-    initialData: user,
-  });
+  const cartQuery = api.user.getCart.useQuery(
+    { restaurantId: (router.query.id as string) || "" },
+    {
+      initialData: user,
+    }
+  );
 
   const [phonePrefix, setPhonePrefix] = useState(
     countries.find((c) => c.isoCode === country)
@@ -50,12 +55,9 @@ const CheckoutBody = ({
     0
   );
 
-  const router = useRouter();
-
   const strapiMutation = api.stripe.createCheckoutSession.useMutation();
 
   const handleCheckout = async () => {
-    localStorage.setItem("cart", JSON.stringify(user.cartItem));
     const { checkoutUrl } = await strapiMutation.mutateAsync({
       items: user.cartItem.map((item) => ({
         id: item.foodId,

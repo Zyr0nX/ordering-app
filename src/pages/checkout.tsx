@@ -57,6 +57,11 @@ export const getServerSideProps = async (
     },
     include: {
       cartItem: {
+        where: {
+          food: {
+            restaurantId: id as string,
+          },
+        },
         include: {
           food: {
             include: {
