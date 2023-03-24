@@ -1,4 +1,5 @@
 import CommonButton from "../common/CommonButton";
+import Loading from "../common/Loading";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
@@ -36,6 +37,10 @@ const CheckoutBody = ({
 
   const restaurant = user.cartItem[0]?.food.restaurant;
 
+  const cartQuery = api.user.getCart.useQuery(undefined, {
+    initialData: user,
+  });
+
   const [phonePrefix, setPhonePrefix] = useState(
     countries.find((c) => c.isoCode === country)
   );
@@ -71,14 +76,34 @@ const CheckoutBody = ({
     }
   };
 
-  const updateUserMutation = api.user.updateInfo.useMutation();
+  const utils = api.useContext();
+
+  const updateUserMutation = api.user.updateInfo.useMutation({
+    onMutate: async (newUser) => {
+      await utils.user.getCart.cancel();
+      utils.user.getCart.setData(undefined, (old) => {
+        if (old) {
+          return {
+            ...old,
+            ...newUser,
+          };
+        }
+        return old;
+      });
+    },
+    onSettled: () => {
+      void utils.user.getCart.invalidate();
+    },
+  });
 
   const handleUpdateUser = async () => {
     await updateUserMutation.mutateAsync({
       name: nameRef.current?.value || "",
       address: addressRef.current?.value || "",
       additionalAddress: additionalAddressRef.current?.value,
-      phoneNumber: phoneNumberRef.current?.value || "",
+      phoneNumber: `${phonePrefix?.dialCode || ""}${
+        phoneNumberRef.current?.value as string
+      }`,
     });
     setIsOpen(false);
   };
@@ -86,37 +111,36 @@ const CheckoutBody = ({
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue">
-        <div className="relative rounded-2xl bg-white p-4 shadow-md">
-          <p className="text-xl font-bold">Shipping address</p>
-          <div className="text-sm">
-            <p>{user.name}</p>
-            <p>{user.additionalAddress}</p>
-            <p>{user.address}</p>
-            <p>{user.phoneNumber}</p>
+      <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue md:mx-32 md:my-8 md:flex-row md:gap-8">
+        <div className="relative h-fit shrink-0 rounded-2xl bg-white p-4 shadow-md md:w-96 flex flex-col md:gap-4 md:p-8">
+          <p className="text-xl font-bold md:text-3xl">Shipping address</p>
+          <div className="text-sm md:text-lg flex flex-col md:gap-0.5">
+            <p>{cartQuery.data?.name}</p>
+            <p>{cartQuery.data?.address}</p>
+            <p>{cartQuery.data?.additionalAddress}</p>
+            <p>{cartQuery.data?.phoneNumber}</p>
           </div>
           <button
-            className="absolute top-4 right-4"
+            className="absolute top-4 right-4 md:top-8 md:right-8"
             onClick={() => setIsOpen(true)}
           >
             <BluePencil />
           </button>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-md">
-          <div className="flex flex-col gap-2">
-            <div>
-              <p>Review Your Order</p>
-              <p>{restaurant?.name}</p>
-              <p>{restaurant?.address}</p>
+        <div className="flex grow flex-col gap-4 rounded-2xl bg-white p-4 shadow-md md:p-8">
+          <div className="flex flex-col gap-2 md:gap-4">
+            <div className="flex flex-col gap-2">
+              <p className="text-xl font-bold md:text-3xl">Review Your Order</p>
+              <div className="text-xs md:text-base">
+                <p>{restaurant?.name}</p>
+                <p>{restaurant?.address}</p>
+              </div>
             </div>
             <div className="h-0.5 w-full bg-virparyasBackground" />
-            <ul className="flex list-decimal flex-col gap-2">
-              {user.cartItem.map((cardItem) => (
-                <li
-                  className="marker:text-sm marker:font-bold"
-                  key={cardItem.id}
-                >
-                  <div className="flex justify-between font-bold">
+            <ul className="flex list-decimal flex-col gap-2 pl-4 md:gap-4">
+              {cartQuery.data?.cartItem.map((cardItem) => (
+                <li className="marker:font-bold marker:md:text-xl" key={cardItem.id}>
+                  <div className="flex justify-between font-bold md:text-xl">
                     <p>{cardItem.food.name}</p>
                     <p>
                       $
@@ -131,7 +155,7 @@ const CheckoutBody = ({
                     </p>
                   </div>
 
-                  <p className="my-1 text-sm font-light">
+                  <p className="my-1 text-sm font-light md:text-base">
                     {cardItem.foodOption
                       .map((option) => option.name)
                       .join(", ")}
@@ -140,10 +164,16 @@ const CheckoutBody = ({
               ))}
             </ul>
             <div className="h-0.5 w-full bg-virparyasBackground" />
-            <div>
+            <div className="text-sm md:text-base">
               <div className="flex justify-between">
                 <p>Items:</p>
-                <p>${total}</p>
+                <p>
+                  $
+                  {total.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </p>
               </div>
               <div className="flex justify-between">
                 <p>Shipping:</p>
@@ -151,16 +181,30 @@ const CheckoutBody = ({
               </div>
             </div>
             <div className="h-0.5 w-full bg-virparyasBackground" />
-            <div className="flex justify-between">
+            <div className="flex justify-between font-bold md:text-2xl">
               <p>Total:</p>
-              <p>$TODO</p>
+              <p>
+                $
+                {(total + 5).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
             </div>
           </div>
+          <div className="flex justify-center">
+            <CommonButton
+              text={`Proceed to Payment - $${(total + 5).toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}`}
+              onClick={() => void handleCheckout()}
+            ></CommonButton>
+          </div>
         </div>
-        <CommonButton
-          text="Proceed to Payment - $TODO"
-          onClick={() => void handleCheckout()}
-        ></CommonButton>
       </div>
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
@@ -191,9 +235,9 @@ const CheckoutBody = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 md:p-12 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
-                    Edit
+                    Edit Infomation
                   </Dialog.Title>
                   <div className="mt-2">
                     <div className="grid grid-cols-1 gap-4">
@@ -206,7 +250,7 @@ const CheckoutBody = ({
                           id="name"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Name..."
-                          defaultValue={user.name || ""}
+                          defaultValue={cartQuery.data?.name || ""}
                           ref={nameRef}
                         />
                       </div>
@@ -219,7 +263,7 @@ const CheckoutBody = ({
                           id="address"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Address..."
-                          defaultValue={user.address || ""}
+                          defaultValue={cartQuery.data?.address || ""}
                           ref={addressRef}
                         />
                       </div>
@@ -235,7 +279,7 @@ const CheckoutBody = ({
                           id="additionalAddress"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Additional address..."
-                          defaultValue={user.additionalAddress || ""}
+                          defaultValue={cartQuery.data?.additionalAddress || ""}
                           ref={additionalAddressRef}
                         />
                       </div>
@@ -312,32 +356,47 @@ const CheckoutBody = ({
                             </Listbox>
                           )}
                           <input
-                            type="text"
+                            type="number"
                             id="phone"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             //   ${
                             //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
                             //   }
-
+                            defaultValue={
+                              (cartQuery.data?.phoneNumber?.startsWith(
+                                phonePrefix?.dialCode || ""
+                              )
+                                ? cartQuery.data.phoneNumber.slice(
+                                    phonePrefix?.dialCode.length
+                                  )
+                                : cartQuery.data?.phoneNumber) || ""
+                            }
                             placeholder="Phone..."
                             ref={phoneNumberRef}
                           />
                         </div>
                       </div>
                     </div>
-                    <div className="px-auto mt-4 flex justify-center gap-4">
-                      <button
-                        type="button"
-                        className="w-36 rounded-xl bg-virparyasRed py-2 px-10 font-medium text-white"
-                      >
-                        Discard
-                      </button>
-                      <button
-                        type="button"
-                        className="w-36 rounded-xl bg-virparyasGreen py-2 px-10 font-medium text-white"
-                      >
-                        Confirm
-                      </button>
+                    <div className="px-auto mt-4 flex w-full justify-center gap-4">
+                      {updateUserMutation.isLoading ? (
+                        <Loading />
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="w-36 rounded-xl bg-virparyasRed py-2 px-10 font-medium text-white"
+                          >
+                            Discard
+                          </button>
+                          <button
+                            type="button"
+                            className="w-36 rounded-xl bg-virparyasGreen py-2 px-10 font-medium text-white"
+                            onClick={() => void handleUpdateUser()}
+                          >
+                            Confirm
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Dialog.Panel>

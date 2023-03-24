@@ -2,6 +2,7 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
+import { getBaseUrl } from "~/utils/api";
 
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
@@ -35,11 +36,6 @@ export const stripeRouter = createTRPCRouter({
         throw new Error("Could not create customer");
       }
 
-      const baseUrl =
-        env.NODE_ENV === "development"
-          ? `http://${req.headers.host ?? "localhost:3000"}`
-          : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
-
       const checkoutSession = await stripe.checkout.sessions.create({
         metadata: {
           restaurantId: input.restaurantId,
@@ -54,7 +50,7 @@ export const stripeRouter = createTRPCRouter({
             currency: "usd",
             product_data: {
               name: item.name,
-              description: item.description,
+              description: item.description ? item.description : undefined,
               images: item.image ? [item.image] : undefined,
             },
             unit_amount: parseInt((item.price * 100).toFixed(0)),
@@ -73,7 +69,7 @@ export const stripeRouter = createTRPCRouter({
             },
           },
         ],
-        success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${getBaseUrl()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: req.headers.referer,
       });
 

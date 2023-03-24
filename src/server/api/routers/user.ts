@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  protectedProcedure,
-  createTRPCRouter,
-} from "~/server/api/trpc";
+import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
   favoriteRestaurant: protectedProcedure
@@ -56,6 +53,26 @@ export const userRouter = createTRPCRouter({
           phoneNumber: input.phoneNumber,
         },
       });
-    }
-  ),
+    }),
+  getCart: protectedProcedure.query(async ({ ctx }) => {
+    const cart = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      include: {
+        cartItem: {
+          include: {
+            food: {
+              include: {
+                restaurant: true,
+              },
+            },
+            foodOption: true,
+          },
+        },
+      },
+    });
+
+    return cart;
+  }),
 });
