@@ -51,7 +51,13 @@ const CheckoutBody = ({
   );
 
   const total = user.cartItem.reduce(
-    (acc, item) => acc + item.food.price * item.quantity,
+    (acc, item) =>
+      acc +
+      (item.food.price +
+        item.foodOption
+          .map((option) => option.price)
+          .reduce((a, b) => a + b, 0)) *
+        item.quantity,
     0
   );
 
@@ -83,15 +89,18 @@ const CheckoutBody = ({
   const updateUserMutation = api.user.updateInfo.useMutation({
     onMutate: async (newUser) => {
       await utils.user.getCart.cancel();
-      utils.user.getCart.setData({ restaurantId: router.query.id as string}, (old) => {
-        if (old) {
-          return {
-            ...old,
-            ...newUser,
-          };
+      utils.user.getCart.setData(
+        { restaurantId: router.query.id as string },
+        (old) => {
+          if (old) {
+            return {
+              ...old,
+              ...newUser,
+            };
+          }
+          return old;
         }
-        return old;
-      });
+      );
     },
     onSettled: () => {
       void utils.user.getCart.invalidate();

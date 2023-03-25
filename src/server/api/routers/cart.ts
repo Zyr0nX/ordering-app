@@ -1,8 +1,12 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  publicProcedure,
+  protectedProcedure,
+} from "~/server/api/trpc";
 
 export const cartRouter = createTRPCRouter({
-  addItems: publicProcedure
+  addItems: protectedProcedure
     .input(
       z.object({
         foodId: z.string().cuid(),
@@ -33,7 +37,7 @@ export const cartRouter = createTRPCRouter({
       const existCartItems = await ctx.prisma.cartItem.findMany({
         where: {
           foodId: input.foodId,
-          userId: ctx.session?.user?.id as string,
+          userId: ctx.session?.user?.id,
         },
         include: {
           foodOption: true,
@@ -62,17 +66,19 @@ export const cartRouter = createTRPCRouter({
       } else {
         await ctx.prisma.cartItem.create({
           data: {
-            foodId: input.foodId,
-            foodOption: {
-              connect: input.foodOptionids.map((id) => ({ id })),
-            },
             quantity: input.quantity,
-            userId: ctx.session?.user?.id as string,
+            foodId: input.foodId,
+            userId: ctx.session?.user?.id,
+            foodOption: {
+              connect: input.foodOptionids.map((id) => ({
+                id,
+              })),
+            },
           },
         });
       }
     }),
-  updateItemQuantity: publicProcedure
+  updateItemQuantity: protectedProcedure
     .input(
       z.object({
         cartItemId: z.string().cuid(),

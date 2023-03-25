@@ -7,7 +7,7 @@ interface AdminMainButtonProps {
   href: string;
 }
 
-const AdminMainButton: React.FC<AdminMainButtonProps> = ({
+const MainButton: React.FC<AdminMainButtonProps> = ({
   text,
   icon,
   href,
@@ -26,4 +26,4 @@ const AdminMainButton: React.FC<AdminMainButtonProps> = ({
   );
 };
 
-export default AdminMainButton;
+export default MainButton;

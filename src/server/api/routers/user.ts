@@ -61,7 +61,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const cart = await ctx.prisma.user.findFirst({
+      const cart = await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,
         },
@@ -72,7 +72,6 @@ export const userRouter = createTRPCRouter({
                 restaurantId: input.restaurantId,
               },
             },
-
             include: {
               food: {
                 include: {
@@ -84,7 +83,14 @@ export const userRouter = createTRPCRouter({
           },
         },
       });
-
       return cart;
     }),
+  getInfomation: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+    });
+    return user;
+  }),
 });

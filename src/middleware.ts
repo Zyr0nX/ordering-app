@@ -37,7 +37,8 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
 
   if (
     request.nextUrl.pathname === "/account/restaurant-registration" ||
-    request.nextUrl.pathname === "/checkout"
+    request.nextUrl.pathname === "/checkout" ||
+    request.nextUrl.pathname === "/account/information"
   ) {
     const { nextUrl: url, geo } = request;
     const country = geo?.country || "";

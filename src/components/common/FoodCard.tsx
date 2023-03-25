@@ -7,7 +7,9 @@ import {
   type FoodOptionItem,
   type Food,
 } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
 
@@ -43,6 +45,9 @@ const FoodCard = ({
     setListFoodOptionItem([]);
     setIsOpen(false);
   };
+
+  const session = useSession();
+  console.log(session);
 
   const addToCartMutation = api.cart.addItems.useMutation();
 
@@ -141,6 +146,13 @@ const FoodCard = ({
               </svg>
               <span className="sr-only">Loading...</span>
             </div>
+          ) : session.status === "unauthenticated" ? (
+            <Link
+              href="/signin"
+              className="flex w-full max-w-md items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+            >
+              Login to Add to Cart
+            </Link>
           ) : (
             <CommonButton
               text={`Add to Cart - $${totalPrice.toFixed(2)}`}

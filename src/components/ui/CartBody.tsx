@@ -33,13 +33,13 @@ const CartBody = ({
 
   if (cartList.length === 0) {
     return (
-      <div className="m-4 flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue">
-        <NoCartIcon />
+      <div className="m-4 flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue md:w-fit mx-auto">
+        <NoCartIcon className="md:w-32 md:h-32" />
         <div className="flex flex-col items-center">
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-xl font-semibold md:text-3xl">
             Your cart is currently empty
           </h2>
-          <p className="text-xs font-light">
+          <p className="text-xs font-light md:text-base">
             but we have plenty of options for you to choose from
           </p>
         </div>

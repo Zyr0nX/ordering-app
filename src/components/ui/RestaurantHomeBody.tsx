@@ -1,4 +1,4 @@
-import AdminMainButton from "../common/AdminMainButton";
+import MainButton from "../common/MainButton";
 import BookIcon from "../icons/BookIcon";
 import CancelOrderIcon from "../icons/CancelOrderIcon";
 import CompleteIcon from "../icons/CompleteIcon";
@@ -11,32 +11,32 @@ const RestaurantHomeBody = () => {
   return (
     <>
       <div className="mx-2 grid grid-cols-2 gap-4 md:mx-12">
-        <AdminMainButton
+        <MainButton
           text="Order Requests"
           icon={<PullRequestIcon className="md:h-24 md:w-24" />}
           href="/manage/restaurant/requests"
         />
-        <AdminMainButton
+        <MainButton
           text="In-progress Orders"
           icon={<InProgressIcon className="md:h-24 md:w-24" />}
           href="/admin/shippers"
         />
-        <AdminMainButton
+        <MainButton
           text="Completed Orders"
           icon={<CompleteIcon className="md:h-24 md:w-24" />}
           href="/admin/users"
         />
-        <AdminMainButton
+        <MainButton
           text="Cancelled Orders"
           icon={<CancelOrderIcon className="md:h-24 md:w-24" />}
           href="/admin/requests"
         />
-        <AdminMainButton
+        <MainButton
           text="Edit Menu"
           icon={<BookIcon className="md:h-24 md:w-24" />}
           href="/admin/requests"
         />
-        <AdminMainButton
+        <MainButton
           text="Settings"
           icon={<SettingsIcon className="md:h-24 md:w-24" />}
           href="/admin/categories"
