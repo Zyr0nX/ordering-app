@@ -23,8 +23,6 @@ export const getServerSideProps = async (
     }),
   ]);
 
-  console.log(checkoutSession);
-
   if (
     !session ||
     !checkoutSession ||

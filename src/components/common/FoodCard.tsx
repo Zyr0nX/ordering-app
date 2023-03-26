@@ -47,7 +47,6 @@ const FoodCard = ({
   };
 
   const session = useSession();
-  console.log(session);
 
   const addToCartMutation = api.cart.addItems.useMutation();
 

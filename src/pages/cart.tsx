@@ -14,14 +14,12 @@ import { api } from "~/utils/api";
 const Cart: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ cart }) => {
-  const cartQuery = api.cart.getCart.useQuery(undefined, {
-    initialData: cart,
-  })
+
   return (
     <Guest>
       <>
         <GuestCommonHeader text="Cart" />
-        <CartBody cart={cartQuery.data} />
+        <CartBody cart={cart} />
       </>
     </Guest>
   );

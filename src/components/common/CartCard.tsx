@@ -38,7 +38,7 @@ const CartCard = ({
   if (cardItems.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+    <div className="overflow-hidden rounded-2xl bg-white shadow-lg h-fit">
       <Link
         href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
         className="relative overflow-hidden text-white"

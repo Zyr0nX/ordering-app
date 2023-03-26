@@ -8,6 +8,8 @@ import {
   type FoodOptionItem,
 } from "@prisma/client";
 import Link from "next/link";
+import React, { useState } from "react";
+import { api } from "~/utils/api";
 
 const CartBody = ({
   cart,
@@ -19,22 +21,59 @@ const CartBody = ({
     foodOption: FoodOptionItem[];
   })[];
 }) => {
-  const cartList = cart
-    .map((item) => item.food.restaurant)
-    .filter(
-      (value, index, self) => index === self.findIndex((t) => t.id === value.id)
-    )
-    .map((restaurant) => {
-      return {
-        restaurant,
-        cart: cart.filter((item) => item.food.restaurant.id === restaurant.id),
-      };
-    });
+  const [cartList, setCartList] = useState<
+    {
+      restaurant: Restaurant;
+      cart: (CartItem & {
+        food: Food & {
+          restaurant: Restaurant;
+        };
+        foodOption: FoodOptionItem[];
+      })[];
+    }[]
+  >(
+    cart
+      .map((item) => item.food.restaurant)
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.id === value.id)
+      )
+      .map((restaurant) => {
+        return {
+          restaurant,
+          cart: cart.filter(
+            (item) => item.food.restaurant.id === restaurant.id
+          ),
+        };
+      })
+  );
+
+  api.cart.getCart.useQuery(undefined, {
+    initialData: cart,
+    onSuccess: (data) => {
+      setCartList(
+        data
+          .map((item) => item.food.restaurant)
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((t) => t.id === value.id)
+          )
+          .map((restaurant) => {
+            return {
+              restaurant,
+              cart: data.filter(
+                (item) => item.food.restaurant.id === restaurant.id
+              ),
+            };
+          })
+      );
+    },
+  });
 
   if (cartList.length === 0) {
     return (
-      <div className="m-4 flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue md:w-fit mx-auto">
-        <NoCartIcon className="md:w-32 md:h-32" />
+      <div className="m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue md:w-fit">
+        <NoCartIcon className="md:h-32 md:w-32" />
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-semibold md:text-3xl">
             Your cart is currently empty
