@@ -1,16 +1,10 @@
-import CommonButton from "./CommonButton";
 import ItemCart from "./ItemCart";
-import {
-  type CartItem,
-  type Food,
-  type Restaurant,
-  type FoodOptionItem,
-} from "@prisma/client";
+import Loading from "./Loading";
+import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { api } from "~/utils/api";
+
 
 const CartCard = ({
   item,
@@ -26,32 +20,20 @@ const CartCard = ({
   };
 }) => {
   const [cardItems, setCardItems] = useState(item.cart);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // const createOrderMutation = api.order.createOrder.useMutation();
-
-  // const createDraftOrder = async () => {
-  //   const order = {
-  //     restaurantId: item.restaurant.id,
-  //     cartItem: cardItems.map((item) => ({
-  //       foodId: item.food.id,
-  //       foodOptionItemId: item.foodOption.map((item) => item.id),
-  //       quantity: item.quantity,
-  //     })),
-  //   }
-  //    await router.push({
-  //     pathname: "/checkout",
-  //     query: { data: JSON.stringify(order) },
-  //   }, "/checkout");
-  // }
-  // const handleCheckout = async () => {
-  //   const orderId = await createOrderMutation.mutateAsync({
-  //     cartItemIds: cardItems.map((item) => item.id),
-  //   });
-  //   await router.push({
-  //     pathname: "/checkout",
-  //     query: { orderId },
-  //   });
-  // };
+  const [totalPrice, setTotalPrice] = useState(
+    item.cart.reduce((acc, cur) => {
+      return (
+        acc +
+        (cur.food.price +
+          cur.foodOption
+            .map((option) => option.price)
+            .reduce((a, b) => a + b, 0)) *
+          cur.quantity
+      );
+    }, 0)
+  );
 
   if (cardItems.length === 0) return null;
 
@@ -85,22 +67,30 @@ const CartCard = ({
                   cardItem={cardItem}
                   key={cardItem.id}
                   setCardItems={setCardItems}
+                  setTotalPrice={setTotalPrice}
+                  totalPrice={totalPrice}
+                  setIsLoading={setIsLoading}
                 />
               ))}
             </ul>
             <div className="flex justify-center">
-              <Link
-                href={{
-                  pathname: "/checkout",
-                  query: { id: item.restaurant.id },
-                }}
-                className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
-              >
-                Checkout
-              </Link>
+              {isLoading ? (
+                <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
+              ) : (
+                <Link
+                  href={{
+                    pathname: "/checkout",
+                    query: { id: item.restaurant.id },
+                  }}
+                  className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+                >
+                  Checkout - {totalPrice.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
+                </Link>
+              )}
             </div>
-
-            {/* <CommonButton text="Checkout" onClick={() => void createDraftOrder()} /> */}
           </div>
         </div>
       </div>

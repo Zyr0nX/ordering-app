@@ -1,17 +1,11 @@
 import RedTrashCan from "../icons/RedTrashCan";
-import {
-  type CartItem,
-  type Food,
-  type Restaurant,
-  type FoodOptionItem,
-} from "@prisma/client";
-import React from "react";
+import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
+import React, { useEffect, useRef } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { api } from "~/utils/api";
 
-const ItemCart = ({
-  cardItem,
-  setCardItems,
-}: {
+
+interface ItemCartProps {
   cardItem: CartItem & {
     food: Food & {
       restaurant: Restaurant;
@@ -28,41 +22,66 @@ const ItemCart = ({
       })[]
     >
   ) => void;
+  totalPrice: number;
+  setTotalPrice: React.Dispatch<React.SetStateAction<number>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ItemCart: React.FC<ItemCartProps> = ({
+  cardItem,
+  setCardItems,
+  totalPrice,
+  setTotalPrice,
+  setIsLoading,
 }) => {
+  const updateItemQuantityMutation = api.cart.updateItemQuantity.useMutation();
+  const utils = api.useContext();
   const [quantity, setQuantity] = React.useState(cardItem.quantity);
 
-  const updateItemQuantityMutation = api.cart.updateItemQuantity.useMutation();
+  const updateDebounce = useDebouncedCallback(async () => {
+    await updateItemQuantityMutation.mutateAsync({
+      cartItemId: cardItem.id,
+      quantity: quantity,
+    });
+    setIsLoading(false);
+  }, 500);
 
   const handleDecrement = () => {
     if (quantity <= 1) return;
+    setIsLoading(true);
     setQuantity(quantity - 1);
-    updateItemQuantityMutation.mutate({
-      cartItemId: cardItem.id,
-      quantity: quantity - 1,
-    });
+    setTotalPrice(totalPrice - cardItem.food.price);
+    void updateDebounce();
   };
 
   const handleIncrement = () => {
     if (quantity >= Number(cardItem.food.quantity)) return;
+    setIsLoading(true);
     setQuantity(quantity + 1);
-    updateItemQuantityMutation.mutate({
-      cartItemId: cardItem.id,
-      quantity: quantity + 1,
-    });
+    setTotalPrice(totalPrice + cardItem.food.price);
+    void updateDebounce();
   };
 
   const handleUpdateQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsLoading(true);
     setQuantity(Number(e.target.value));
-    updateItemQuantityMutation.mutate({
-      cartItemId: cardItem.id,
-      quantity: Number(e.target.value),
-    });
+    setTotalPrice(
+      totalPrice -
+        cardItem.food.price * quantity +
+        cardItem.food.price * Number(e.target.value)
+    );
+    void updateDebounce();
   };
 
   const removeItemMutation = api.cart.removeItem.useMutation({
     onMutate: () => {
+      setIsLoading(true);
       setCardItems((prev) => prev.filter((item) => item.id !== cardItem.id));
     },
+    onSettled: () => {
+      void utils.cart.getCart.invalidate();
+      setIsLoading(false);
+    }
   });
 
   const handleRemoveItem = () => {

@@ -47,6 +47,7 @@
     "react-dom": "^18.2.0",
     "stripe": "^11.15.0",
     "superjson": "^1.12.2",
+    "use-debounce": "^9.0.3",
     "zod": "^3.18.0",
     "zustand": "^4.3.2"
   },

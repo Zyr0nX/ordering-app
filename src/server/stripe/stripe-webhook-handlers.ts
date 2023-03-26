@@ -47,26 +47,3 @@ export const getOrCreateStripeCustomerIdForUser = async ({
     return updatedUser.stripeCustomerId;
   }
 };
-
-export const handlePaymentIntentSucceeded = async ({
-  event,
-  stripe,
-  prisma,
-}: {
-  event: Stripe.Event;
-  stripe: Stripe;
-  prisma: PrismaClient;
-}) => {
-  const paymentIntent = event.data.object as Stripe.PaymentIntent;
-  const userId = paymentIntent.metadata.userId;
-  // update user with payment intent data
-  await prisma.order.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      stripePaymentIntentId: paymentIntent.id,
-      stripePaymentIntentStatus: paymentIntent.status,
-    },
-  });
-};

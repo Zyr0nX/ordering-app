@@ -59,7 +59,7 @@ export const orderRouter = createTRPCRouter({
         },
       });
       await ctx.stripe.refunds.create({
-        payment_intent: order.paymentIntentId as string,
+        payment_intent: order.paymentIntentId,
       });
       return order;
     }),

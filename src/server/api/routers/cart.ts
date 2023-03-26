@@ -123,4 +123,20 @@ export const cartRouter = createTRPCRouter({
         },
       });
     }),
+  getCart: protectedProcedure.query(async ({ ctx }) => {
+    const cart = ctx.prisma.cartItem.findMany({
+      where: {
+        userId: ctx.session.user.id || "",
+      },
+      include: {
+        food: {
+          include: {
+            restaurant: true,
+          },
+        },
+        foodOption: true,
+      },
+    });
+    return cart;
+  }),
 });
