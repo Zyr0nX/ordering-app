@@ -28,7 +28,7 @@ export default Order;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { id: orderId } = context.query;
+  const { slug: orderId } = context.query;
 
   const session = await getServerAuthSession(context);
 
@@ -40,7 +40,7 @@ export const getServerSideProps = async (
 
   const order = await prisma.order.findFirst({
     where: {
-      id: Number(orderId),
+      id: Number((orderId as string).replace("VP-", "")),
       userId: session?.user.id || "",
     },
     include: {

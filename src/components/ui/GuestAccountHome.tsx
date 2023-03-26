@@ -27,9 +27,9 @@ const GuestAccountHome = () => {
       <MainButton
         text="Order History"
         icon={<OrderIcon className="md:h-24 md:w-24" />}
-        href="/order"
+        href="/orders/history"
       />
-      <button className="flex h-40 flex-col items-center justify-center gap-2 rounded-2xl bg-white shadow-[0_4px_5px_0_rgba(0,0,0,0.1)] md:flex-row md:gap-8" onClick={() => signOut()}>
+      <button className="flex h-40 flex-col items-center justify-center gap-2 rounded-2xl bg-white shadow-[0_4px_5px_0_rgba(0,0,0,0.1)] md:flex-row md:gap-8" onClick={() => void signOut()}>
         <div>
           <LogoutIcon className="h-16 w-16 fill-virparyasMainBlue md:h-24 md:w-24" />
         </div>

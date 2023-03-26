@@ -10,7 +10,7 @@ import ManageRestaurantRequestsBody from "~/components/ui/ManageRestaurantReques
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-const Requests: NextPage<
+const InProgress: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ orderList }) => {
   return (
@@ -23,7 +23,7 @@ const Requests: NextPage<
   );
 };
 
-export default Requests;
+export default InProgress;
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

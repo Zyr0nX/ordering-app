@@ -79,36 +79,6 @@ export const stripeRouter = createTRPCRouter({
 
       return { checkoutUrl: checkoutSession.url };
     }),
-  createBillingPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
-    const { stripe, session, prisma, req } = ctx;
-
-    const customerId = await getOrCreateStripeCustomerIdForUser({
-      prisma,
-      stripe,
-      userId: session.user?.id,
-    });
-
-    if (!customerId) {
-      throw new Error("Could not create customer");
-    }
-
-    const baseUrl =
-      env.NODE_ENV === "development"
-        ? `http://${req.headers.host ?? "localhost:3000"}`
-        : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
-
-    const stripeBillingPortalSession =
-      await stripe.billingPortal.sessions.create({
-        customer: customerId,
-        return_url: `${baseUrl}/dashboard`,
-      });
-
-    if (!stripeBillingPortalSession) {
-      throw new Error("Could not create billing portal session");
-    }
-
-    return { billingPortalUrl: stripeBillingPortalSession.url };
-  }),
   getCheckoutSession: protectedProcedure
     .input(
       z.object({
@@ -127,7 +97,6 @@ export const stripeRouter = createTRPCRouter({
       if (!checkoutSession) {
         throw new Error("Could not find checkout session");
       }
-
       return checkoutSession;
     }),
 });
