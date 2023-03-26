@@ -15,6 +15,10 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const { session_id } = context.query;
+  if (!session_id)
+    return {
+      notFound: true,
+    };
 
   const [session, checkoutSession] = await Promise.all([
     getServerAuthSession(context),
@@ -22,7 +26,6 @@ export const getServerSideProps = async (
       expand: ["payment_intent", "line_items.data.price.product"],
     }),
   ]);
-
   if (
     !session ||
     !checkoutSession ||
@@ -48,7 +51,9 @@ export const getServerSideProps = async (
         userId: session?.user.id,
         restaurantId: checkoutSession.metadata?.restaurantId as string,
         shippingFee: 5,
-        paymentIntentId: checkoutSession.payment_intent as string,
+        paymentIntentId: (
+          checkoutSession.payment_intent as Stripe.PaymentIntent
+        ).id,
       },
     }),
     prisma.cartItem.deleteMany({
