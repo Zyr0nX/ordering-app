@@ -48,79 +48,7 @@ export const getOrCreateStripeCustomerIdForUser = async ({
   }
 };
 
-export const handleInvoicePaid = async ({
-  event,
-  stripe,
-  prisma,
-}: {
-  event: Stripe.Event;
-  stripe: Stripe;
-  prisma: PrismaClient;
-}) => {
-  const invoice = event.data.object as Stripe.Invoice;
-  const subscriptionId = invoice.subscription;
-  const subscription = await stripe.subscriptions.retrieve(
-    subscriptionId as string
-  );
-  const userId = subscription.metadata.userId;
-
-  // update user with subscription data
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      stripeSubscriptionId: subscription.id,
-      stripeSubscriptionStatus: subscription.status,
-    },
-  });
-};
-
-export const handleSubscriptionCreatedOrUpdated = async ({
-  event,
-  prisma,
-}: {
-  event: Stripe.Event;
-  prisma: PrismaClient;
-}) => {
-  const subscription = event.data.object as Stripe.Subscription;
-  const userId = subscription.metadata.userId;
-
-  // update user with subscription data
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      stripeSubscriptionId: subscription.id,
-      stripeSubscriptionStatus: subscription.status,
-    },
-  });
-};
-
-export const handleSubscriptionCanceled = async ({
-  event,
-  prisma,
-}: {
-  event: Stripe.Event;
-  prisma: PrismaClient;
-}) => {
-  const subscription = event.data.object as Stripe.Subscription;
-  const userId = subscription.metadata.userId;
-
-  // remove subscription data from user
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      stripeSubscriptionId: null,
-      stripeSubscriptionStatus: null,
-    },
-  });
-};
-
-export const handlePaymentIntentSucceeded = ({
+export const handlePaymentIntentSucceeded = async ({
   event,
   stripe,
   prisma,
@@ -132,13 +60,13 @@ export const handlePaymentIntentSucceeded = ({
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
   const userId = paymentIntent.metadata.userId;
   // update user with payment intent data
-  // await prisma.user.update({
-  //   where: {
-  //     id: userId,
-  //   },
-  //   data: {
-  //     stripePaymentIntentId: paymentIntent.id,
-  //     stripePaymentIntentStatus: paymentIntent.status,
-  //   },
-  // });
+  await prisma.order.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      stripePaymentIntentId: paymentIntent.id,
+      stripePaymentIntentStatus: paymentIntent.status,
+    },
+  });
 };

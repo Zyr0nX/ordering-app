@@ -38,25 +38,23 @@ model Session {
 }
 
 model User {
-  id                       String                    @id @default(cuid())
-  name                     String?
-  email                    String?                   @unique
-  emailVerified            DateTime?
-  image                    String?
-  role                     Role
-  address                  String?
-  additionalAddress        String?
-  phoneNumber              String?
-  accounts                 Account[]
-  sessions                 Session[]
-  restaurant               Restaurant?
-  cartItem                 CartItem[]
-  favorite                 Favorite[]
-  shipper                  Shipper?
-  order                    Order[]
-  stripeCustomerId         String?
-  stripeSubscriptionId     String?
-  stripeSubscriptionStatus StripeSubscriptionStatus?
+  id                String      @id @default(cuid())
+  name              String?
+  email             String?     @unique
+  emailVerified     DateTime?
+  image             String?
+  role              Role
+  address           String?
+  additionalAddress String?
+  phoneNumber       String?
+  accounts          Account[]
+  sessions          Session[]
+  restaurant        Restaurant?
+  cartItem          CartItem[]
+  favorite          Favorite[]
+  shipper           Shipper?
+  order             Order[]
+  stripeCustomerId  String?
 
   @@index([id])
 }
@@ -191,6 +189,7 @@ model Order {
   shippingFee      Float       @db.Float
   restaurantRating Int?
   shipperRating    Int?
+  paymentIntentId  String     @unique
   status           OrderStatus @default(PLACED)
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt

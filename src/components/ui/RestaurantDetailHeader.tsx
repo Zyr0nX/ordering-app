@@ -34,10 +34,10 @@ const RestaurantDetailHeader = ({
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/account">
-              <AccountIcon className="md:h-10 md:w-10" />
+              <AccountIcon className="fill-white md:h-10 md:w-10" />
             </Link>
             <Link href="/cart">
-              <CartIcon className="md:h-10 md:w-10" />
+              <CartIcon className="fill-white md:h-10 md:w-10" />
             </Link>
           </div>
         </div>

@@ -17,10 +17,10 @@ const HomeHeader = () => {
         </div>
         <div className="flex items-center gap-4">
           <Link href="/signin">
-            <AccountIcon className="md:h-10 md:w-10" />
+            <AccountIcon className="md:h-10 md:w-10 fill-black" />
           </Link>
           <Link href="/cart">
-            <CartIcon className="md:h-10 md:w-10" />
+            <CartIcon className="md:h-10 md:w-10 fill-white" />
           </Link>
         </div>
       </div>

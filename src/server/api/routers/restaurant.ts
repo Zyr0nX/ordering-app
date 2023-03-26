@@ -72,7 +72,6 @@ export const restaurantRouter = createTRPCRouter({
         firstname: z.string(),
         lastname: z.string(),
         phonenumber: z.string(),
-        userId: z.string().cuid(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -87,7 +86,6 @@ export const restaurantRouter = createTRPCRouter({
           firstName: input.firstname,
           lastName: input.lastname,
           phoneNumber: input.phonenumber,
-          userId: input.userId,
         },
       });
     }),

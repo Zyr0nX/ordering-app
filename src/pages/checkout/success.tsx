@@ -23,6 +23,8 @@ export const getServerSideProps = async (
     }),
   ]);
 
+  console.log(checkoutSession);
+
   if (
     !session ||
     !checkoutSession ||
@@ -48,6 +50,7 @@ export const getServerSideProps = async (
         userId: session?.user.id,
         restaurantId: checkoutSession.metadata?.restaurantId as string,
         shippingFee: 5,
+        paymentIntentId: checkoutSession.payment_intent as string,
       },
     }),
     prisma.cartItem.deleteMany({
@@ -64,7 +67,7 @@ export const getServerSideProps = async (
 
   return {
     redirect: {
-      destination: `/order?id=${order.id}`,
+      destination: `/orders/VP-${order.id}`,
       permanent: false,
     },
   };
