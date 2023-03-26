@@ -42,7 +42,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.user.update({
+      const user = await ctx.prisma.user.update({
         where: {
           id: ctx.session.user.id,
         },
@@ -53,6 +53,7 @@ export const userRouter = createTRPCRouter({
           phoneNumber: input.phoneNumber,
         },
       });
+      return user;
     }),
   getCart: protectedProcedure
     .input(

@@ -3,18 +3,13 @@ import Loading from "../common/Loading";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
-import {
-  type User,
-  type CartItem,
-  type Food,
-  type FoodOptionItem,
-  type Restaurant,
-} from "@prisma/client";
+import { type User, type CartItem, type Food, type FoodOptionItem, type Restaurant } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
+
 
 const CheckoutBody = ({
   user,
@@ -61,10 +56,20 @@ const CheckoutBody = ({
     0
   );
 
-  const strapiMutation = api.stripe.createCheckoutSession.useMutation();
+  const strapiMutation = api.stripe.createCheckoutSession.useMutation({
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSuccess: (data) => {
+      if (data.checkoutUrl) void router.push(data.checkoutUrl);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
+  });
 
-  const handleCheckout = async () => {
-    const { checkoutUrl } = await strapiMutation.mutateAsync({
+  const handleCheckout = () => {
+    strapiMutation.mutate({
       items: user.cartItem.map((item) => ({
         id: item.foodId,
         name: item.food.name,
@@ -79,26 +84,25 @@ const CheckoutBody = ({
       restaurantId: restaurant?.id as string,
       deliveryAddress: user.address || "",
     });
-    if (checkoutUrl) {
-      void router.push(checkoutUrl);
-    }
   };
 
   const utils = api.useContext();
 
   const updateUserMutation = api.user.updateInfo.useMutation({
-    onMutate: async (newUser) => {
-      await utils.user.getCart.cancel();
+    onSuccess: (newUser) => {
       utils.user.getCart.setData(
         { restaurantId: router.query.id as string },
-        (old) => {
-          if (old) {
+        (data) => {
+          if (data) {
             return {
-              ...old,
-              ...newUser,
+              ...data,
+              name: newUser.name,
+              address: newUser.address,
+              additionalAddress: newUser.additionalAddress,
+              phoneNumber: newUser.phoneNumber,
             };
           }
-          return old;
+          return data;
         }
       );
     },
@@ -116,9 +120,12 @@ const CheckoutBody = ({
         phoneNumberRef.current?.value as string
       }`,
     });
+    setIsDisabled(false)
     setIsOpen(false);
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(user.address && user.phoneNumber ? false : true );
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
@@ -207,16 +214,21 @@ const CheckoutBody = ({
             </div>
           </div>
           <div className="flex justify-center">
-            <CommonButton
-              text={`Proceed to Payment - $${(total + 5).toLocaleString(
-                "en-US",
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }
-              )}`}
-              onClick={() => void handleCheckout()}
-            ></CommonButton>
+            {isLoading ? (
+              <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
+            ) : (
+              <CommonButton
+                text={`Proceed to Payment - $${(total + 5).toLocaleString(
+                  "en-US",
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }
+                )}`}
+                onClick={() => void handleCheckout()}
+                disabled={isDisabled}
+              ></CommonButton>
+            )}
           </div>
         </div>
       </div>
@@ -393,7 +405,7 @@ const CheckoutBody = ({
                     </div>
                     <div className="px-auto mt-4 flex w-full justify-center gap-4">
                       {updateUserMutation.isLoading ? (
-                        <Loading />
+                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                       ) : (
                         <>
                           <button
