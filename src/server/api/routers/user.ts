@@ -35,10 +35,10 @@ export const userRouter = createTRPCRouter({
   updateInfo: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
-        address: z.string(),
+        name: z.string().nullish(),
+        address: z.string().nullish(),
         additionalAddress: z.string().nullish(),
-        phoneNumber: z.string(),
+        phoneNumber: z.string().nullish(),
       })
     )
     .mutation(async ({ ctx, input }) => {

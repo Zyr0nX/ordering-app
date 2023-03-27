@@ -1,4 +1,8 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType, NextPage } from "next";
+import {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
 import GuestAccountInformation from "~/components/ui/GuestAccountInformation";
@@ -6,7 +10,9 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
-const Information: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ user, country }) => {
+const Information: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ user, country }) => {
   return (
     <Guest>
       <>
@@ -22,7 +28,7 @@ export default Information;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-const { country } = context.query;
+  const { country } = context.query;
 
   const session = await getServerAuthSession(context);
 
@@ -44,7 +50,7 @@ const { country } = context.query;
   return {
     props: {
       user,
-      country: country as string
+      country: country as string,
     },
   };
 };

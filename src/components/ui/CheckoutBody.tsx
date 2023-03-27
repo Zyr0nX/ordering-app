@@ -3,13 +3,19 @@ import Loading from "../common/Loading";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
-import { type User, type CartItem, type Food, type FoodOptionItem, type Restaurant } from "@prisma/client";
+import {
+  type User,
+  type CartItem,
+  type Food,
+  type FoodOptionItem,
+  type Restaurant,
+} from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useState } from "react";
+import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
-
 
 const CheckoutBody = ({
   user,
@@ -26,11 +32,20 @@ const CheckoutBody = ({
   country: string;
 }) => {
   const router = useRouter();
+  const [name, setName] = useState(user.name);
+  const [address, setAddress] = useState(user.address);
+  const [additionalAddress, setAdditionalAddress] = useState(
+    user.additionalAddress
+  );
+  const [phoneNumber, setPhoneNumber] = useState("");
 
-  const nameRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const additionalAddressRef = useRef<HTMLInputElement>(null);
-  const phoneNumberRef = useRef<HTMLInputElement>(null);
+  const [isInvalidName, setIsInvalidName] = useState<boolean | null>(null);
+  const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
+    null
+  );
+  const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = useState<
+    boolean | null
+  >(null);
 
   const restaurant = user.cartItem[0]?.food.restaurant;
 
@@ -56,7 +71,7 @@ const CheckoutBody = ({
     0
   );
 
-  const strapiMutation = api.stripe.createCheckoutSession.useMutation({
+  const stripeMutation = api.stripe.createCheckoutSession.useMutation({
     onMutate: () => {
       setIsLoading(true);
     },
@@ -69,7 +84,7 @@ const CheckoutBody = ({
   });
 
   const handleCheckout = () => {
-    strapiMutation.mutate({
+    stripeMutation.mutate({
       items: user.cartItem.map((item) => ({
         id: item.foodId,
         name: item.food.name,
@@ -112,31 +127,87 @@ const CheckoutBody = ({
   });
 
   const handleUpdateUser = async () => {
+    let isInvalidForm = true;
+
+    if (!z.string().nonempty().safeParse(name).success) {
+      setIsInvalidName(true);
+      isInvalidForm = false;
+    } else {
+      setIsInvalidName(false);
+    }
+
+    if (!z.string().nonempty().safeParse(address).success) {
+      setIsInvalidAddress(true);
+      isInvalidForm = false;
+    } else {
+      setIsInvalidAddress(false);
+    }
+
+    if (!z.string().nonempty().safeParse(phoneNumber).success) {
+      setIsInvalidPhoneNumber(true);
+      isInvalidForm = false;
+    } else {
+      setIsInvalidPhoneNumber(false);
+    }
+
+    if (!isInvalidForm) return;
     await updateUserMutation.mutateAsync({
-      name: nameRef.current?.value || "",
-      address: addressRef.current?.value || "",
-      additionalAddress: additionalAddressRef.current?.value,
-      phoneNumber: `${phonePrefix?.dialCode || ""}${
-        phoneNumberRef.current?.value as string
-      }`,
+      name: name,
+      address: address,
+      additionalAddress: additionalAddress,
+      phoneNumber: `${
+        phonePrefix?.dialCode ? `(${phonePrefix?.dialCode})` : ""
+      }${phoneNumber}`,
     });
-    setIsDisabled(false)
     setIsOpen(false);
+    if (name && phoneNumber && address) {
+      setIsDisabled(false);
+      return;
+    }
+    setIsDisabled(true);
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(user.address && user.phoneNumber ? false : true );
+  const [isDisabled, setIsDisabled] = useState(
+    user.address && user.phoneNumber ? false : true
+  );
   const [isOpen, setIsOpen] = useState(false);
+
+  const formatPhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    // Only allow digits
+    const newValue = value.replace(/\D/g, "");
+
+    // Format the phone number
+    const formattedValue = newValue.replace(
+      /(\d{3})(\d{3})(\d{3})/,
+      "$1-$2-$3"
+    );
+    setPhoneNumber(formattedValue);
+  };
   return (
     <>
       <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue md:mx-32 md:my-8 md:flex-row md:gap-8">
         <div className="relative flex h-fit shrink-0 flex-col rounded-2xl bg-white p-4 shadow-md md:w-96 md:gap-4 md:p-8">
           <p className="text-xl font-bold md:text-3xl">Shipping address</p>
           <div className="flex flex-col text-sm md:gap-0.5 md:text-lg">
-            <p>{cartQuery.data?.name}</p>
-            <p>{cartQuery.data?.address}</p>
-            <p>{cartQuery.data?.additionalAddress}</p>
-            <p>{cartQuery.data?.phoneNumber}</p>
+            <p>
+              <span className="font-semibold">Name:</span>{" "}
+              {cartQuery.data?.name}
+            </p>
+            <p>
+              <span className="font-semibold">Address:</span>{" "}
+              {cartQuery.data?.address}
+            </p>
+            <p>
+              <span className="font-semibold">Additional address:</span>{" "}
+              {cartQuery.data?.additionalAddress}
+            </p>
+            <p>
+              <span className="font-semibold">Phone number:</span>{" "}
+              {cartQuery.data?.phoneNumber}
+            </p>
           </div>
           <button
             className="absolute top-4 right-4 md:top-8 md:right-8"
@@ -268,29 +339,49 @@ const CheckoutBody = ({
                   <div className="mt-2">
                     <div className="grid grid-cols-1 gap-4">
                       <div className="flex flex-col">
-                        <label htmlFor="name" className="font-medium">
-                          * Name:
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="name" className="font-medium">
+                            * Name:
+                          </label>
+                          {isInvalidName && (
+                            <p className="text-xs text-red-500">
+                              Name is required
+                            </p>
+                          )}
+                        </div>
+
                         <input
                           type="text"
                           id="name"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            isInvalidName ? "ring-2 ring-virparyasRed" : ""
+                          }`}
                           placeholder="Name..."
-                          defaultValue={cartQuery.data?.name || ""}
-                          ref={nameRef}
+                          value={name || ""}
+                          onChange={(e) => setName(e.target.value)}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label htmlFor="address" className="font-medium">
-                          * Address:
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="address" className="font-medium">
+                            * Address:
+                          </label>
+                          {isInvalidAddress && (
+                            <p className="text-xs text-red-500">
+                              Address is required
+                            </p>
+                          )}
+                        </div>
+
                         <input
                           type="text"
                           id="address"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
+                          }`}
                           placeholder="Address..."
-                          defaultValue={cartQuery.data?.address || ""}
-                          ref={addressRef}
+                          value={address || ""}
+                          onChange={(e) => setAddress(e.target.value)}
                         />
                       </div>
                       <div className="flex flex-col">
@@ -305,14 +396,21 @@ const CheckoutBody = ({
                           id="additionalAddress"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Additional address..."
-                          defaultValue={cartQuery.data?.additionalAddress || ""}
-                          ref={additionalAddressRef}
+                          value={additionalAddress || ""}
+                          onChange={(e) => setAdditionalAddress(e.target.value)}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <label htmlFor="phone" className="font-medium">
-                          * Phone:
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="phoneNumber" className="font-medium">
+                            * Phone number:
+                          </label>
+                          {isInvalidPhoneNumber && (
+                            <p className="text-xs text-red-500">
+                              Phone number is required
+                            </p>
+                          )}
+                        </div>
                         <div className="flex gap-2">
                           {phonePrefix && (
                             <Listbox
@@ -382,12 +480,13 @@ const CheckoutBody = ({
                             </Listbox>
                           )}
                           <input
-                            type="number"
-                            id="phone"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            //   ${
-                            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-                            //   }
+                            type="text"
+                            id="phoneNumber"
+                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                              isInvalidPhoneNumber
+                                ? "ring-2 ring-virparyasRed"
+                                : ""
+                            }`}
                             defaultValue={
                               (cartQuery.data?.phoneNumber?.startsWith(
                                 phonePrefix?.dialCode || ""
@@ -398,7 +497,8 @@ const CheckoutBody = ({
                                 : cartQuery.data?.phoneNumber) || ""
                             }
                             placeholder="Phone..."
-                            ref={phoneNumberRef}
+                            value={phoneNumber}
+                            onChange={(e) => formatPhoneNumber(e)}
                           />
                         </div>
                       </div>

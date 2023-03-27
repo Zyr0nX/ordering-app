@@ -27,10 +27,8 @@ const OrderHistoryCard = ({
   }, 0);
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
-      <Link
-        href={`/orders/VP-${order.id}`}
-      >
+    <div className="h-fit overflow-hidden rounded-2xl bg-white shadow-lg">
+      <Link href={`/orders/VP-${order.id}`}>
         <div className="relative overflow-hidden text-white">
           <Image
             src={order.restaurant.brandImage || ""}

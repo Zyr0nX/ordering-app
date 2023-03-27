@@ -1,9 +1,13 @@
 import RedTrashCan from "../icons/RedTrashCan";
-import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
+import {
+  type CartItem,
+  type Food,
+  type Restaurant,
+  type FoodOptionItem,
+} from "@prisma/client";
 import React, { useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { api } from "~/utils/api";
-
 
 interface ItemCartProps {
   cardItem: CartItem & {
@@ -74,14 +78,10 @@ const ItemCart: React.FC<ItemCartProps> = ({
   };
 
   const removeItemMutation = api.cart.removeItem.useMutation({
-    onMutate: () => {
-      setIsLoading(true);
-      setCardItems((prev) => prev.filter((item) => item.id !== cardItem.id));
-    },
     onSettled: () => {
       void utils.cart.getCart.invalidate();
       setIsLoading(false);
-    }
+    },
   });
 
   const handleRemoveItem = () => {

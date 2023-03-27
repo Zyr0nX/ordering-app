@@ -8,6 +8,7 @@ import React from "react";
 import { api } from "~/utils/api";
 
 interface RestaurantMainCardProps {
+  displayFavorite: boolean;
   restaurant: Restaurant & {
     favorite: Favorite[];
   };
@@ -24,6 +25,7 @@ interface RestaurantMainCardProps {
 }
 
 const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
+  displayFavorite,
   restaurant,
   setRestaurantList,
   restaurantList,
@@ -107,26 +109,30 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
           <p className="text-xs">$2 - $10 Delivery Fee</p>
         </div>
       </Link>
-      {favoriteMutation.isLoading || unfavotiteMutation.isLoading ? (
-        <div className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2">
-          <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
-        </div>
-      ) : restaurant.favorite.length > 0 ? (
-        <button
-          type="button"
-          className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-          onClick={handleUnfavorite}
-        >
-          <HeartIcon className="fill-virparyasMainBlue" />
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-          onClick={handleFavorite}
-        >
-          <HeartIcon />
-        </button>
+      {displayFavorite && (
+        <>
+          {favoriteMutation.isLoading || unfavotiteMutation.isLoading ? (
+            <div className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2">
+              <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
+            </div>
+          ) : restaurant.favorite.length > 0 ? (
+            <button
+              type="button"
+              className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+              onClick={handleUnfavorite}
+            >
+              <HeartIcon className="fill-virparyasMainBlue" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+              onClick={handleFavorite}
+            >
+              <HeartIcon />
+            </button>
+          )}
+        </>
       )}
     </div>
   );

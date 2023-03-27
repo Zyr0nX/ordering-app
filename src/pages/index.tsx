@@ -2,7 +2,6 @@ import { type GetServerSidePropsContext, type NextPage } from "next";
 import { type InferGetServerSidePropsType } from "next";
 import Guest from "~/components/layouts/Guest";
 import HomeBody from "~/components/ui/HomeBody";
-import HomeHeader from "~/components/ui/HomeHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 
@@ -12,7 +11,6 @@ const Home: NextPage<
   return (
     <Guest>
       <>
-        {/* <HomeHeader /> */}
         <HomeBody cuisines={cuisines} restaurants={restaurants} />
       </>
     </Guest>
@@ -25,7 +23,6 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-
   const [cuisines, restaurants] = await Promise.all([
     prisma.cuisine.findMany(),
     prisma.restaurant.findMany({

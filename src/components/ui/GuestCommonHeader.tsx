@@ -1,7 +1,7 @@
 import AccountIcon from "../icons/AccountIcon";
 import BackArrowIcon from "../icons/BackArrowIcon";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 
 const GuestCommonHeader = ({ text }: { text: string }) => {
   const router = useRouter();
@@ -13,9 +13,9 @@ const GuestCommonHeader = ({ text }: { text: string }) => {
       <div>
         <p className="text-center text-2xl font-bold">{text}</p>
       </div>
-      <button>
-        <AccountIcon className="md:h-10 md:w-10" />
-      </button>
+      <Link href="/account">
+        <AccountIcon className="fill-white md:h-10 md:w-10" />
+      </Link>
     </div>
   );
 };

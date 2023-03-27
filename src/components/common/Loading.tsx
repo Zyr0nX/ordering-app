@@ -1,9 +1,6 @@
 import React, { type HtmlHTMLAttributes } from "react";
 
-
-const Loading: React.FC<HtmlHTMLAttributes<SVGElement>> = ({
-  ...props
-}) => {
+const Loading: React.FC<HtmlHTMLAttributes<SVGElement>> = ({ ...props }) => {
   return (
     <svg
       aria-hidden="true"

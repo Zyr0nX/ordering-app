@@ -14,7 +14,6 @@ import { api } from "~/utils/api";
 const Cart: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ cart }) => {
-
   return (
     <Guest>
       <>

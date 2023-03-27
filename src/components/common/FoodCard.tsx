@@ -126,7 +126,7 @@ const FoodCard = ({
         </div>
         <div className="flex justify-center bg-white px-8 pb-4">
           {addToCartMutation.isLoading ? (
-            <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200"/>
+            <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
           ) : session.status === "unauthenticated" ? (
             <Link
               href="/signin"

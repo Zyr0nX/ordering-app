@@ -4,8 +4,10 @@ import CartIcon from "../icons/CartIcon";
 import EmptyStarIcon from "../icons/EmptyStarIcon";
 import FullStarIcon from "../icons/FullStarIcon";
 import HalfStarIcon from "../icons/HalfStarIcon";
+import LoginIcon from "../icons/LoginIcon";
 import UserIcon from "../icons/UserIcon";
 import { type Restaurant } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -17,6 +19,7 @@ const RestaurantDetailHeader = ({
   restaurant: Restaurant | null;
   rating: number | null;
 }) => {
+  const session = useSession();
   const roundedRating = Math.round(((rating || 5) * 2) / 2);
   return (
     <div className="relative">
@@ -33,9 +36,15 @@ const RestaurantDetailHeader = ({
             <BackArrowIcon className="fill-white md:h-10 md:w-10" />
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/account">
-              <AccountIcon className="fill-white md:h-10 md:w-10" />
-            </Link>
+            {session.status === "authenticated" ? (
+              <Link href="/account">
+                <AccountIcon className="fill-white md:h-10 md:w-10" />
+              </Link>
+            ) : (
+              <Link href="/login">
+                <LoginIcon className="fill-white md:h-10 md:w-10" />
+              </Link>
+            )}
             <Link href="/cart">
               <CartIcon className="fill-white md:h-10 md:w-10" />
             </Link>

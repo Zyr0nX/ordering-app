@@ -9,8 +9,11 @@ interface CommonButtonProps
 const CommonButton: React.FC<CommonButtonProps> = ({ ...props }) => {
   return (
     <button
-      className={`flex w-full max-w-md items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white ${
-        props.disabled ? "cursor-not-allowed bg-gray-200" : ""}`}
+      className={`flex w-full max-w-md items-center justify-center rounded-xl p-3 font-bold text-white ${
+        props.disabled
+          ? "cursor-not-allowed bg-gray-200"
+          : "bg-virparyasMainBlue"
+      }`}
       {...props}
     >
       {props.text}

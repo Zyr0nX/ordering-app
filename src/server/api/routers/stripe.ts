@@ -3,7 +3,6 @@ import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
 
-
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
     .input(

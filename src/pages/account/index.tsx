@@ -1,7 +1,7 @@
-import React from 'react'
-import Guest from '~/components/layouts/Guest'
-import GuestAccountHome from '~/components/ui/GuestAccountHome'
-import GuestCommonHeader from '~/components/ui/GuestCommonHeader'
+import React from "react";
+import Guest from "~/components/layouts/Guest";
+import GuestAccountHome from "~/components/ui/GuestAccountHome";
+import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 
 const index = () => {
   return (
@@ -11,7 +11,7 @@ const index = () => {
         <GuestAccountHome />
       </>
     </Guest>
-  )
-}
+  );
+};
 
-export default index
+export default index;

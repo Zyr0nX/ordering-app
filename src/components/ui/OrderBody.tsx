@@ -25,45 +25,80 @@ const OrderBody = ({
     <div className="m-4 grid grid-cols-1 gap-4 text-virparyasMainBlue md:m-8 md:grid-cols-2 md:gap-8">
       <div className="h-fit rounded-2xl bg-white p-4 shadow-md md:col-start-2 md:row-start-1">
         <p className="text-xl font-bold md:text-3xl">Order Status</p>
-        <div className="mt-4 flex gap-2">
-          <div className="grow">
+        <div className="mt-4 grid grid-cols-4 grid-rows-1 gap-2">
+          <div className="flex flex-col gap-1">
             <div
               className={`h-[0.325rem] w-full ${
-                order.status ===
-                ("PLACED" || "PREPARING" || "DELIVERING" || "DELIVERED")
+                order.status === "PLACED" ||
+                order.status === "PREPARING" ||
+                order.status === "DELIVERING" ||
+                order.status === "DELIVERED" ||
+                order.status === "REJECTED_BY_RESTAURANT" ||
+                order.status === "READY_FOR_PICKUP" ||
+                order.status === "REJECTED_BY_SHIPPER"
                   ? "bg-virparyasGreen"
                   : "bg-virparyasBackground"
               }`}
             />
-            <p className="mt-1 text-[0.625rem] text-virparyasGreen">
-              Order placed
-            </p>
+            <p className="text-[0.625rem] text-virparyasGreen">Order placed</p>
           </div>
-          <div className="grow">
+          <div className="flex flex-col gap-1">
             <div
               className={`h-[0.325rem] w-full ${
-                order.status === ("PREPARING" || "DELIVERING" || "DELIVERED")
+                order.status === "PREPARING" ||
+                order.status === "DELIVERING" ||
+                order.status === "DELIVERED" ||
+                order.status === "READY_FOR_PICKUP" ||
+                order.status === "REJECTED_BY_SHIPPER"
                   ? "bg-virparyasGreen"
+                  : order.status === "REJECTED_BY_RESTAURANT"
+                  ? "bg-virparyasRed"
                   : "bg-virparyasBackground"
               }`}
             />
-            <p className="mt-1 text-[0.625rem] text-virparyasGreen">
-              Order placed
+            <p
+              className={`text-[0.625rem] ${
+                order.status === "PREPARING" ||
+                order.status === "DELIVERING" ||
+                order.status === "DELIVERED" ||
+                order.status === "READY_FOR_PICKUP" ||
+                order.status === "REJECTED_BY_SHIPPER"
+                  ? "text-virparyasGreen"
+                  : order.status === "REJECTED_BY_RESTAURANT"
+                  ? "text-virparyasRed"
+                  : "text-virparyasBackground"
+              }`}
+            >
+              {order.status === "REJECTED_BY_RESTAURANT"
+                ? "Rejected"
+                : "Preparing"}
             </p>
           </div>
-          <div className="grow">
+          <div className="flex flex-col gap-1">
             <div
               className={`h-[0.325rem] w-full ${
-                order.status === ("DELIVERING" || "DELIVERED")
+                order.status === "DELIVERING" || order.status === "DELIVERED"
                   ? "bg-virparyasGreen"
+                  : order.status === "REJECTED_BY_SHIPPER"
+                  ? "bg-virparyasRed"
                   : "bg-virparyasBackground"
               }`}
             />
-            <p className="mt-1 text-[0.625rem] text-virparyasGreen">
-              Order placed
+            <p
+              className={`text-[0.625rem] ${
+                order.status === "DELIVERING" || order.status === "DELIVERED"
+                  ? "text-virparyasGreen"
+                  : order.status === "REJECTED_BY_SHIPPER"
+                  ? "text-virparyasRed"
+                  : "text-virparyasBackground"
+              }`}
+            >
+              {order.status === "REJECTED_BY_SHIPPER"
+                ? "Rejected"
+                : "Out for delivery"}
             </p>
           </div>
-          <div className="grow">
+          <div className="flex flex-col gap-1">
             <div
               className={`h-[0.325rem] w-full ${
                 order.status === "DELIVERED"
@@ -71,8 +106,14 @@ const OrderBody = ({
                   : "bg-virparyasBackground"
               }`}
             />
-            <p className="mt-1 text-[0.625rem] text-virparyasGreen">
-              Order placed
+            <p
+              className={`text-[0.625rem] ${
+                order.status === "DELIVERED"
+                  ? "text-virparyasGreen"
+                  : "text-virparyasBackground"
+              }`}
+            >
+              Delivered
             </p>
           </div>
         </div>

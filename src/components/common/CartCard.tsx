@@ -1,10 +1,14 @@
 import ItemCart from "./ItemCart";
 import Loading from "./Loading";
-import { type CartItem, type Food, type Restaurant, type FoodOptionItem } from "@prisma/client";
+import {
+  type CartItem,
+  type Food,
+  type Restaurant,
+  type FoodOptionItem,
+} from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-
 
 const CartCard = ({
   item,
@@ -38,7 +42,7 @@ const CartCard = ({
   if (cardItems.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-lg h-fit">
+    <div className="h-fit overflow-hidden rounded-2xl bg-white shadow-lg">
       <Link
         href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
         className="relative overflow-hidden text-white"
@@ -84,7 +88,8 @@ const CartCard = ({
                   }}
                   className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
                 >
-                  Checkout - {totalPrice.toLocaleString("en-US", {
+                  Checkout -{" "}
+                  {totalPrice.toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}

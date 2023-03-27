@@ -4,11 +4,13 @@ import AccountIcon from "../icons/AccountIcon";
 import CartIcon from "../icons/CartIcon";
 import HeartIcon from "../icons/HeartIcon";
 import HouseIcon from "../icons/HouseIcon";
+import LoginIcon from "../icons/LoginIcon";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
 import { createId } from "@paralleldrive/cuid2";
 import { type Restaurant, type Favorite, type Cuisine } from "@prisma/client";
 import fuzzysort from "fuzzysort";
+import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,6 +28,7 @@ const HomeBody = ({
   })[];
 }) => {
   const session = useSession();
+
   const utils = api.useContext();
 
   const [selectedCuisine, setSelectedCuisine] = useState<Cuisine | null>(null);
@@ -55,7 +58,7 @@ const HomeBody = ({
             restaurant.favorite = [
               {
                 id: createId(),
-                userId: session.data?.user.id || "",
+                userId: "",
                 restaurantId: restaurant.id,
               },
             ];
@@ -84,25 +87,6 @@ const HomeBody = ({
       await utils.restaurant.getRestaurantForUser.invalidate();
     },
   });
-
-  const handleFavorite = (id: string) => {
-    favoriteMutation.mutate({
-      restaurantId: id,
-    });
-  };
-  const handleUnfavorite = (id: string) => {
-    unfavotiteMutation.mutate({
-      restaurantId: id,
-    });
-  };
-
-  // const [allRestaurants, setAllRestaurants] = useState<
-  //   | (Restaurant & {
-  //       favorite: Favorite[];
-  //     })[]
-  //   | undefined
-  // >(undefined);
-  // console.log(allRestaurants);
 
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -205,9 +189,15 @@ const HomeBody = ({
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/account">
-              <AccountIcon className="fill-white md:h-10 md:w-10" />
-            </Link>
+            {session.status === "authenticated" ? (
+              <Link href="/account">
+                <AccountIcon className="fill-white md:h-10 md:w-10" />
+              </Link>
+            ) : (
+              <Link href="/login">
+                <LoginIcon className="fill-white md:h-10 md:w-10" />
+              </Link>
+            )}
             <Link href="/cart">
               <CartIcon className="fill-white md:h-10 md:w-10" />
             </Link>
@@ -297,48 +287,8 @@ const HomeBody = ({
               </p>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {restaurantList.map((restaurant) => (
-                  // <div
-                  //   className="relative overflow-hidden rounded-2xl bg-white"
-                  //   key={restaurant.id}
-                  // >
-                  //   <Link
-                  //     href={`/restaurant/${restaurant.name}/${restaurant.id}`}
-                  //     className="relative"
-                  //   >
-                  //     <div className="relative h-36">
-                  //       <Image
-                  //         src={restaurant.brandImage || ""}
-                  //         fill
-                  //         alt="Restaurant Image"
-                  //         className="object-cover"
-                  //       />
-                  //     </div>
-                  //     <div className="py-3 px-4">
-                  //       <p className="text-xl font-semibold">
-                  //         {restaurant.name}
-                  //       </p>
-                  //       <p className="text-xs">$2 - $10 Delivery Fee</p>
-                  //     </div>
-                  //   </Link>
-                  //   {restaurant.favorite.length > 0 ? (
-                  //     <button
-                  //       type="button"
-                  //       className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-                  //       onClick={() => handleUnfavorite(restaurant.id)}
-                  //     >
-                  //       <HeartIcon className="fill-virparyasMainBlue" />
-                  //     </button>
-                  //   ) : (
-                  //     <button
-                  //       type="button"
-                  //       className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
-                  //       onClick={() => handleFavorite(restaurant.id)}
-                  //     >
-                  //       <HeartIcon />
-                  //     </button>
-                  //   )}
-                  // </div>
                   <RestaurantCard
+                    displayFavorite={session.status === "authenticated"}
                     restaurant={restaurant}
                     key={restaurant.id}
                     setRestaurantList={setRestaurantList}

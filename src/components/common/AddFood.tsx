@@ -2,7 +2,7 @@ import CommonImageInput from "./CommonImageInput";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
-import React, { Fragment, useState, useRef } from "react";
+import React, { Fragment, useState, useRef, useEffect } from "react";
 import { api } from "~/utils/api";
 
 export interface FoodCategory {
@@ -25,6 +25,7 @@ const AddFood = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [foodCategories, setFoodCategories] = useState<FoodCategory[]>([]);
+  const parent = useRef(null);
 
   const addFoodCategory = () =>
     setFoodCategories((foodCategories) => [
@@ -158,15 +159,17 @@ const AddFood = () => {
                         label="* Image"
                       />
                       <div className="h-0.5 bg-virparyasSeparator" />
-                      {foodCategories.map((foodCategory, index) => (
-                        <FoodOptionInput
-                          foodCategory={foodCategory}
-                          index={index}
-                          key={foodCategory.id}
-                          setFoodCategories={setFoodCategories}
-                          foodCategories={foodCategories}
-                        />
-                      ))}
+                      <div className="flex flex-col gap-4" ref={parent}>
+                        {foodCategories.map((foodCategory, index) => (
+                          <FoodOptionInput
+                            foodCategory={foodCategory}
+                            index={index}
+                            key={foodCategory.id}
+                            setFoodCategories={setFoodCategories}
+                            foodCategories={foodCategories}
+                          />
+                        ))}
+                      </div>
 
                       <button className="font-medium" onClick={addFoodCategory}>
                         Add customization +

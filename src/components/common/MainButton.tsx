@@ -7,11 +7,7 @@ interface AdminMainButtonProps {
   href: string;
 }
 
-const MainButton: React.FC<AdminMainButtonProps> = ({
-  text,
-  icon,
-  href,
-}) => {
+const MainButton: React.FC<AdminMainButtonProps> = ({ text, icon, href }) => {
   return (
     <Link
       href={href}
