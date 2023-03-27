@@ -37,7 +37,7 @@ const CheckoutBody = ({
   const [additionalAddress, setAdditionalAddress] = useState(
     user.additionalAddress
   );
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
 
   const [isInvalidName, setIsInvalidName] = useState<boolean | null>(null);
   const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
@@ -156,8 +156,8 @@ const CheckoutBody = ({
       address: address,
       additionalAddress: additionalAddress,
       phoneNumber: `${
-        phonePrefix?.dialCode ? `(${phonePrefix?.dialCode})` : ""
-      }${phoneNumber}`,
+        phonePrefix?.dialCode ? `(${phonePrefix?.dialCode}) ` : ""
+      }${phoneNumber || ""}`,
     });
     setIsOpen(false);
     if (name && phoneNumber && address) {
@@ -489,13 +489,13 @@ const CheckoutBody = ({
                             }`}
                             placeholder="Phone..."
                             value={
-                              phoneNumber.startsWith(
+                              phoneNumber?.startsWith(
                                 phonePrefix?.dialCode || ""
                               )
-                                ? phoneNumber.slice(
+                                ? phoneNumber?.slice(
                                     phonePrefix?.dialCode.length
                                   )
-                                : phoneNumber
+                                : phoneNumber || ""
                             }
                             onChange={(e) => formatPhoneNumber(e)}
                           />
