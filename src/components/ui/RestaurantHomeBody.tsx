@@ -3,7 +3,6 @@ import BookIcon from "../icons/BookIcon";
 import CancelOrderIcon from "../icons/CancelOrderIcon";
 import CompleteIcon from "../icons/CompleteIcon";
 import InProgressIcon from "../icons/InProgressIcon";
-import PullRequestIcon from "../icons/PullRequestIcon";
 import SettingsIcon from "../icons/SettingsIcon";
 import React from "react";
 

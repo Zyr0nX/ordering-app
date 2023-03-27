@@ -1,7 +1,6 @@
 import CommonDialog from "../common/CommonDialog";
 import CommonImageInput from "../common/CommonImageInput";
 import CommonInput from "../common/CommonInput";
-import CommonSearch from "../common/CommonSearch";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
@@ -9,8 +8,7 @@ import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
 import { Transition, Listbox } from "@headlessui/react";
 import { type Restaurant, type User, type Cuisine } from "@prisma/client";
-import fuzzysort from "fuzzysort";
-import React, { Fragment, useState, useRef, useEffect } from "react";
+import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
 
 const AdminRestaurantsBody = ({
@@ -32,8 +30,6 @@ const AdminRestaurantsBody = ({
   const additionalAddressRef = useRef<HTMLInputElement>(null);
 
   const searchRef = useRef<HTMLInputElement>(null);
-
-  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const [isOpen, setIsOpen] = useState(false);
 

@@ -1,5 +1,4 @@
 import BluePencil from "../icons/BluePencil";
-import RedCross from "../icons/RedCross";
 import { type FoodCategory } from "./AddFood";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";

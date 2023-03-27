@@ -1,5 +1,4 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
-import React from "react";
 import type Stripe from "stripe";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";

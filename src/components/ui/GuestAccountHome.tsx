@@ -1,7 +1,6 @@
 import MainButton from "../common/MainButton";
 import AccountIcon from "../icons/AccountIcon";
 import CartIcon from "../icons/CartIcon";
-import HeartIcon from "../icons/HeartIcon";
 import LogoutIcon from "../icons/LogoutIcon";
 import OrderIcon from "../icons/OrderIcon";
 import { signOut } from "next-auth/react";

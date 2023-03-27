@@ -5,6 +5,7 @@ import { externalRouter } from "./routers/external";
 import { foodRouter } from "./routers/food";
 import { orderRouter } from "./routers/order";
 import { restaurantRouter } from "./routers/restaurant";
+import { shipperRouter } from "./routers/shipper";
 import { spamRouter } from "./routers/spam";
 import { stripeRouter } from "./routers/stripe";
 import { userRouter } from "./routers/user";
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   order: orderRouter,
   stripe: stripeRouter,
   user: userRouter,
+  shipper: shipperRouter,
 });
 
 // export type definition of API

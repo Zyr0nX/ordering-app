@@ -20,10 +20,37 @@ export const getServerSideProps = async (context: {
 }) => {
   const session = await getServerAuthSession(context);
 
-  if (session) {
+  if (session?.user.role === "ADMIN") {
     return {
       redirect: {
-        destination: "/",
+        destination: "/manage/admin",
+        permanent: false,
+      },
+    };
+  }
+
+  if (session?.user.role === "USER") {
+    return {
+      redirect: {
+        destination: "/manage/user",
+        permanent: false,
+      },
+    };
+  }
+
+  if (session?.user.role === "RESTAURANT") {
+    return {
+      redirect: {
+        destination: "/manage/restaurant",
+        permanent: false,
+      },
+    };
+  }
+
+  if (session?.user.role === "SHIPPER") {
+    return {
+      redirect: {
+        destination: "/manage/shipper",
         permanent: false,
       },
     };

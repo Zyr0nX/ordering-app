@@ -1,187 +1,353 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
+import { type Cuisine } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import React, { Fragment, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import React, { Fragment, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
 
-const RestaurantRegistrationForm = ({ country }: { country: string }) => {
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const lastNameRef = useRef<HTMLInputElement>(null);
-  const phoneRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const restaurantNameRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const additionAddresRef = useRef<HTMLInputElement>(null);
-  const categoryRef = useRef<HTMLInputElement>(null);
+interface RestaurantRegistrationFormProps {
+  country: string;
+  cuisines: Cuisine[];
+}
 
-  const [validFirstName, setValidFirstName] = useState(false);
-  const [validLastName, setValidLastName] = useState(false);
-  const [validPhone, setValidPhone] = useState(false);
-  const [validEmail, setValidEmail] = useState(false);
-  const [validRestaurantName, setValidRestaurantName] = useState(false);
-  const [validAddress, setValidAddress] = useState(false);
-  const [validAdditionAddress, setValidAdditionAddress] = useState(false);
-  const [validCategory, setValidCategory] = useState(false);
+const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
+  country,
+  cuisines,
+}) => {
+  const router = useRouter();
+  const session = useSession();
 
-  const [restaurantTypes, setRestaurantTypes] = useState<
-    | {
-        id: string;
-        name: string;
-      }[]
-    | null
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [restaurantName, setRestaurantName] = useState("");
+  const [address, setAddress] = useState("");
+  const [additionalAddress, setAdditionalAddress] = useState("");
+  const [cuisine, setCuisine] = useState<Cuisine | null>(null);
+
+  const [isInvalidFirstName, setIsInvalidFirstName] = useState<boolean | null>(
+    null
+  );
+  const [isInvalidLastName, setIsInvalidLastName] = useState<boolean | null>(
+    null
+  );
+  const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = useState<
+    boolean | null
   >(null);
-
-  const [selected, setSelected] = useState<
-    | {
-        id: string;
-        name: string;
-      }
-    | undefined
-  >(undefined);
+  const [isInvalidRestaurantName, setIsInvalidRestaurantName] = useState<
+    boolean | null
+  >(null);
+  const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
+    null
+  );
+  const [isInvalidCuisine, setIsInvalidCuisine] = useState<boolean | null>(
+    null
+  );
 
   const [phonePrefix, setPhonePrefix] = useState(
     countries.find((c) => c.isoCode === country)
   );
 
-  const registrationMutation = api.restaurant.registration.useMutation();
+  const formatPhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
 
-  api.cuisine.getAll.useQuery(undefined, {
-    onSuccess: (data) => {
-      setRestaurantTypes(data);
-      setSelected(data[1]);
-    },
-  });
+    // Only allow digits
+    const newValue = value.replace(/\D/g, "");
 
-  const handleDiscard = () => {
-    if (confirm("Are you sure you want to discard?")) {
-      if (firstNameRef.current) firstNameRef.current.value = "";
-      if (lastNameRef.current) lastNameRef.current.value = "";
-      if (phoneRef.current) phoneRef.current.value = "";
-      if (emailRef.current) emailRef.current.value = "";
-      if (restaurantNameRef.current) restaurantNameRef.current.value = "";
-      if (addressRef.current) addressRef.current.value = "";
-      if (additionAddresRef.current) additionAddresRef.current.value = "";
-      if (categoryRef.current) categoryRef.current.value = "";
-    }
+    // Format the phone number
+    const formattedValue = newValue.replace(
+      /(\d{3})(\d{3})(\d{3})/,
+      "$1-$2-$3"
+    );
+    setPhoneNumber(formattedValue);
   };
 
-  const handleConfirm = () => {
-    let invalid = false;
-    if (!z.string().safeParse(firstNameRef.current?.value).success) {
-      invalid = true;
-      setValidFirstName(false);
+  const restaurantRegistrationMutation =
+    api.restaurant.registration.useMutation();
+
+  const handleDiscard = () => {
+    if (confirm("Are you sure you want to discard your forms?")) {
+      setFirstName("");
+      setLastName("");
+      setPhoneNumber("");
+      setRestaurantName("");
+      setAddress("");
+      setAdditionalAddress("");
+      setCuisine(null);
+    }
+    void router.push("/");
+  };
+
+  const handleSendRegistrationRequest = () => {
+    let isInvalidForm = true;
+
+    if (!z.string().nonempty().safeParse(restaurantName).success) {
+      setIsInvalidRestaurantName(true);
+      isInvalidForm = false;
     } else {
-      setValidFirstName(true);
+      setIsInvalidRestaurantName(false);
     }
 
-    if (!z.string().safeParse(lastNameRef.current?.value).success) {
-      invalid = true;
-      setValidLastName(false);
+    if (!z.string().nonempty().safeParse(address).success) {
+      setIsInvalidAddress(true);
+      isInvalidForm = false;
     } else {
-      setValidLastName(true);
+      setIsInvalidAddress(false);
     }
 
-    if (!z.string().regex(/^\d+$/).safeParse(phoneRef.current?.value).success) {
-      invalid = true;
-      setValidPhone(false);
+    if (!z.string().nonempty().safeParse(phoneNumber).success) {
+      setIsInvalidPhoneNumber(true);
+      isInvalidForm = false;
     } else {
-      setValidPhone(true);
+      setIsInvalidPhoneNumber(false);
     }
 
-    if (!z.string().safeParse(emailRef.current?.value).success) {
-      invalid = true;
-      setValidEmail(false);
+    if (!z.string().nonempty().safeParse(cuisine?.id).success) {
+      setIsInvalidCuisine(true);
+      isInvalidForm = false;
     } else {
-      setValidEmail(true);
+      setIsInvalidCuisine(false);
     }
 
-    if (!z.string().safeParse(restaurantNameRef.current?.value).success) {
-      invalid = true;
-      setValidRestaurantName(false);
+    if (!z.string().nonempty().safeParse(firstName).success) {
+      setIsInvalidFirstName(true);
+      isInvalidForm = false;
     } else {
-      setValidRestaurantName(true);
+      setIsInvalidFirstName(false);
     }
 
-    if (!z.string().safeParse(addressRef.current?.value).success) {
-      invalid = true;
-      setValidAddress(false);
+    if (!z.string().nonempty().safeParse(lastName).success) {
+      setIsInvalidLastName(true);
+      isInvalidForm = false;
     } else {
-      setValidAddress(true);
+      setIsInvalidLastName(false);
     }
 
-    if (!z.string().safeParse(additionAddresRef.current?.value).success) {
-      invalid = true;
-      setValidAdditionAddress(false);
-    } else {
-      setValidAdditionAddress(true);
-    }
-
-    // if (!z.string().safeParse(categoryRef.current?.value).success) {
-    //   invalid = true;
-    //   setValidCategory(false);
-    // } else {
-    //   setValidCategory(true);
-    // }
-
-    if (invalid) return;
-
-    registrationMutation.mutate({
-      name: restaurantNameRef.current?.value as string,
-      address: addressRef.current?.value as string,
-      additionaladdress: additionAddresRef.current?.value,
-      firstname: firstNameRef.current?.value as string,
-      lastname: lastNameRef.current?.value as string,
-      phonenumber: `${phonePrefix?.dialCode || ""}${
-        phoneRef.current?.value as string
-      }`,
-      email: emailRef.current?.value as string,
-      restaurantTypeId: selected?.id,
+    if (!isInvalidForm) return;
+    restaurantRegistrationMutation.mutate({
+      restaurantName,
+      address,
+      additionalAddress,
+      firstName,
+      lastName,
+      cuisineId: cuisine?.id,
+      phoneNumber: `${
+        phonePrefix?.dialCode ? `(${phonePrefix.dialCode})` : ""
+      }${phoneNumber}`,
     });
   };
 
   return (
     <div className="mx-4 mt-6 text-virparyasMainBlue">
       <div className="flex flex-col gap-2">
-        <div className="flex gap-4">
-          <div className="flex flex-col">
-            <label htmlFor="firstName" className="font-medium">
-              * First name:
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="restaurantName"
+              className="whitespace-nowrap font-medium"
+            >
+              * Restaurant name:
             </label>
+            {isInvalidRestaurantName && (
+              <p className="text-xs text-virparyasRed">
+                Restaurant name is required
+              </p>
+            )}
+          </div>
+
+          <input
+            type="text"
+            id="restaurantName"
+            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+              isInvalidRestaurantName ? "ring-2 ring-virparyasRed" : ""
+            }`}
+            placeholder="Restaurant name..."
+            value={restaurantName || ""}
+            onChange={(e) => setRestaurantName(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <label htmlFor="address" className="whitespace-nowrap font-medium">
+              * Address:
+            </label>
+            {isInvalidAddress && (
+              <p className="text-xs text-virparyasRed">Address is required</p>
+            )}
+          </div>
+
+          <input
+            type="text"
+            id="address"
+            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+              isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
+            }`}
+            placeholder="Address..."
+            value={address || ""}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="additionalAddress"
+              className="whitespace-nowrap font-medium"
+            >
+              Additional Address:
+            </label>
+          </div>
+
+          <input
+            type="text"
+            id="additionalAddress"
+            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+            placeholder="Additional address..."
+            value={additionalAddress || ""}
+            onChange={(e) => setAdditionalAddress(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between">
+            <label htmlFor="cuisine" className="whitespace-nowrap font-medium">
+              * Cuisine:
+            </label>
+            {isInvalidCuisine && (
+              <p className="text-xs text-virparyasRed">Cuisine is required</p>
+            )}
+          </div>
+
+          <Listbox value={cuisine} onChange={setCuisine} defaultValue={cuisine}>
+            {({ open }) => (
+              <div className="relative">
+                <Listbox.Button
+                  className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
+                    open
+                      ? "ring-2 ring-virparyasMainBlue"
+                      : isInvalidCuisine
+                      ? "ring-2 ring-virparyasRed"
+                      : ""
+                  }`}
+                >
+                  <span className="truncate">
+                    {cuisine?.name || "Select a cuisine"}
+                  </span>
+                  <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
+                    <DropDownIcon />
+                  </span>
+                </Listbox.Button>
+                {cuisines && (
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                      {cuisines.map((cuisine) => (
+                        <Listbox.Option
+                          key={cuisine.id}
+                          className={({ active }) =>
+                            `relative cursor-default select-none text-viparyasDarkBlue ${
+                              active ? "bg-[#E9E9FF]" : "text-gray-900"
+                            }`
+                          }
+                          value={cuisine}
+                        >
+                          {({ selected }) => (
+                            <span
+                              className={`block truncate py-2 px-4 ${
+                                selected
+                                  ? "bg-virparyasMainBlue font-semibold text-white"
+                                  : ""
+                              }`}
+                            >
+                              {cuisine.name}
+                            </span>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                )}
+              </div>
+            )}
+          </Listbox>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex grow flex-col">
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="firstName"
+                className="whitespace-nowrap font-medium"
+              >
+                * First name:
+              </label>
+              {isInvalidFirstName && (
+                <p className="text-xs text-virparyasRed">
+                  First name is required
+                </p>
+              )}
+            </div>
+
             <input
               type="text"
               id="firstName"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-              //   ${
-              //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-              //   }
-
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidFirstName ? "ring-2 ring-virparyasRed" : ""
+              }`}
               placeholder="First name..."
-              ref={firstNameRef}
+              value={firstName || ""}
+              onChange={(e) => setFirstName(e.target.value)}
             />
           </div>
-          <div className="flex flex-col">
-            <label htmlFor="lastName" className="font-medium">
-              * Last name:
-            </label>
+          <div className="flex grow flex-col">
+            <div className="inline-flex items-center justify-between">
+              <label
+                htmlFor="lastName"
+                className="whitespace-nowrap font-medium"
+              >
+                * Last name:
+              </label>
+              {isInvalidLastName && (
+                <p className="text-xs text-virparyasRed">
+                  Last name is required
+                </p>
+              )}
+            </div>
+
             <input
               type="text"
               id="lastName"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-              //   ${
-              //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-              //   }
-
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidLastName ? "ring-2 ring-virparyasRed" : ""
+              }`}
               placeholder="Last name..."
-              ref={lastNameRef}
+              value={lastName || ""}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </div>
         </div>
+
         <div className="flex flex-col">
-          <label htmlFor="phone" className="font-medium">
-            * Phone:
-          </label>
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="phoneNumber"
+              className="whitespace-nowrap font-medium"
+            >
+              * Phone number:
+            </label>
+            {isInvalidPhoneNumber && (
+              <p className="text-xs text-virparyasRed">
+                Phone number is required
+              </p>
+            )}
+          </div>
           <div className="flex gap-2">
             {phonePrefix && (
               <Listbox value={phonePrefix} onChange={setPhonePrefix}>
@@ -243,136 +409,33 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
             )}
             <input
               type="text"
-              id="phone"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-              //   ${
-              //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-              //   }
-
-              placeholder="Phone..."
-              ref={phoneRef}
+              id="phoneNumber"
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidPhoneNumber ? "ring-2 ring-virparyasRed" : ""
+              }`}
+              placeholder="Phone number..."
+              value={
+                phoneNumber.startsWith(phonePrefix?.dialCode || "")
+                  ? phoneNumber.slice(phonePrefix?.dialCode.length)
+                  : phoneNumber
+              }
+              onChange={(e) => formatPhoneNumber(e)}
             />
           </div>
         </div>
         <div className="flex flex-col">
-          <label htmlFor="email" className="font-medium">
-            * Email:
+          <label htmlFor="email" className="whitespace-nowrap font-medium">
+            Email:
           </label>
+
           <input
             type="email"
             id="email"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-            //   ${
-            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-            //   }
-
-            placeholder="Email..."
-            ref={emailRef}
+            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+            disabled
+            value={session.data?.user.email || ""}
           />
         </div>
-        <div className="flex flex-col">
-          <label htmlFor="restaurantName" className="font-medium">
-            * Restaurant name:
-          </label>
-          <input
-            type="text"
-            id="restaurantName"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-            //   ${
-            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-            //   }
-
-            placeholder="Restaurant name..."
-            ref={restaurantNameRef}
-          />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="address" className="font-medium">
-            * Address:
-          </label>
-          <input
-            type="text"
-            id="address"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue `}
-            //   ${
-            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-            //   }
-
-            placeholder="Address..."
-            ref={addressRef}
-          />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="additionalAddress" className="font-medium">
-            Additional address:
-          </label>
-          <input
-            type="text"
-            id="additionalAddress"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue`}
-            //   ${
-            //     emailSent === false ? "ring-2 ring-virparyasRed" : ""
-            //   }
-
-            placeholder="Additional address..."
-            ref={additionAddresRef}
-          />
-        </div>
-        <Listbox
-          value={selected}
-          onChange={setSelected}
-          defaultValue={selected}
-        >
-          {({ open }) => (
-            <div className="relative">
-              <Listbox.Label className="font-medium">* Category:</Listbox.Label>
-              <Listbox.Button
-                className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                  open ? "ring-2 ring-virparyasMainBlue" : ""
-                }`}
-              >
-                <span className="truncate">{selected?.name}</span>
-                <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
-                  <DropDownIcon />
-                </span>
-              </Listbox.Button>
-              {restaurantTypes && (
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute mt-1 max-h-32 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                    {restaurantTypes.map((restaurantType) => (
-                      <Listbox.Option
-                        key={restaurantType.id}
-                        className={({ active }) =>
-                          `relative cursor-default select-none text-viparyasDarkBlue ${
-                            active ? "bg-[#E9E9FF]" : "text-gray-900"
-                          }`
-                        }
-                        value={restaurantType}
-                      >
-                        {({ selected }) => (
-                          <span
-                            className={`block truncate py-2 px-4 ${
-                              selected
-                                ? "bg-virparyasMainBlue font-semibold text-white"
-                                : ""
-                            }`}
-                          >
-                            {restaurantType.name}
-                          </span>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
-              )}
-            </div>
-          )}
-        </Listbox>
         <div className="mt-4 flex gap-4">
           <button
             className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
@@ -382,7 +445,7 @@ const RestaurantRegistrationForm = ({ country }: { country: string }) => {
           </button>
           <button
             className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
-            onClick={handleConfirm}
+            onClick={handleSendRegistrationRequest}
           >
             Confirm
           </button>

@@ -9,7 +9,6 @@ import CartBody from "~/components/ui/CartBody";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
-import { api } from "~/utils/api";
 
 const Cart: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>

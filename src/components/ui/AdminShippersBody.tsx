@@ -467,7 +467,7 @@ const AdminShippersBody = ({
                             id="address"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            defaultValue={selectedShipper?.ssn}
+                            defaultValue={selectedShipper?.identificationNumber}
                             ref={ssnRef}
                           />
                         </div>
@@ -483,7 +483,7 @@ const AdminShippersBody = ({
                             id="additionalAddress"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Email..."
-                            defaultValue={selectedShipper?.phone}
+                            defaultValue={selectedShipper?.phoneNumber}
                             ref={phoneRef}
                           />
                         </div>

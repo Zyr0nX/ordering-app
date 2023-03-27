@@ -142,8 +142,8 @@ export const adminRouter = createTRPCRouter({
         data: {
           firstName: input.firstname,
           lastName: input.lastname,
-          ssn: input.ssn,
-          phone: input.phonenumber,
+          identificationNumber: input.ssn,
+          phoneNumber: input.phonenumber,
           avatar: input.avatar,
           dateOfBirth: input.dateofbirth,
         },

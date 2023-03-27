@@ -1,33 +1,36 @@
 import {
+  type GetServerSidePropsContext,
   type InferGetServerSidePropsType,
   type NextPage,
-  type GetServerSidePropsContext,
 } from "next";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
-import OrderBody from "~/components/ui/OrderBody";
+import ShipperRegistrationForm from "~/components/ui/ShipperRegistrationForm";
 import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
 
-const Order: NextPage<
+const ShipperRegistration: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ order }) => {
+> = ({ country }) => {
   return (
     <Guest>
       <>
-        <GuestCommonHeader text="Order Summary" />
-        <OrderBody order={order} />
+        <GuestCommonHeader text="Restaurant Registration" />
+        <ShipperRegistrationForm country={country} />
       </>
     </Guest>
   );
 };
 
-export default Order;
-
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
+  let { country } = context.query;
+
+  if (Array.isArray(country)) {
+    country = country[0];
+  }
+
   const session = await getServerAuthSession(context);
 
   if (!session) {
@@ -39,27 +42,7 @@ export const getServerSideProps = async (
     };
   }
 
-  const { slug: orderId } = context.query;
-
-  if (!orderId) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const order = await prisma.order.findFirst({
-    where: {
-      id: Number((orderId as string).replace("VP-", "")),
-      userId: session?.user.id || "",
-    },
-    include: {
-      orderFood: true,
-      restaurant: true,
-      user: true,
-    },
-  });
-
-  if (!order) {
+  if (session.user.role === "SHIPPER") {
     return {
       notFound: true,
     };
@@ -67,7 +50,9 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      order,
+      country: country || "",
     },
   };
 };
+
+export default ShipperRegistration;

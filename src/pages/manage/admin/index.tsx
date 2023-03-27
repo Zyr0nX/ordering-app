@@ -28,17 +28,12 @@ export const getServerSideProps = async (context: {
 
   if (!session || session.user.role !== "ADMIN") {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+      notFound: true,
     };
   }
 
   return {
-    props: {
-      session,
-    },
+    props: {},
   };
 };
 

@@ -9,29 +9,26 @@ export const restaurantRouter = createTRPCRouter({
   registration: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
+        restaurantName: z.string(),
         address: z.string(),
-        additionaladdress: z.string().optional(),
-        firstname: z.string(),
-        lastname: z.string(),
-        email: z.string().email(),
-        phonenumber: z
-          .string()
-          .regex(/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/g),
-        restaurantTypeId: z.string().cuid().optional(),
+        additionalAddress: z.string().optional(),
+        firstName: z.string(),
+        lastName: z.string(),
+        phoneNumber: z.string(),
+        cuisineId: z.string().cuid().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.restaurant.create({
         data: {
-          name: input.name,
+          name: input.restaurantName,
           address: input.address,
-          additionalAddress: input.additionaladdress,
-          firstName: input.firstname,
-          lastName: input.lastname,
-          phoneNumber: input.phonenumber,
-          userId: ctx.session?.user?.id,
-          cuisineId: input.restaurantTypeId,
+          additionalAddress: input.additionalAddress,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phoneNumber: input.phoneNumber,
+          userId: ctx.session.user.id,
+          cuisineId: input.cuisineId,
         },
       });
     }),

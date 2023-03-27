@@ -141,19 +141,20 @@ model Favorite {
 }
 
 model Shipper {
-  id          String   @id @default(cuid())
-  firstName   String
-  lastName    String
-  dateOfBirth DateTime
-  ssn         String
-  phone       String
-  avatar      String?
-  approved    Approve  @default(PENDING)
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  order       Order[]
+  id                   String   @id @default(cuid())
+  firstName            String
+  lastName             String
+  dateOfBirth          DateTime
+  identificationNumber String
+  phoneNumber          String
+  licensePlate         String
+  avatar               String?
+  approved             Approve  @default(PENDING)
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id])
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  order                Order[]
 }
 
 model FoodOption {
@@ -189,7 +190,7 @@ model Order {
   shippingFee      Float       @db.Float
   restaurantRating Int?
   shipperRating    Int?
-  paymentIntentId  String     @unique
+  paymentIntentId  String      @unique
   status           OrderStatus @default(PLACED)
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt

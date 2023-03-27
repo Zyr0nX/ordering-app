@@ -5,7 +5,6 @@ import EmptyStarIcon from "../icons/EmptyStarIcon";
 import FullStarIcon from "../icons/FullStarIcon";
 import HalfStarIcon from "../icons/HalfStarIcon";
 import LoginIcon from "../icons/LoginIcon";
-import UserIcon from "../icons/UserIcon";
 import { type Restaurant } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -38,15 +37,15 @@ const RestaurantDetailHeader = ({
           <div className="flex items-center gap-4">
             {session.status === "authenticated" ? (
               <Link href="/account">
-                <AccountIcon className="fill-white md:h-10 md:w-10" />
+                <AccountIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
               </Link>
             ) : (
               <Link href="/login">
-                <LoginIcon className="fill-white md:h-10 md:w-10" />
+                <LoginIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
               </Link>
             )}
             <Link href="/cart">
-              <CartIcon className="fill-white md:h-10 md:w-10" />
+              <CartIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
             </Link>
           </div>
         </div>

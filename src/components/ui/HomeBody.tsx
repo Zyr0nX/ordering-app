@@ -2,15 +2,12 @@ import RestaurantFavoriteCard from "../common/RestaurantFavoriteCard";
 import RestaurantCard from "../common/RestaurantMainCard";
 import AccountIcon from "../icons/AccountIcon";
 import CartIcon from "../icons/CartIcon";
-import HeartIcon from "../icons/HeartIcon";
 import HouseIcon from "../icons/HouseIcon";
 import LoginIcon from "../icons/LoginIcon";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
-import { createId } from "@paralleldrive/cuid2";
 import { type Restaurant, type Favorite, type Cuisine } from "@prisma/client";
 import fuzzysort from "fuzzysort";
-import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,8 +25,6 @@ const HomeBody = ({
   })[];
 }) => {
   const session = useSession();
-
-  const utils = api.useContext();
 
   const [selectedCuisine, setSelectedCuisine] = useState<Cuisine | null>(null);
 
@@ -49,44 +44,6 @@ const HomeBody = ({
       refetchOnWindowFocus: false,
     }
   );
-
-  const favoriteMutation = api.user.favoriteRestaurant.useMutation({
-    onMutate: (data) => {
-      setRestaurantList((old) => {
-        return old.map((restaurant) => {
-          if (restaurant.id === data.restaurantId) {
-            restaurant.favorite = [
-              {
-                id: createId(),
-                userId: "",
-                restaurantId: restaurant.id,
-              },
-            ];
-          }
-          return restaurant;
-        });
-      });
-    },
-    onSettled: async () => {
-      await utils.restaurant.getRestaurantForUser.invalidate();
-    },
-  });
-
-  const unfavotiteMutation = api.user.unfavoriteRestaurant.useMutation({
-    onMutate: (data) => {
-      setRestaurantList((old) => {
-        return old.map((restaurant) => {
-          if (restaurant.id === data.restaurantId) {
-            restaurant.favorite = [];
-          }
-          return restaurant;
-        });
-      });
-    },
-    onSettled: async () => {
-      await utils.restaurant.getRestaurantForUser.invalidate();
-    },
-  });
 
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -191,15 +148,15 @@ const HomeBody = ({
           <div className="flex items-center gap-4">
             {session.status === "authenticated" ? (
               <Link href="/account">
-                <AccountIcon className="fill-white md:h-10 md:w-10" />
+                <AccountIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
               </Link>
             ) : (
               <Link href="/login">
-                <LoginIcon className="fill-white md:h-10 md:w-10" />
+                <LoginIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
               </Link>
             )}
             <Link href="/cart">
-              <CartIcon className="fill-white md:h-10 md:w-10" />
+              <CartIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
             </Link>
           </div>
         </div>

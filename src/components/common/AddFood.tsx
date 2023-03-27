@@ -2,7 +2,7 @@ import CommonImageInput from "./CommonImageInput";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
-import React, { Fragment, useState, useRef, useEffect } from "react";
+import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
 
 export interface FoodCategory {

@@ -1,18 +1,7 @@
-import CommonButton from "./CommonButton";
-import ItemCart from "./ItemCart";
-import {
-  type CartItem,
-  type Food,
-  type Restaurant,
-  type FoodOptionItem,
-  type Order,
-  type OrderFood,
-} from "@prisma/client";
+import { type Restaurant, type Order, type OrderFood } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { api } from "~/utils/api";
+import React from "react";
 
 const OrderHistoryCard = ({
   order,

@@ -1,7 +1,7 @@
 import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextPage,
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
 } from "next";
 import React from "react";
 import Guest from "~/components/layouts/Guest";
@@ -28,7 +28,11 @@ export default Information;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { country } = context.query;
+  let { country } = context.query;
+
+  if (Array.isArray(country)) {
+    country = country[0];
+  }
 
   const session = await getServerAuthSession(context);
 
@@ -47,10 +51,19 @@ export const getServerSideProps = async (
     },
   });
 
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
       user,
-      country: country as string,
+      country: country || "",
     },
   };
 };

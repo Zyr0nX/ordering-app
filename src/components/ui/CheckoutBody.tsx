@@ -344,7 +344,7 @@ const CheckoutBody = ({
                             * Name:
                           </label>
                           {isInvalidName && (
-                            <p className="text-xs text-red-500">
+                            <p className="text-xs text-virparyasRed">
                               Name is required
                             </p>
                           )}
@@ -367,7 +367,7 @@ const CheckoutBody = ({
                             * Address:
                           </label>
                           {isInvalidAddress && (
-                            <p className="text-xs text-red-500">
+                            <p className="text-xs text-virparyasRed">
                               Address is required
                             </p>
                           )}
@@ -406,7 +406,7 @@ const CheckoutBody = ({
                             * Phone number:
                           </label>
                           {isInvalidPhoneNumber && (
-                            <p className="text-xs text-red-500">
+                            <p className="text-xs text-virparyasRed">
                               Phone number is required
                             </p>
                           )}
@@ -487,17 +487,16 @@ const CheckoutBody = ({
                                 ? "ring-2 ring-virparyasRed"
                                 : ""
                             }`}
-                            defaultValue={
-                              (cartQuery.data?.phoneNumber?.startsWith(
+                            placeholder="Phone..."
+                            value={
+                              phoneNumber.startsWith(
                                 phonePrefix?.dialCode || ""
                               )
-                                ? cartQuery.data.phoneNumber.slice(
+                                ? phoneNumber.slice(
                                     phonePrefix?.dialCode.length
                                   )
-                                : cartQuery.data?.phoneNumber) || ""
+                                : phoneNumber
                             }
-                            placeholder="Phone..."
-                            value={phoneNumber}
                             onChange={(e) => formatPhoneNumber(e)}
                           />
                         </div>

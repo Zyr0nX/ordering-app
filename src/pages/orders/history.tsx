@@ -41,7 +41,7 @@ export const getServerSideProps = async (
 
   const orderHistory = await prisma.order.findMany({
     where: {
-      userId: session.user.id,
+      userId: session.user.id || "",
     },
     include: {
       orderFood: true,

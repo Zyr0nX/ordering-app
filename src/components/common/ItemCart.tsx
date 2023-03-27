@@ -5,7 +5,7 @@ import {
   type Restaurant,
   type FoodOptionItem,
 } from "@prisma/client";
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { api } from "~/utils/api";
 
@@ -33,7 +33,6 @@ interface ItemCartProps {
 
 const ItemCart: React.FC<ItemCartProps> = ({
   cardItem,
-  setCardItems,
   totalPrice,
   setTotalPrice,
   setIsLoading,

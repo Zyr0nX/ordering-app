@@ -1,19 +1,10 @@
 import AddFood from "../common/AddFood";
 import FoodList from "../common/FoodList";
-import RestaurantPendingOrder from "../common/RestaurantPendingOrder";
-import GreenCheckmark from "../icons/GreenCheckmark";
-import RedCross from "../icons/RedCross";
-import { Transition, Dialog } from "@headlessui/react";
 import {
-  type Restaurant,
-  type Order,
-  type OrderFood,
-  type User,
-  Food,
-  FoodOption,
-  FoodOptionItem,
+  type Food,
+  type FoodOption,
+  type FoodOptionItem,
 } from "@prisma/client";
-import React, { Fragment } from "react";
 import { api } from "~/utils/api";
 
 const ManageRestaurantMenuBody = ({
