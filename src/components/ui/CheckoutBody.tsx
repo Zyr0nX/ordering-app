@@ -490,10 +490,10 @@ const CheckoutBody = ({
                             placeholder="Phone..."
                             value={
                               phoneNumber?.startsWith(
-                                phonePrefix?.dialCode || ""
+                                `(${phonePrefix?.dialCode || ""} ` 
                               )
                                 ? phoneNumber?.slice(
-                                    phonePrefix?.dialCode.length
+                                    (phonePrefix?.dialCode.length || 0) + 3
                                   )
                                 : phoneNumber || ""
                             }
