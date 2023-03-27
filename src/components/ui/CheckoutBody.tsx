@@ -186,6 +186,7 @@ const CheckoutBody = ({
     );
     setPhoneNumber(formattedValue);
   };
+
   return (
     <>
       <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue md:mx-32 md:my-8 md:flex-row md:gap-8">
@@ -363,45 +364,6 @@ const CheckoutBody = ({
                       </div>
                       <div className="flex flex-col">
                         <div className="flex items-center justify-between">
-                          <label htmlFor="address" className="font-medium">
-                            * Address:
-                          </label>
-                          {isInvalidAddress && (
-                            <p className="text-xs text-virparyasRed">
-                              Address is required
-                            </p>
-                          )}
-                        </div>
-
-                        <input
-                          type="text"
-                          id="address"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
-                          }`}
-                          placeholder="Address..."
-                          value={address || ""}
-                          onChange={(e) => setAddress(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <label
-                          htmlFor="additionalAddress"
-                          className="font-medium"
-                        >
-                          Additional address:
-                        </label>
-                        <input
-                          type="text"
-                          id="additionalAddress"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Additional address..."
-                          value={additionalAddress || ""}
-                          onChange={(e) => setAdditionalAddress(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between">
                           <label htmlFor="phoneNumber" className="font-medium">
                             * Phone number:
                           </label>
@@ -440,7 +402,7 @@ const CheckoutBody = ({
                                       leaveFrom="opacity-100"
                                       leaveTo="opacity-0"
                                     >
-                                      <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                      <Listbox.Options className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                                         {countries.map((country) => (
                                           <Listbox.Option
                                             key={country.name}
@@ -490,7 +452,7 @@ const CheckoutBody = ({
                             placeholder="Phone..."
                             value={
                               phoneNumber?.startsWith(
-                                `(${phonePrefix?.dialCode || ""} ` 
+                                `(${phonePrefix?.dialCode || ""}) `
                               )
                                 ? phoneNumber?.slice(
                                     (phonePrefix?.dialCode.length || 0) + 3
@@ -500,6 +462,45 @@ const CheckoutBody = ({
                             onChange={(e) => formatPhoneNumber(e)}
                           />
                         </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="address" className="font-medium">
+                            * Address:
+                          </label>
+                          {isInvalidAddress && (
+                            <p className="text-xs text-virparyasRed">
+                              Address is required
+                            </p>
+                          )}
+                        </div>
+
+                        <input
+                          type="text"
+                          id="address"
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
+                          }`}
+                          placeholder="Address..."
+                          value={address || ""}
+                          onChange={(e) => setAddress(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <label
+                          htmlFor="additionalAddress"
+                          className="font-medium"
+                        >
+                          Additional address:
+                        </label>
+                        <input
+                          type="text"
+                          id="additionalAddress"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          placeholder="Additional address..."
+                          value={additionalAddress || ""}
+                          onChange={(e) => setAdditionalAddress(e.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="px-auto mt-4 flex w-full justify-center gap-4">

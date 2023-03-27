@@ -136,7 +136,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       lastName,
       cuisineId: cuisine?.id,
       phoneNumber: `${
-        phonePrefix?.dialCode ? `(${phonePrefix.dialCode})` : ""
+        phonePrefix?.dialCode ? `(${phonePrefix.dialCode}) ` : ""
       }${phoneNumber}`,
     });
   };
@@ -414,11 +414,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 isInvalidPhoneNumber ? "ring-2 ring-virparyasRed" : ""
               }`}
               placeholder="Phone number..."
-              value={
-                phoneNumber.startsWith(phonePrefix?.dialCode || "")
-                  ? phoneNumber.slice(phonePrefix?.dialCode.length)
-                  : phoneNumber
-              }
+              value={phoneNumber}
               onChange={(e) => formatPhoneNumber(e)}
             />
           </div>

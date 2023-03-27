@@ -150,7 +150,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       firstName,
       lastName,
       phoneNumber: `${
-        phonePrefix?.dialCode ? `(${phonePrefix.dialCode})` : ""
+        phonePrefix?.dialCode ? `(${phonePrefix.dialCode}) ` : ""
       }${phoneNumber}`,
       identificationNumber,
       licensePlate,
