@@ -6,13 +6,13 @@ import fuzzysort from "fuzzysort";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 
-const AdminShippersBody = ({
-  shippers,
-}: {
+interface AdminShippersBodyProps {
   shippers: (Shipper & {
     user: User;
   })[];
-}) => {
+}
+
+const AdminShippersBody: React.FC<AdminShippersBodyProps> = ({ shippers }) => {
   const [search, setSearch] = useState("");
 
   const [shipperList, setShipperList] = useState<

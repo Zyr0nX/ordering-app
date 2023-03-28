@@ -3,6 +3,7 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -12,11 +13,27 @@ export const adminRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.prisma.restaurant.update({
+        where: {
+          id: input.restaurantId,
+        },
         data: {
           approved: "APPROVED",
         },
+      });
+    }),
+  rejectRestaurant: adminProtectedProcedure
+    .input(
+      z.object({
+        restaurantId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
+        },
+        data: {
+          approved: "REJECTED",
         },
       });
     }),
@@ -256,4 +273,37 @@ export const adminRouter = createTRPCRouter({
         text: `Your account has been disabled for the following reason: ${input.reason}`,
       });
     }),
+  getPendingRestauranntAndShipperRequests: adminProtectedProcedure.query(
+    async ({ ctx }) => {
+      const [pendingRestaurant, pendingShipper] = await Promise.all([
+        ctx.prisma.restaurant.findMany({
+          where: {
+            approved: "PENDING",
+          },
+          include: {
+            cuisine: true,
+            user: true,
+          },
+        }),
+        ctx.prisma.shipper.findMany({
+          where: {
+            approved: "PENDING",
+          },
+          include: {
+            user: true,
+          },
+        }),
+      ]);
+      return [
+        ...pendingRestaurant.map((restaurant) => ({
+          type: "restaurant" as const,
+          data: restaurant,
+        })),
+        ...pendingShipper.map((shipper) => ({
+          type: "shipper" as const,
+          data: shipper,
+        })),
+      ].sort((a, b) => b.data.updatedAt.getTime() - a.data.updatedAt.getTime());
+    }
+  ),
 });

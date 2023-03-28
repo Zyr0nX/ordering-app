@@ -6,16 +6,17 @@ import fuzzysort from "fuzzysort";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 
-const AdminRestaurantsBody = ({
-  restaurants,
-  cuisines,
-}: {
+interface AdminRestaurantsBodyProps {
   restaurants: (Restaurant & {
     user: User;
     cuisine: Cuisine;
   })[];
-
   cuisines: Cuisine[];
+}
+
+const AdminRestaurantsBody: React.FC<AdminRestaurantsBodyProps> = ({
+  restaurants,
+  cuisines,
 }) => {
   const [search, setSearch] = useState("");
 
