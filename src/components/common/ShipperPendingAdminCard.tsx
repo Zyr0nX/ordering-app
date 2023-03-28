@@ -12,9 +12,8 @@ import React, { Fragment, useState } from "react";
 import { api } from "~/utils/api";
 
 interface ShipperPendingAdminCardProps {
-  restaurant: Restaurant & {
+  shipper: Shipper & {
     user: User;
-    cuisine: Cuisine;
   };
   pendingList: (
     | {
@@ -53,18 +52,18 @@ interface ShipperPendingAdminCardProps {
 }
 
 const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
-  restaurant,
+  shipper,
   pendingList,
   setPendingList,
 }) => {
   const utils = api.useContext();
   const [isOpen, setIsOpen] = useState(false);
 
-  const approveRestaurantMutation = api.admin.approveRestaurant.useMutation({
+  const approveShipperMutation = api.admin.approveShipper.useMutation({
     onSuccess: () => {
       setPendingList(
         pendingList.filter(
-          (item) => item.type !== "restaurant" || item.data.id !== restaurant.id
+          (item) => item.type !== "shipper" || item.data.id !== shipper.id
         )
       );
     },
@@ -73,11 +72,11 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
     },
   });
 
-  const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
+  const rejectShipperMutation = api.admin.rejectShipper.useMutation({
     onSuccess: () => {
       setPendingList(
         pendingList.filter(
-          (item) => item.type !== "restaurant" || item.data.id !== restaurant.id
+          (item) => item.type !== "shipper" || item.data.id !== shipper.id
         )
       );
     },
@@ -87,15 +86,15 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
   });
 
   const handleApprove = async () => {
-    await approveRestaurantMutation.mutateAsync({
-      restaurantId: restaurant.id,
+    await approveShipperMutation.mutateAsync({
+      shipperId: shipper.id,
     });
     setIsOpen(false);
   };
 
   const handleReject = async () => {
-    await rejectRestaurantMutation.mutateAsync({
-      restaurantId: restaurant.id,
+    await rejectShipperMutation.mutateAsync({
+      shipperId: shipper.id,
     });
     setIsOpen(false);
   };
@@ -105,11 +104,9 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
         <div className="flex w-full items-center justify-between">
           <div className="text-virparyasMainBlue">
             <p className="text-xl font-medium md:mt-2 md:text-3xl">
-              {restaurant.name}
+              {shipper.firstName} {shipper.lastName}
             </p>
-            <p className="text-xs font-light md:mb-2 md:text-base">
-              Restaurant
-            </p>
+            <p className="text-xs font-light md:mb-2 md:text-base">Shipper</p>
           </div>
           <div className="flex">
             <button
@@ -160,71 +157,10 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
               >
                 <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
-                    Edit {restaurant.name}
+                    Edit {shipper.firstName} {shipper.lastName}
                   </Dialog.Title>
                   <div className="mt-2">
                     <div className="grid grid-cols-1 gap-4">
-                      <div className="flex flex-col">
-                        <label htmlFor="cuisine" className="font-medium">
-                          * Cuisine:
-                        </label>
-                        <input
-                          type="text"
-                          id="cuisine"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Cuisine..."
-                          value={restaurant.cuisine.name}
-                          disabled
-                        />
-                      </div>
-                      <div className="flex flex-col">
-                        <label htmlFor="restaurantName" className="font-medium">
-                          * Restaurant name:
-                        </label>
-
-                        <input
-                          type="text"
-                          id="restaurantName"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Restaurant name..."
-                          value={restaurant.name}
-                          disabled
-                        />
-                      </div>
-
-                      <div className="flex flex-col">
-                        <label htmlFor="address" className="font-medium">
-                          * Address:
-                        </label>
-
-                        <input
-                          type="text"
-                          id="address"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Address..."
-                          value={restaurant.address}
-                          disabled
-                        />
-                      </div>
-
-                      <div className="flex flex-col">
-                        <label
-                          htmlFor="additionalAddress"
-                          className="font-medium"
-                        >
-                          * Additional address:
-                        </label>
-
-                        <input
-                          type="text"
-                          id="additionalAddress"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Additional address..."
-                          value={restaurant.additionalAddress || ""}
-                          disabled
-                        />
-                      </div>
-
                       <div className="flex gap-4">
                         <div className="flex grow flex-col">
                           <label
@@ -239,7 +175,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             id="firstName"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="First name..."
-                            value={restaurant.firstName}
+                            value={shipper.firstName}
                             disabled
                           />
                         </div>
@@ -256,17 +192,72 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             id="lastName"
                             className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Last name..."
-                            value={restaurant.lastName}
+                            value={shipper.lastName}
                             disabled
                           />
                         </div>
                       </div>
+                      <div className="flex gap-4">
+                        <div className="flex grow flex-col">
+                          <label
+                            htmlFor="dateOfBirth"
+                            className="whitespace-nowrap font-medium"
+                          >
+                            Date of birth:
+                          </label>
 
+                          <div className="grid grid-cols-3 gap-4">
+                            <input
+                              type="text"
+                              id="date"
+                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              placeholder="First name..."
+                              value={shipper.dateOfBirth.toLocaleString(
+                                "en-US",
+                                { day: "numeric" }
+                              )}
+                              disabled
+                            />
+                            <input
+                              type="text"
+                              id="firstName"
+                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              placeholder="First name..."
+                              value={shipper.dateOfBirth.toLocaleString(
+                                "en-US",
+                                { month: "short" }
+                              )}
+                              disabled
+                            />
+                            <input
+                              type="text"
+                              id="firstName"
+                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              placeholder="First name..."
+                              value={shipper.dateOfBirth.toLocaleString(
+                                "en-US",
+                                { year: "numeric" }
+                              )}
+                              disabled
+                            />
+                          </div>
+                        </div>
+                      </div>
                       <div className="flex flex-col">
-                        <label
-                          htmlFor="phoneNumber"
-                          className="whitespace-nowrap font-medium"
-                        >
+                        <label htmlFor="cuisine" className="font-medium">
+                          * Identification number:
+                        </label>
+                        <input
+                          type="text"
+                          id="cuisine"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          placeholder="Cuisine..."
+                          value={shipper.identificationNumber}
+                          disabled
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <label htmlFor="phoneNumber" className="font-medium">
                           Phone number:
                         </label>
 
@@ -274,31 +265,28 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                           type="text"
                           id="phoneNumber"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Phone number..."
-                          value={restaurant.phoneNumber}
+                          placeholder="Restaurant name..."
+                          value={shipper.phoneNumber}
                           disabled
                         />
                       </div>
 
                       <div className="flex flex-col">
-                        <label
-                          htmlFor="additionalAddress"
-                          className="whitespace-nowrap font-medium"
-                        >
+                        <label htmlFor="email" className="font-medium">
                           Email:
                         </label>
 
                         <input
-                          type="text"
-                          id="additionalAddress"
+                          type="email"
+                          id="email"
                           className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          placeholder="Additional address..."
-                          value={restaurant.user.email || ""}
+                          placeholder="Email..."
+                          value={shipper.user.email || ""}
                           disabled
                         />
                       </div>
                       <div className="mt-4 grid grid-cols-2 gap-4">
-                        {rejectRestaurantMutation.isLoading ? (
+                        {rejectShipperMutation.isLoading ? (
                           <div className="flex justify-center">
                             <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                           </div>
@@ -310,7 +298,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             Reject
                           </button>
                         )}
-                        {approveRestaurantMutation.isLoading ? (
+                        {approveShipperMutation.isLoading ? (
                           <div className="flex justify-center">
                             <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                           </div>

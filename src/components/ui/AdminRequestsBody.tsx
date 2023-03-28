@@ -1,11 +1,16 @@
 import RestaurantPendingAdminCard from "../common/RestaurantPendingAdminCard";
+import ShipperPendingAdminCard from "../common/ShipperPendingAdminCard";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
-import { type Shipper, type Restaurant, User, Cuisine } from "@prisma/client";
+import {
+  type Shipper,
+  type Restaurant,
+  type User,
+  type Cuisine,
+} from "@prisma/client";
 import fuzzysort from "fuzzysort";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { api } from "~/utils/api";
-
 
 interface AdminRequestsBodyProps {
   pendingRestaurantAndShipper: (
@@ -110,7 +115,14 @@ const AdminRequestsBody: React.FC<AdminRequestsBodyProps> = ({
                   />
                 );
               } else {
-                return <></>;
+                return (
+                  <ShipperPendingAdminCard
+                    shipper={pending.data}
+                    pendingList={pendingList}
+                    setPendingList={setPendingList}
+                    key={pending.data.id}
+                  />
+                );
               }
             })}
           </div>

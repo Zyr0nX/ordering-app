@@ -21,6 +21,22 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
+  approveShipper: adminProtectedProcedure
+    .input(
+      z.object({
+        shipperId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.shipper.update({
+        where: {
+          id: input.shipperId,
+        },
+        data: {
+          approved: "APPROVED",
+        },
+      });
+    }),
   rejectRestaurant: adminProtectedProcedure
     .input(
       z.object({
@@ -31,6 +47,22 @@ export const adminRouter = createTRPCRouter({
       await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
+        },
+        data: {
+          approved: "REJECTED",
+        },
+      });
+    }),
+  rejectShipper: adminProtectedProcedure
+    .input(
+      z.object({
+        shipperId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.shipper.update({
+        where: {
+          id: input.shipperId,
         },
         data: {
           approved: "REJECTED",
@@ -141,23 +173,6 @@ export const adminRouter = createTRPCRouter({
       },
     });
   }),
-  rejectShipper: adminProtectedProcedure
-    .input(
-      z.object({
-        shipperId: z.string().cuid(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.shipper.update({
-        data: {
-          approved: "REJECTED",
-        },
-        where: {
-          id: input.shipperId,
-        },
-      });
-    }),
-
   editShipper: adminProtectedProcedure
     .input(
       z.object({

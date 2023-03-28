@@ -1,4 +1,3 @@
-import { Restaurant, Shipper } from "@prisma/client";
 import { type InferGetServerSidePropsType, type GetServerSidePropsContext, type NextPage } from "next";
 import React from "react";
 import Admin from "~/components/layouts/Admin";
