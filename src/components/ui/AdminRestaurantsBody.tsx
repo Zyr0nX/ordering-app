@@ -6,7 +6,6 @@ import fuzzysort from "fuzzysort";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
 
-
 const AdminRestaurantsBody = ({
   restaurants,
   cuisines,
@@ -32,7 +31,7 @@ const AdminRestaurantsBody = ({
     refetchInterval: 5000,
     enabled: search === "",
     onSuccess: (data) => {
-      if(search === "") setRestaurantList(data);
+      if (search === "") setRestaurantList(data);
     },
   });
 

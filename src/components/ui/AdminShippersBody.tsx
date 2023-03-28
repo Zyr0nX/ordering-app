@@ -1,10 +1,7 @@
 import ShipperAdminCard from "../common/ShipperAdminCard";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
-import {
-  type User,
-  type Shipper,
-} from "@prisma/client";
+import { type User, type Shipper } from "@prisma/client";
 import fuzzysort from "fuzzysort";
 import React, { useState } from "react";
 import { api } from "~/utils/api";

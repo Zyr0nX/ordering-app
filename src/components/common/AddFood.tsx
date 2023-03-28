@@ -1,4 +1,3 @@
-import CommonImageInput from "./CommonImageInput";
 import FoodOptionInput from "./FoodOptionInput";
 import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
@@ -153,11 +152,11 @@ const AddFood = () => {
                           ref={descriptionRef}
                         />
                       </div>
-                      <CommonImageInput
+                      {/* <CommonImageInput
                         image={image}
                         setImage={setImage}
                         label="* Image"
-                      />
+                      /> */}
                       <div className="h-0.5 bg-virparyasSeparator" />
                       <div className="flex flex-col gap-4" ref={parent}>
                         {foodCategories.map((foodCategory, index) => (

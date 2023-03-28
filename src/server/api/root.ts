@@ -11,7 +11,6 @@ import { stripeRouter } from "./routers/stripe";
 import { userRouter } from "./routers/user";
 import { createTRPCRouter } from "~/server/api/trpc";
 
-
 /**
  * This is the primary router for your server.
  *

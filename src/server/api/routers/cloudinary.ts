@@ -5,9 +5,11 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const cloudinaryRouter = createTRPCRouter({
   upload: publicProcedure
-    .input(z.object({
-      file: z.string().url(),
-    }))
+    .input(
+      z.object({
+        file: z.string().url(),
+      })
+    )
     .mutation(async ({ input }) => {
       cloudinary.config({
         cloud_name: env.CLOUDINARY_CLOUD_NAME,

@@ -1,77 +1,48 @@
 import BluePencil from "../icons/BluePencil";
 import CloudIcon from "../icons/CloudIcon";
-import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
 import Loading from "./Loading";
-import { Transition, Dialog, Listbox } from "@headlessui/react";
-import { type User, type Restaurant, type Cuisine } from "@prisma/client";
+import { Transition, Dialog } from "@headlessui/react";
+import { type User } from "@prisma/client";
 import Image from "next/image";
 import React, { Fragment, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import useBase64 from "~/utils/useBase64";
 
-interface RestaurantAdminCardProps {
-  restaurant: Restaurant & {
-    user: User;
-    cuisine: Cuisine;
-  };
-  cuisines: Cuisine[];
-  restaurantList: (Restaurant & {
-    user: User;
-    cuisine: Cuisine;
-  })[];
-  setRestaurantList: React.Dispatch<
-    React.SetStateAction<
-      (Restaurant & {
-        user: User;
-        cuisine: Cuisine;
-      })[]
-    >
-  >;
+interface ShipperAdminCardProps {
+  user: User;
+  userList: User[];
+  setUserList: React.Dispatch<React.SetStateAction<User[]>>;
 }
 
-const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
-  restaurant,
-  cuisines,
-  restaurantList,
-  setRestaurantList,
+const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
+  user,
+  userList,
+  setUserList,
 }) => {
   const utils = api.useContext();
 
-  const [firstName, setFirstName] = useState(restaurant.firstName);
-  const [lastName, setLastName] = useState(restaurant.lastName);
-  const [phoneNumber, setPhoneNumber] = useState(restaurant.phoneNumber);
-  const [restaurantName, setRestaurantName] = useState(restaurant.name);
-  const [address, setAddress] = useState(restaurant.address);
+  const [name, setName] = useState(user.name);
+  const [address, setAddress] = useState(user.address);
   const [additionalAddress, setAdditionalAddress] = useState(
-    restaurant.additionalAddress
+    user.additionalAddress
   );
-  const [cuisine, setCuisine] = useState(restaurant.cuisine);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
+
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [reason, setReason] = useState("");
 
   const { result: base64Image } = useBase64(imageFile);
 
-  const [isInvalidFirstName, setIsInvalidFirstName] = useState<boolean | null>(
-    null
-  );
-  const [isInvalidLastName, setIsInvalidLastName] = useState<boolean | null>(
+  const [isInvalidName, setIsInvalidName] = useState<boolean | null>(null);
+  const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
     null
   );
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = useState<
     boolean | null
   >(null);
-  const [isInvalidRestaurantName, setIsInvalidRestaurantName] = useState<
-    boolean | null
-  >(null);
-  const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
-    null
-  );
-  const [isInvalidCuisine, setIsInvalidCuisine] = useState<boolean | null>(
-    null
-  );
   const [isInvalidImage, setIsInvalidImage] = useState<boolean | null>(null);
 
   const [isInvalidReason, setIsInvalidReason] = useState<boolean | null>(null);
@@ -79,29 +50,26 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
 
-  const editRestaurantMutation = api.admin.editRestaurant.useMutation({
+  const editUserMutation = api.admin.editUser.useMutation({
     onSuccess: (data) => {
-      const newRestaurantList = restaurantList.map((restaurant) => {
-        if (restaurant.id === data.id) {
+      const newUserList = userList.map((user) => {
+        if (user.id === data.id) {
           return {
-            ...restaurant,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            phoneNumber: data.phoneNumber,
+            ...user,
             name: data.name,
             address: data.address,
             additionalAddress: data.additionalAddress,
-            cuisineId: data.cuisineId,
+            phoneNumber: data.phoneNumber,
             image: data.image,
           };
         } else {
-          return restaurant;
+          return user;
         }
       });
-      setRestaurantList(newRestaurantList);
+      setUserList(newUserList);
     },
     onSettled: () => {
-      void utils.admin.getApprovedRestaurants.invalidate();
+      void utils.admin.getUsers.invalidate();
     },
   });
 
@@ -113,14 +81,14 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     }
   };
 
-  const handleEditRestaurant = async () => {
+  const handleEditUser = async () => {
     let isValidForm = true;
 
-    if (!z.string().nonempty().safeParse(restaurantName).success) {
-      setIsInvalidRestaurantName(true);
+    if (!z.string().nonempty().safeParse(name).success) {
+      setIsInvalidName(true);
       isValidForm = false;
     } else {
-      setIsInvalidRestaurantName(false);
+      setIsInvalidName(false);
     }
 
     if (!z.string().nonempty().safeParse(address).success) {
@@ -130,37 +98,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
       setIsInvalidAddress(false);
     }
 
-    if (!z.string().nonempty().safeParse(phoneNumber).success) {
-      setIsInvalidPhoneNumber(true);
-      isValidForm = false;
-    } else {
-      setIsInvalidPhoneNumber(false);
-    }
-
-    if (!z.string().nonempty().safeParse(cuisine?.id).success) {
-      setIsInvalidCuisine(true);
-      isValidForm = false;
-    } else {
-      setIsInvalidCuisine(false);
-    }
-
-    if (!z.string().nonempty().safeParse(firstName).success) {
-      setIsInvalidFirstName(true);
-      isValidForm = false;
-    } else {
-      setIsInvalidFirstName(false);
-    }
-
-    if (!z.string().nonempty().safeParse(lastName).success) {
-      setIsInvalidLastName(true);
-      isValidForm = false;
-    } else {
-      setIsInvalidLastName(false);
-    }
-
     if (
       !z.string().url().safeParse(base64Image).success &&
-      !z.string().url().safeParse(restaurant.image).success
+      !z.string().url().safeParse(user.image).success
     ) {
       setIsInvalidImage(true);
       isValidForm = false;
@@ -175,26 +115,20 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
       const secure_url = await cloudinaryUploadMutation.mutateAsync({
         file: base64Image as string,
       });
-      await editRestaurantMutation.mutateAsync({
-        restaurantId: restaurant.id,
-        restaurantName,
+      await editUserMutation.mutateAsync({
+        userId: user.id,
+        name,
         address,
         additionalAddress,
-        firstName,
-        lastName,
-        cuisineId: cuisine?.id,
         phoneNumber,
         image: secure_url,
       });
     } else {
-      await editRestaurantMutation.mutateAsync({
-        restaurantId: restaurant.id,
-        restaurantName,
+      await editUserMutation.mutateAsync({
+        userId: user.id,
+        name,
         address,
         additionalAddress,
-        firstName,
-        lastName,
-        cuisineId: cuisine?.id,
         phoneNumber,
       });
     }
@@ -202,7 +136,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     setIsEditOpen(false);
   };
 
-  const disableRestaurantMutation = api.admin.disableRestaurant.useMutation();
+  const disableUserMutation = api.admin.disableUser.useMutation();
 
   const handleDisable = async () => {
     let isValidForm = true;
@@ -213,32 +147,24 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
       setIsInvalidReason(false);
     }
     if (!isValidForm) return;
-    await disableRestaurantMutation.mutateAsync({
-      restaurantId: restaurant.id,
+    await disableUserMutation.mutateAsync({
+      userId: user.id,
       reason,
     });
     setIsRejectOpen(false);
   };
 
   const handleDiscard = () => {
-    setFirstName(restaurant.firstName);
-    setLastName(restaurant.lastName);
-    setPhoneNumber(restaurant.phoneNumber);
-    setRestaurantName(restaurant.name);
-    setAddress(restaurant.address);
-    setAdditionalAddress(restaurant.additionalAddress);
-    setCuisine(restaurant.cuisine);
-    setImageFile(null);
-    setIsInvalidFirstName(null);
-    setIsInvalidLastName(null);
-    setIsInvalidPhoneNumber(null);
-    setIsInvalidRestaurantName(null);
+    setName(user.name);
+    setAddress(user.address);
+    setAdditionalAddress(user.additionalAddress);
+    setPhoneNumber(user.phoneNumber);
+    setIsInvalidName(null);
     setIsInvalidAddress(null);
-    setIsInvalidCuisine(null);
+    setIsInvalidPhoneNumber(null);
     setIsInvalidImage(null);
+    setImageFile(null);
     setIsEditOpen(false);
-    console.log(imageFile);
-    console.log(base64Image);
   };
 
   return (
@@ -246,11 +172,11 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
       <div className="flex flex-auto rounded-2xl bg-white p-4 pt-3 shadow-md">
         <div className="flex w-full items-center justify-between">
           <div className="text-virparyasMainBlue">
-            <p className="text-xl font-medium md:mt-2 md:text-3xl">
-              {restaurant.name}
+            <p className="min-h-[2.25rem] text-xl font-medium md:mt-2 md:text-3xl">
+              {user.name}
             </p>
             <p className="text-xs font-light md:mb-2 md:text-base">
-              {restaurant.address}
+              {user.email}
             </p>
           </div>
           <div className="flex">
@@ -302,110 +228,34 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
               >
                 <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
-                    Edit {restaurant.name}
+                    Edit {user.name}
                   </Dialog.Title>
                   <div className="mt-2">
                     <div className="grid grid-cols-1 gap-4">
-                      <div className="flex flex-col">
+                      <div className="flex grow flex-col">
                         <div className="flex items-center justify-between">
                           <label
-                            htmlFor="cuisine"
+                            htmlFor="name"
                             className="whitespace-nowrap font-medium"
                           >
-                            * Cuisine:
+                            * Name:
                           </label>
-                          {isInvalidCuisine && (
+                          {isInvalidName && (
                             <p className="text-xs text-virparyasRed">
-                              Cuisine is required
-                            </p>
-                          )}
-                        </div>
-
-                        <Listbox value={cuisine} onChange={setCuisine}>
-                          {({ open }) => (
-                            <div className="relative">
-                              <Listbox.Button
-                                className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                                  open
-                                    ? "ring-2 ring-virparyasMainBlue"
-                                    : isInvalidCuisine
-                                    ? "ring-2 ring-virparyasRed"
-                                    : ""
-                                }`}
-                              >
-                                <span className="truncate">
-                                  {cuisine?.name || "Select a cuisine"}
-                                </span>
-                                <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
-                                  <DropDownIcon />
-                                </span>
-                              </Listbox.Button>
-                              {cuisines && (
-                                <Transition
-                                  as={Fragment}
-                                  leave="transition ease-in duration-100"
-                                  leaveFrom="opacity-100"
-                                  leaveTo="opacity-0"
-                                >
-                                  <Listbox.Options className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                                    {cuisines.map((cuisine) => (
-                                      <Listbox.Option
-                                        key={cuisine.id}
-                                        className={({ active }) =>
-                                          `relative cursor-default select-none text-viparyasDarkBlue ${
-                                            active
-                                              ? "bg-[#E9E9FF]"
-                                              : "text-gray-900"
-                                          }`
-                                        }
-                                        value={cuisine}
-                                      >
-                                        {({ selected }) => (
-                                          <span
-                                            className={`block truncate py-2 px-4 ${
-                                              selected
-                                                ? "bg-virparyasMainBlue font-semibold text-white"
-                                                : ""
-                                            }`}
-                                          >
-                                            {cuisine.name}
-                                          </span>
-                                        )}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox.Options>
-                                </Transition>
-                              )}
-                            </div>
-                          )}
-                        </Listbox>
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between">
-                          <label
-                            htmlFor="restaurantName"
-                            className="whitespace-nowrap font-medium"
-                          >
-                            * Restaurant name:
-                          </label>
-                          {isInvalidRestaurantName && (
-                            <p className="text-xs text-virparyasRed">
-                              Restaurant name is required
+                              Name is required
                             </p>
                           )}
                         </div>
 
                         <input
                           type="text"
-                          id="restaurantName"
+                          id="name"
                           className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                            isInvalidRestaurantName
-                              ? "ring-2 ring-virparyasRed"
-                              : ""
+                            isInvalidName ? "ring-2 ring-virparyasRed" : ""
                           }`}
-                          placeholder="Restaurant name..."
-                          value={restaurantName}
-                          onChange={(e) => setRestaurantName(e.target.value)}
+                          placeholder="Name..."
+                          value={name || ""}
+                          onChange={(e) => setName(e.target.value)}
                         />
                       </div>
 
@@ -419,7 +269,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           </label>
                           {isInvalidAddress && (
                             <p className="text-xs text-virparyasRed">
-                              Address is required
+                              Identification number is required
                             </p>
                           )}
                         </div>
@@ -431,7 +281,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
                           }`}
                           placeholder="Address..."
-                          value={address}
+                          value={address || ""}
                           onChange={(e) => setAddress(e.target.value)}
                         />
                       </div>
@@ -442,7 +292,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             htmlFor="additionalAddress"
                             className="whitespace-nowrap font-medium"
                           >
-                            Additional Address:
+                            Additional address:
                           </label>
                         </div>
 
@@ -456,64 +306,6 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         />
                       </div>
 
-                      <div className="flex gap-4">
-                        <div className="flex grow flex-col">
-                          <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="firstName"
-                              className="whitespace-nowrap font-medium"
-                            >
-                              * First name:
-                            </label>
-                            {isInvalidFirstName && (
-                              <p className="text-xs text-virparyasRed">
-                                First name is required
-                              </p>
-                            )}
-                          </div>
-
-                          <input
-                            type="text"
-                            id="firstName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                              isInvalidFirstName
-                                ? "ring-2 ring-virparyasRed"
-                                : ""
-                            }`}
-                            placeholder="First name..."
-                            value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
-                          />
-                        </div>
-                        <div className="flex grow flex-col">
-                          <div className="inline-flex items-center justify-between">
-                            <label
-                              htmlFor="lastName"
-                              className="whitespace-nowrap font-medium"
-                            >
-                              * Last name:
-                            </label>
-                            {isInvalidLastName && (
-                              <p className="text-xs text-virparyasRed">
-                                Last name is required
-                              </p>
-                            )}
-                          </div>
-
-                          <input
-                            type="text"
-                            id="lastName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                              isInvalidLastName
-                                ? "ring-2 ring-virparyasRed"
-                                : ""
-                            }`}
-                            placeholder="Last name..."
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                          />
-                        </div>
-                      </div>
                       <div className="flex flex-col">
                         <div className="flex items-center justify-between">
                           <label
@@ -524,7 +316,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           </label>
                           {isInvalidPhoneNumber && (
                             <p className="text-xs text-virparyasRed">
-                              Address is required
+                              Phone number is required
                             </p>
                           )}
                         </div>
@@ -537,31 +329,16 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                               ? "ring-2 ring-virparyasRed"
                               : ""
                           }`}
-                          placeholder="Address..."
-                          value={phoneNumber}
+                          placeholder="Phone number..."
+                          value={phoneNumber || ""}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                       </div>
-                      <div className="flex flex-col">
-                        <label
-                          htmlFor="email"
-                          className="whitespace-nowrap font-medium"
-                        >
-                          Email:
-                        </label>
 
-                        <input
-                          type="email"
-                          id="email"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                          disabled
-                          value={restaurant.user.email || ""}
-                        />
-                      </div>
                       <div className="flex flex-col">
                         <div className="flex items-center justify-between">
                           <label
-                            htmlFor="brandImage"
+                            htmlFor="image"
                             className="truncate font-medium"
                           >
                             * Image:
@@ -586,7 +363,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           </div>
                           <input
                             type="file"
-                            id="brandImage"
+                            id="image"
                             className="absolute top-0 z-10 h-full w-full cursor-pointer opacity-0"
                             accept="image/*"
                             onChange={(e) => void handleSelectImage(e)}
@@ -599,12 +376,14 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                               className="object-cover"
                             ></Image>
                           ) : (
-                            <Image
-                              src={restaurant.image || ""}
-                              alt="Image"
-                              fill
-                              className="object-cover"
-                            ></Image>
+                            user.image && (
+                              <Image
+                                src={user.image}
+                                alt="Image"
+                                fill
+                                className="object-cover"
+                              ></Image>
+                            )
                           )}
                         </div>
                         <div className="mt-4 grid grid-cols-2 gap-4">
@@ -615,14 +394,14 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             Discard
                           </button>
                           {cloudinaryUploadMutation.isLoading ||
-                          editRestaurantMutation.isLoading ? (
+                          editUserMutation.isLoading ? (
                             <div className="flex justify-center">
                               <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                             </div>
                           ) : (
                             <button
                               className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
-                              onClick={() => void handleEditRestaurant()}
+                              onClick={() => void handleEditUser()}
                             >
                               Confirm
                             </button>
@@ -668,7 +447,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
               >
                 <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
-                    Disable {restaurant.name}
+                    Disable {user.name}
                   </Dialog.Title>
                   <div className="flex flex-col">
                     <div className="flex items-center justify-between">
@@ -696,7 +475,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                     />
                   </div>
                   <div className="mt-4 flex justify-center gap-4">
-                    {disableRestaurantMutation.isLoading ? (
+                    {disableUserMutation.isLoading ? (
                       <div className="flex justify-center">
                         <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                       </div>
@@ -719,4 +498,4 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
   );
 };
 
-export default RestaurantAdminCard;
+export default UserAdminCard;

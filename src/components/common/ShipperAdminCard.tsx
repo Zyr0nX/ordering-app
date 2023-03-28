@@ -119,7 +119,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
       setShipperList(newShipperList);
     },
     onSettled: () => {
-      void utils.admin.getApprovedRestaurants.invalidate();
+      void utils.admin.getApprovedShippers.invalidate();
     },
   });
 

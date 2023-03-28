@@ -58,7 +58,7 @@ const AdminRequestsBody = () => {
   };
 
   const handleReject = (id: string) => {
-    rejectRestaurantMutation.mutate({ restaurantId: id });
+    // rejectRestaurantMutation.mutate({ restaurantId: id });
   };
 
   const handleSelect = (

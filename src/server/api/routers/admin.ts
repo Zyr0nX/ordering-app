@@ -3,7 +3,6 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -209,19 +208,52 @@ export const adminRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string().cuid(),
-        name: z.string(),
-        image: z.string().url().nullable(),
+        name: z.string().nullish(),
+        address: z.string().nullish(),
+        additionalAddress: z.string().nullish(),
+        phoneNumber: z.string().nullish(),
+        image: z.string().url().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.user.update({
-        data: {
-          name: input.name,
-          image: input.image,
-        },
+      return await ctx.prisma.user.update({
         where: {
           id: input.userId,
         },
+        data: {
+          name: input.name,
+          address: input.address,
+          additionalAddress: input.additionalAddress,
+          phoneNumber: input.phoneNumber,
+          image: input.image,
+        },
+      });
+    }),
+  disableUser: adminProtectedProcedure
+    .input(
+      z.object({
+        userId: z.string().cuid(),
+        reason: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          status: "DISABLED",
+        },
+      });
+      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
+      if (!user.email) {
+        return;
+      }
+      await transporter.sendMail({
+        from: env.EMAIL_FROM,
+        to: user.email,
+        subject: "Your account has been disabled",
+        text: `Your account has been disabled for the following reason: ${input.reason}`,
       });
     }),
 });

@@ -30,10 +30,7 @@ export const getServerSideProps = async (
 
   if (!session || session.user.role !== "ADMIN") {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+      notFound: true,
     };
   }
 

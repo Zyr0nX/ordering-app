@@ -434,7 +434,9 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * License plate:
             </label>
             {isInvalidLicensePlate && (
-              <p className="text-xs text-virparyasRed">License plate is required</p>
+              <p className="text-xs text-virparyasRed">
+                License plate is required
+              </p>
             )}
           </div>
 

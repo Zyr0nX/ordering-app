@@ -47,6 +47,7 @@ model User {
   address           String?
   additionalAddress String?
   phoneNumber       String?
+  status            Status      @default(ENABLED)
   accounts          Account[]
   sessions          Session[]
   restaurant        Restaurant?
@@ -148,7 +149,7 @@ model Shipper {
   identificationNumber String
   phoneNumber          String
   licensePlate         String
-  image               String?
+  image                String?
   approved             Approve  @default(PENDING)
   userId               String   @unique
   user                 User     @relation(fields: [userId], references: [id])
@@ -263,4 +264,9 @@ enum StripeSubscriptionStatus {
   canceled
   unpaid
   paused
+}
+
+enum Status {
+  ENABLED
+  DISABLED
 }
