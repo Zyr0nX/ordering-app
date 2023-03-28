@@ -11,6 +11,7 @@ import { z } from "zod";
 import { api } from "~/utils/api";
 import useBase64 from "~/utils/useBase64";
 
+
 interface RestaurantAdminCardProps {
   restaurant: Restaurant & {
     user: User;
@@ -50,6 +51,8 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
   const [cuisine, setCuisine] = useState(restaurant.cuisine);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  const [reason, setReason] = useState("");
+
   const { result: base64Image } = useBase64(imageFile);
 
   const [isInvalidFirstName, setIsInvalidFirstName] = useState<boolean | null>(
@@ -71,6 +74,8 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     null
   );
   const [isInvalidImage, setIsInvalidImage] = useState<boolean | null>(null);
+
+  const [isInvalidReason, setIsInvalidReason] = useState<boolean | null>(null);
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
@@ -194,8 +199,26 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
         phoneNumber,
       });
     }
-
+    setImageFile(null);
     setIsEditOpen(false);
+  };
+
+  const disableRestaurantMutation = api.admin.disableRestaurant.useMutation();
+
+  const handleDisable = async () => {
+    let isValidForm = true;
+    if (!z.string().nonempty().safeParse(reason).success) {
+      setIsInvalidReason(true);
+      isValidForm = false;
+    } else {
+      setIsInvalidReason(false);
+    }
+    if (!isValidForm) return;
+    await disableRestaurantMutation.mutateAsync({
+      restaurantId: restaurant.id,
+      reason,
+    });
+    setIsRejectOpen(false);
   };
 
   const handleDiscard = () => {
@@ -215,8 +238,8 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     setIsInvalidCuisine(null);
     setIsInvalidImage(null);
     setIsEditOpen(false);
-    console.log(imageFile)
-    console.log(base64Image)
+    console.log(imageFile);
+    console.log(base64Image);
   };
 
   return (
@@ -600,9 +623,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           ) : (
                             <button
                               className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
-                              onClick={() =>
-                                void handleEditRestaurant()
-                              }
+                              onClick={() => void handleEditRestaurant()}
                             >
                               Confirm
                             </button>
@@ -610,6 +631,84 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         </div>
                       </div>
                     </div>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+      <Transition appear show={isRejectOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsRejectOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                  <Dialog.Title as="h3" className="text-3xl font-bold">
+                    Disable {restaurant.name}
+                  </Dialog.Title>
+                  <div className="flex flex-col">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="phoneNumber"
+                        className="whitespace-nowrap font-medium"
+                      >
+                        * Reason for disabling account:
+                      </label>
+                      {isInvalidReason && (
+                        <p className="text-xs text-virparyasRed">
+                          Reason is required
+                        </p>
+                      )}
+                    </div>
+
+                    <textarea
+                      id="phoneNumber"
+                      className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                        isInvalidReason ? "ring-2 ring-virparyasRed" : ""
+                      }`}
+                      placeholder="Reason for disabling account..."
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                    />
+                  </div>
+                  <div className="mt-4 flex justify-center gap-4">
+                    {disableRestaurantMutation.isLoading ? (
+                      <div className="flex justify-center">
+                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                      </div>
+                    ) : (
+                      <button
+                        className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                        onClick={() => void handleDisable()}
+                      >
+                        Disable account
+                      </button>
+                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

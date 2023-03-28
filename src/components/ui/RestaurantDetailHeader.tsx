@@ -22,13 +22,16 @@ const RestaurantDetailHeader = ({
   const roundedRating = Math.round(((rating || 5) * 2) / 2);
   return (
     <div className="relative">
-      <Image
-        src={restaurant?.brandImage || ""}
-        fill
-        alt="Restaurant Image"
-        className="object-cover brightness-50"
-        priority
-      />
+      {restaurant?.image && (
+        <Image
+          src={restaurant?.image}
+          fill
+          alt="Restaurant Image"
+          className="object-cover brightness-50"
+          priority
+        />
+      )}
+
       <div className="relative w-full p-4 text-white md:p-8">
         <div className="flex w-full items-center justify-between md:absolute md:w-[calc(100%-4rem)]">
           <Link href="/">

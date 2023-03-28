@@ -1,4 +1,6 @@
+import nodemailer from "nodemailer";
 import { z } from "zod";
+import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 
@@ -19,20 +21,34 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
-  rejectRestaurant: adminProtectedProcedure
+  disableRestaurant: adminProtectedProcedure
     .input(
       z.object({
         restaurantId: z.string().cuid(),
+        reason: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.restaurant.update({
-        data: {
-          approved: "REJECTED",
-        },
+      const restaurant = await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
         },
+        data: {
+          approved: "REJECTED",
+        },
+        include: {
+          user: true,
+        },
+      });
+      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
+      if (!restaurant.user.email) {
+        return;
+      }
+      await transporter.sendMail({
+        from: env.EMAIL_FROM,
+        to: restaurant.user.email,
+        subject: "Your restaurant has been disabled",
+        text: `Your restaurant has been disabled for the following reason: ${input.reason}`,
       });
     }),
   getPendingRestaurantRequests: adminProtectedProcedure.query(
@@ -127,31 +143,63 @@ export const adminRouter = createTRPCRouter({
     }),
 
   editShipper: adminProtectedProcedure
-
     .input(
       z.object({
         shipperId: z.string().cuid(),
-        firstname: z.string(),
-        lastname: z.string(),
-        ssn: z.string(),
-        phonenumber: z.string(),
-        avatar: z.string().url().nullable(),
-        dateofbirth: z.date(),
+        firstName: z.string(),
+        lastName: z.string(),
+        identificationNumber: z.string(),
+        licensePlate: z.string(),
+        phoneNumber: z.string(),
+        image: z.string().url().optional(),
+        dateOfBirth: z.date(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.shipper.update({
-        data: {
-          firstName: input.firstname,
-          lastName: input.lastname,
-          identificationNumber: input.ssn,
-          phoneNumber: input.phonenumber,
-          avatar: input.avatar,
-          dateOfBirth: input.dateofbirth,
-        },
+      const shipper = await ctx.prisma.shipper.update({
         where: {
           id: input.shipperId,
         },
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          identificationNumber: input.identificationNumber,
+          licensePlate: input.licensePlate,
+          phoneNumber: input.phoneNumber,
+          image: input.image,
+          dateOfBirth: input.dateOfBirth,
+        },
+      });
+      return shipper;
+    }),
+  disableShipper: adminProtectedProcedure
+    .input(
+      z.object({
+        shipperId: z.string().cuid(),
+        reason: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const shipper = await ctx.prisma.shipper.update({
+        where: {
+          id: input.shipperId,
+        },
+        data: {
+          approved: "REJECTED",
+        },
+        include: {
+          user: true,
+        },
+      });
+      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
+      if (!shipper.user.email) {
+        return;
+      }
+      await transporter.sendMail({
+        from: env.EMAIL_FROM,
+        to: shipper.user.email,
+        subject: "Your shipper account has been disabled",
+        text: `Your shipper account has been disabled for the following reason: ${input.reason}`,
       });
     }),
   getUsers: adminProtectedProcedure.query(async ({ ctx }) => {

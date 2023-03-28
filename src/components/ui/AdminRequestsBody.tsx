@@ -49,7 +49,7 @@ const AdminRequestsBody = () => {
   const approveRestaurantMutation = api.admin.approveRestaurant.useMutation({
     onSuccess: () => pendingRestaurantRequestsQuery.refetch(),
   });
-  const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
+  const rejectRestaurantMutation = api.admin.disableRestaurant.useMutation({
     onSuccess: () => pendingRestaurantRequestsQuery.refetch(),
   });
 

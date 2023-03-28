@@ -17,7 +17,7 @@ const CommonImageInput: React.FC<CommonImageInputProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
 
-  const uploadImageMutation = api.external.uploadCloudinary.useMutation({
+  const uploadImageMutation = api.cloudinary.upload.useMutation({
     onMutate: () => {
       setUploading(true);
     },
@@ -28,13 +28,6 @@ const CommonImageInput: React.FC<CommonImageInputProps> = ({
       setUploading(false);
     },
   });
-
-  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const base64 = await getBase64(e.target.files[0]);
-      uploadImageMutation.mutate(base64);
-    }
-  };
   return (
     <div className="flex flex-col">
       <label htmlFor="brandImage" className="truncate font-medium">
@@ -74,7 +67,7 @@ const CommonImageInput: React.FC<CommonImageInputProps> = ({
           id="brandImage"
           className="absolute top-0 z-10 h-full w-full cursor-pointer opacity-0"
           accept="image/*"
-          onChange={(e) => void handleImage(e)}
+          // onChange={(e) => void handleImage(e)}
         />
         {image && (
           <Image

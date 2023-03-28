@@ -98,7 +98,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
       >
         <div className="relative h-36">
           <Image
-            src={restaurant.brandImage || ""}
+            src={restaurant.image || ""}
             fill
             alt="Restaurant Image"
             className="object-cover"

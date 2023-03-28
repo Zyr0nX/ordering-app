@@ -434,7 +434,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * License plate:
             </label>
             {isInvalidLicensePlate && (
-              <p className="text-xs text-virparyasRed">Address is required</p>
+              <p className="text-xs text-virparyasRed">License plate is required</p>
             )}
           </div>
 
@@ -444,7 +444,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
               isInvalidLicensePlate ? "ring-2 ring-virparyasRed" : ""
             }`}
-            placeholder="Address..."
+            placeholder="License plate..."
             value={licensePlate || ""}
             onChange={(e) => setLicensePlate(e.target.value)}
           />

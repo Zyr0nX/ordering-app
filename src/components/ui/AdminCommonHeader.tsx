@@ -2,18 +2,19 @@ import BackArrowIcon from "../icons/BackArrowIcon";
 import LogoutIcon from "../icons/LogoutIcon";
 import { signOut } from "next-auth/react";
 import React from "react";
+import Link from "next/link";
 
 const AdminCommonHeader = ({ title }: { title: string }) => {
   return (
     <div className="flex items-center justify-between bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 p-6 text-white">
-      <button onClick={() => void signOut()}>
-        <BackArrowIcon className="h-6 w-6 fill-white" />
-      </button>
+      <Link href="/manage/admin">
+        <BackArrowIcon className="h-8 w-8 fill-white" />
+      </Link>
       <div>
         <p className="text-2xl font-bold">{title}</p>
       </div>
       <button onClick={() => void signOut()}>
-        <LogoutIcon />
+        <LogoutIcon className="h-8 w-8 fill-white" />
       </button>
     </div>
   );

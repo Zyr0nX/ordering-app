@@ -47,13 +47,16 @@ const CartCard = ({
         href={`/restaurant/${item.restaurant.name}/${item.restaurant.id}`}
         className="relative overflow-hidden text-white"
       >
-        <Image
-          src={item.restaurant.brandImage || ""}
-          fill
-          alt="Restaurant Image"
-          className="object-cover brightness-50"
-          priority
-        />
+        {item.restaurant.image && (
+          <Image
+            src={item.restaurant.image || ""}
+            fill
+            alt="Restaurant Image"
+            className="object-cover brightness-50"
+            priority
+          />
+        )}
+
         <div className="relative p-4 md:p-6">
           <p className="mt-4 text-2xl font-bold md:mt-12 md:text-4xl">
             {item.restaurant.name}

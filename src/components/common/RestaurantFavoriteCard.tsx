@@ -64,7 +64,7 @@ const RestaurantFavoriteCard: React.FC<RestaurantFavoriteCardProps> = ({
       >
         <div className="relative h-28">
           <Image
-            src={restaurant.brandImage || ""}
+            src={restaurant.image || ""}
             fill
             alt="Restaurant Image"
             className="object-cover"

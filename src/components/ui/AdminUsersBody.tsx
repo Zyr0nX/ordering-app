@@ -60,7 +60,7 @@ const AdminUsersBody = ({ users }: { users: User[] }) => {
     },
   });
 
-  const uploadImageMutation = api.external.uploadCloudinary.useMutation({
+  const uploadImageMutation = api.cloudinary.upload.useMutation({
     onSuccess: (data) => {
       setImage(data);
     },
@@ -74,10 +74,10 @@ const AdminUsersBody = ({ users }: { users: User[] }) => {
     });
   };
 
-  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const base64 = await getBase64(e.target.files[0]);
-      uploadImageMutation.mutate(base64);
+      // const base64 = await getBase64(e.target.files[0]);
+      // uploadImageMutation.mutate(base64);
     }
   };
 

@@ -12,7 +12,6 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRef } from "react";
 import { api } from "~/utils/api";
 
 const HomeBody = ({
@@ -45,78 +44,46 @@ const HomeBody = ({
     }
   );
 
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [search, setSearch] = useState("");
 
   const handleSelectCuisine = (cuisine: Cuisine) => {
     if (selectedCuisine?.id === cuisine.id) {
       setRestaurantList(() => {
-        if (searchRef.current?.value === "") {
-          return restaurantQuery.data;
-        } else {
-          const result = fuzzysort.go(
-            searchRef.current?.value as string,
-            restaurantQuery.data,
-            {
-              keys: ["name"],
-            }
-          );
-          return result.map((restaurant) => {
-            return restaurant.obj;
-          });
-        }
+        const result = fuzzysort.go(search, restaurantQuery.data, {
+          keys: ["name"],
+          all: true,
+        });
+        return result.map((restaurant) => {
+          return restaurant.obj;
+        });
       });
       setSelectedCuisine(null);
       return;
     }
     setRestaurantList(() => {
-      if (searchRef.current?.value === "") {
-        return restaurantQuery.data.filter((restaurant) => {
+      const result = fuzzysort.go(search, restaurantQuery.data, {
+        keys: ["name"],
+        all: true,
+      });
+      return result
+        .map((restaurant) => {
+          return restaurant.obj;
+        })
+        .filter((restaurant) => {
           if (restaurant.cuisineId === cuisine.id) {
             return true;
           }
           return false;
         });
-      } else {
-        const result = fuzzysort.go(
-          searchRef.current?.value as string,
-          restaurantQuery.data,
-          {
-            keys: ["name"],
-          }
-        );
-        return result
-          .map((restaurant) => {
-            return restaurant.obj;
-          })
-          .filter((restaurant) => {
-            if (restaurant.cuisineId === cuisine.id) {
-              return true;
-            }
-            return false;
-          });
-      }
     });
     setSelectedCuisine(cuisine);
   };
 
   const handleSearch = (query: string) => {
-    if (query === "") {
-      setRestaurantList(() => {
-        if (selectedCuisine) {
-          return restaurantQuery.data.filter((restaurant) => {
-            if (restaurant.cuisineId === selectedCuisine.id) {
-              return true;
-            }
-            return false;
-          });
-        }
-        return restaurantQuery.data;
-      });
-
-      return;
-    }
+    setSearch(query);
     const result = fuzzysort.go(query, restaurantQuery.data, {
       keys: ["name"],
+      all: true,
     });
     setRestaurantList(
       result
@@ -172,7 +139,7 @@ const HomeBody = ({
               type="text"
               className="h-full w-full bg-transparent placeholder:text-sm placeholder:font-light placeholder:text-white focus-within:outline-none"
               placeholder="Food, drinks, restaurants, ..."
-              ref={searchRef}
+              value={search}
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>

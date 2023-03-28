@@ -148,7 +148,7 @@ model Shipper {
   identificationNumber String
   phoneNumber          String
   licensePlate         String
-  avatar               String?
+  image               String?
   approved             Approve  @default(PENDING)
   userId               String   @unique
   user                 User     @relation(fields: [userId], references: [id])

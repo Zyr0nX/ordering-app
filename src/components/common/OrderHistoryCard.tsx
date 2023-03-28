@@ -19,13 +19,16 @@ const OrderHistoryCard = ({
     <div className="h-fit overflow-hidden rounded-2xl bg-white shadow-lg">
       <Link href={`/orders/VP-${order.id}`}>
         <div className="relative overflow-hidden text-white">
-          <Image
-            src={order.restaurant.brandImage || ""}
-            fill
-            alt="Restaurant Image"
-            className="object-cover brightness-50"
-            priority
-          />
+          {order.restaurant.image && (
+            <Image
+              src={order.restaurant.image}
+              fill
+              alt="Restaurant Image"
+              className="object-cover brightness-50"
+              priority
+            />
+          )}
+
           <div
             className={`absolute top-4 right-4 flex w-fit justify-center rounded-xl px-2 py-1 font-medium ${
               order.status === "PLACED" ||
