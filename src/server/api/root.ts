@@ -1,7 +1,7 @@
 import { adminRouter } from "./routers/admin";
 import { cartRouter } from "./routers/cart";
+import { cloudinaryRouter } from "./routers/cloudinary";
 import { cuisineRouter } from "./routers/cuisine";
-import { externalRouter } from "./routers/external";
 import { foodRouter } from "./routers/food";
 import { orderRouter } from "./routers/order";
 import { restaurantRouter } from "./routers/restaurant";
@@ -10,6 +10,7 @@ import { spamRouter } from "./routers/spam";
 import { stripeRouter } from "./routers/stripe";
 import { userRouter } from "./routers/user";
 import { createTRPCRouter } from "~/server/api/trpc";
+
 
 /**
  * This is the primary router for your server.
@@ -21,7 +22,7 @@ export const appRouter = createTRPCRouter({
   restaurant: restaurantRouter,
   food: foodRouter,
   cart: cartRouter,
-  external: externalRouter,
+  cloudinary: cloudinaryRouter,
   spam: spamRouter,
   cuisine: cuisineRouter,
   order: orderRouter,

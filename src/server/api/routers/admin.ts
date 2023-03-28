@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -70,32 +71,33 @@ export const adminRouter = createTRPCRouter({
     .input(
       z.object({
         restaurantId: z.string().cuid(),
-        name: z.string(),
+        restaurantName: z.string(),
         address: z.string(),
-        additionaladdress: z.string().nullish(),
-        firstname: z.string(),
-        lastname: z.string(),
-        phonenumber: z.string(),
+        additionalAddress: z.string().nullish(),
+        firstName: z.string(),
+        lastName: z.string(),
+        phoneNumber: z.string(),
         cuisineId: z.string().cuid(),
-        brandImage: z.string().url().nullish(),
+        image: z.string().url().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.restaurant.update({
-        data: {
-          name: input.name,
-          address: input.address,
-          additionalAddress: input.additionaladdress,
-          firstName: input.firstname,
-          lastName: input.lastname,
-          phoneNumber: input.phonenumber,
-          cuisineId: input.cuisineId,
-          brandImage: input.brandImage,
-        },
+      const restaurant = await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
         },
+        data: {
+          name: input.restaurantName,
+          address: input.address,
+          additionalAddress: input.additionalAddress,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phoneNumber: input.phoneNumber,
+          cuisineId: input.cuisineId,
+          image: input.image,
+        },
       });
+      return restaurant;
     }),
   getApprovedShippers: adminProtectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.shipper.findMany({

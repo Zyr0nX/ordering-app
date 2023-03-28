@@ -106,7 +106,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       setIsInvalidPhoneNumber(false);
     }
 
-    if (!z.string().nonempty().safeParse(cuisine?.id).success) {
+    if (!z.string().cuid().nonempty().safeParse(cuisine?.id).success) {
       setIsInvalidCuisine(true);
       isInvalidForm = false;
     } else {
@@ -134,7 +134,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       additionalAddress,
       firstName,
       lastName,
-      cuisineId: cuisine?.id,
+      cuisineId: cuisine?.id as string,
       phoneNumber: `${
         phonePrefix?.dialCode ? `(${phonePrefix.dialCode}) ` : ""
       }${phoneNumber}`,
@@ -222,7 +222,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             )}
           </div>
 
-          <Listbox value={cuisine} onChange={setCuisine} defaultValue={cuisine}>
+          <Listbox value={cuisine} onChange={setCuisine}>
             {({ open }) => (
               <div className="relative">
                 <Listbox.Button

@@ -10,7 +10,7 @@ import Link from "next/link";
 import React, { Fragment, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import dates from "~/utils/dates.json";
-import getBase64 from "~/utils/getBase64";
+import getBase64 from "~/utils/useBase64";
 import months from "~/utils/months.json";
 import years from "~/utils/years.json";
 

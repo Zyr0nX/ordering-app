@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
-import getBase64 from "~/utils/getBase64";
+import getBase64 from "~/utils/useBase64";
 
 const AdminUsersBody = ({ users }: { users: User[] }) => {
   const nameRef = useRef<HTMLInputElement>(null);

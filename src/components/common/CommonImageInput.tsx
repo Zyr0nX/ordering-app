@@ -2,7 +2,7 @@ import CloudIcon from "../icons/CloudIcon";
 import Image from "next/image";
 import React, { useState } from "react";
 import { api } from "~/utils/api";
-import getBase64 from "~/utils/getBase64";
+import getBase64 from "~/utils/useBase64";
 
 interface CommonImageInputProps {
   label: string;

@@ -12,27 +12,27 @@ const AdminBody = () => {
       <MainButton
         text="Restaurants"
         icon={<RestaurantIcon className="md:h-24 md:w-24" />}
-        href="/admin/restaurants"
+        href="/manage/admin/restaurants"
       />
       <MainButton
         text="Shippers"
         icon={<ShipperIcon className="md:h-24 md:w-24" />}
-        href="/admin/shippers"
+        href="/manage/admin/shippers"
       />
       <MainButton
         text="Users"
         icon={<UserIcon className="md:h-24 md:w-24" />}
-        href="/admin/users"
+        href="/manage/admin/users"
       />
       <MainButton
         text="Requests"
         icon={<RequestIcon className="md:h-24 md:w-24" />}
-        href="/admin/requests"
+        href="/manage/admin/requests"
       />
       <MainButton
         text="Categories"
         icon={<CategoryIcon className="md:h-24 md:w-24" />}
-        href="/admin/categories"
+        href="/manage/admin/categories"
       />
     </div>
   );

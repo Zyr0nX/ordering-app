@@ -78,12 +78,12 @@ model Restaurant {
   approved          Approve    @default(PENDING)
   userId            String     @unique
   food              Food[]
-  cuisine           Cuisine?   @relation(fields: [cuisineId], references: [id])
-  brandImage        String?
+  cuisine           Cuisine    @relation(fields: [cuisineId], references: [id])
+  image             String?
   user              User       @relation(fields: [userId], references: [id])
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
-  cuisineId         String?
+  cuisineId         String
   favorite          Favorite[]
   order             Order[]
 

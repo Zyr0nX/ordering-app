@@ -1,6 +1,7 @@
 import CommonDialog from "../common/CommonDialog";
 import CommonImageInput from "../common/CommonImageInput";
 import CommonInput from "../common/CommonInput";
+import RestaurantAdminCard from "../common/RestaurantAdminCard";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import RedCross from "../icons/RedCross";
@@ -11,111 +12,25 @@ import { type Restaurant, type User, type Cuisine } from "@prisma/client";
 import React, { Fragment, useState, useRef } from "react";
 import { api } from "~/utils/api";
 
+
 const AdminRestaurantsBody = ({
   restaurants,
   cuisines,
 }: {
   restaurants: (Restaurant & {
     user: User;
-    cuisine: Cuisine | null;
+    cuisine: Cuisine;
   })[];
 
   cuisines: Cuisine[];
 }) => {
-  const firstNameRef = useRef<HTMLInputElement>(null);
-  const lastNameRef = useRef<HTMLInputElement>(null);
-  const phoneNumberRef = useRef<HTMLInputElement>(null);
-  const restaurantNameRef = useRef<HTMLInputElement>(null);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const additionalAddressRef = useRef<HTMLInputElement>(null);
-
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const [selectedRestaurant, setSelectedRestaurant] = useState<
-    Restaurant & {
+  const [restaurantList, setRestaurantList] = useState<
+    (Restaurant & {
       user: User;
-      cuisine: Cuisine | null;
-    }
-  >();
+      cuisine: Cuisine;
+    })[]
+  >([]);
 
-  const [image, setImage] = useState<string | null>(null);
-
-  const [selected, setSelected] = useState<Cuisine | null>(null);
-
-  const utils = api.useContext();
-
-  // useEffect(() => {
-  //   console.log("running");
-  //   if (searchRef.current?.value !== undefined && searchRef.current.value.length > 2) {
-  //     utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
-  //       return fuzzysort.go(searchRef.current?.value as string, old, {
-  //         key: "name",
-  //         });
-  //       });
-
-  //   }
-  // }, [searchRef.current?.value, utils.admin.getApprovedRestaurants]);
-
-  const approvedRestaurantQuery = api.admin.getApprovedRestaurants.useQuery(
-    undefined,
-    {
-      initialData: restaurants,
-      refetchInterval: 5000,
-      enabled: false,
-    }
-  );
-
-  const editRestaurantMutation = api.admin.editRestaurant.useMutation({
-    onMutate: async (newData) => {
-      await utils.admin.getApprovedRestaurants.cancel();
-      const prevData = utils.admin.getApprovedRestaurants.getData();
-      utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
-        return old?.map((restaurant) => {
-          if (restaurant.id === newData.restaurantId) {
-            return {
-              ...restaurant,
-              name: newData.name,
-              address: newData.address,
-              firstName: newData.firstname,
-              lastName: newData.lastname,
-              phoneNumber: newData.phonenumber,
-              additionalAddress: newData.additionaladdress as string,
-              brandImage: newData.brandImage as string,
-              cuisine: {
-                id: newData.cuisineId,
-                name: selected?.name as string,
-                image: "",
-              },
-            };
-          } else {
-            return restaurant;
-          }
-        });
-      });
-      return { prevData };
-    },
-    onSettled: async () => {
-      await utils.admin.getApprovedRestaurants.invalidate();
-    },
-  });
-
-  const rejectRestaurantMutation = api.admin.rejectRestaurant.useMutation({
-    onMutate: async (newData) => {
-      await utils.admin.getApprovedRestaurants.cancel();
-      const prevData = utils.admin.getApprovedRestaurants.getData();
-      utils.admin.getApprovedRestaurants.setData(undefined, (old) => {
-        return old?.filter(
-          (restaurant) => restaurant.id !== newData.restaurantId
-        );
-      });
-      return { prevData };
-    },
-    onSettled: async () => {
-      await utils.admin.getApprovedRestaurants.invalidate();
-    },
-  });
 
   // const handleSearch = async () => {
   //   await utils.admin.getApprovedRestaurants.cancel();
@@ -129,38 +44,6 @@ const AdminRestaurantsBody = ({
   //   console.log(a);
   //   return { prevData };
   // };
-
-  const handleReject = (id: string) => {
-    rejectRestaurantMutation.mutate({ restaurantId: id });
-  };
-
-  const handleEditRestaurant = (id: string) => {
-    editRestaurantMutation.mutate({
-      restaurantId: id,
-      name: restaurantNameRef.current?.value as string,
-      address: addressRef.current?.value as string,
-      cuisineId: selected?.id as string,
-      firstname: firstNameRef.current?.value as string,
-      lastname: lastNameRef.current?.value as string,
-      phonenumber: phoneNumberRef.current?.value as string,
-      additionaladdress: additionalAddressRef.current?.value,
-      brandImage: image,
-    });
-  };
-
-  const handleSelect = (
-    restaurant: Restaurant & {
-      user: User;
-      cuisine: Cuisine | null;
-    }
-  ) => {
-    setIsOpen(true);
-    setSelectedRestaurant(restaurant);
-    setSelected(
-      cuisines.find((cuisine) => cuisine.id === restaurant.cuisineId) ?? null
-    );
-    setImage(restaurant.brandImage);
-  };
 
   return (
     <div className="m-4 text-virparyasMainBlue">
@@ -179,7 +62,7 @@ const AdminRestaurantsBody = ({
         </div>
       </div>
       <div className="mt-4">
-        {approvedRestaurantQuery.data.length === 0 ? (
+        {restaurantList.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
             <p className="text-xl font-semibold">No restaurants found</p>
             <SleepIcon />
@@ -187,42 +70,42 @@ const AdminRestaurantsBody = ({
         ) : (
           <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {approvedRestaurantQuery.data.map((restaurant) => (
-                <div
-                  key={restaurant.id}
-                  className="flex flex-auto cursor-pointer rounded-2xl bg-white p-4 pt-3 shadow-[0_4px_4px_0_rgba(0,0,0,0.1)]"
-                  onClick={() => handleSelect(restaurant)}
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <div className="text-virparyasMainBlue">
-                      <p className="text-xl font-medium md:mt-2 md:text-3xl">
-                        {restaurant.name}
-                      </p>
-                      <p className="text-xs font-light md:mb-2 md:text-base">
-                        Restaurant
-                      </p>
-                    </div>
-                    <div className="flex">
-                      <button
-                        type="button"
-                        className="relative z-10 mr-2"
-                        onClick={() => setIsOpen(true)}
-                      >
-                        <BluePencil className="md:h-10 md:w-10" />
-                      </button>
-                      <button
-                        type="button"
-                        className="relative z-10"
-                        onClick={() => handleReject(restaurant.id)}
-                      >
-                        <RedCross className="md:h-10 md:w-10" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              {restaurantList.map((restaurant) => (
+                // <div
+                //   key={restaurant.id}
+                //   className="flex flex-auto rounded-2xl bg-white p-4 pt-3 shadow-md"
+                // >
+                //   <div className="flex w-full items-center justify-between">
+                //     <div className="text-virparyasMainBlue">
+                //       <p className="text-xl font-medium md:mt-2 md:text-3xl">
+                //         {restaurant.name}
+                //       </p>
+                //       <p className="text-xs font-light md:mb-2 md:text-base">
+                //         Restaurant
+                //       </p>
+                //     </div>
+                //     <div className="flex">
+                //       <button
+                //         type="button"
+                //         className="relative z-10 mr-2"
+                //         onClick={() => setIsOpen(true)}
+                //       >
+                //         <BluePencil className="md:h-10 md:w-10" />
+                //       </button>
+                //       <button
+                //         type="button"
+                //         className="relative z-10"
+                //         onClick={() => handleReject(restaurant.id)}
+                //       >
+                //         <RedCross className="md:h-10 md:w-10" />
+                //       </button>
+                //     </div>
+                //   </div>
+                // </div>
+                <RestaurantAdminCard restaurant={restaurant} cuisines={cuisines} restaurantList={restaurantList} setRestaurantList={setRestaurantList} key={restaurant.id} />
               ))}
             </div>
-            <CommonDialog
+            {/* <CommonDialog
               label="Edit mode"
               isOpen={isOpen}
               setIsOpen={setIsOpen}
@@ -356,7 +239,7 @@ const AdminRestaurantsBody = ({
                   Confirm
                 </button>
               </div>
-            </CommonDialog>
+            </CommonDialog> */}
           </>
         )}
       </div>
