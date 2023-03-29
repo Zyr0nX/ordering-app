@@ -6,25 +6,27 @@ import HouseIcon from "../icons/HouseIcon";
 import LoginIcon from "../icons/LoginIcon";
 import SearchIcon from "../icons/SearchIcon";
 import SleepIcon from "../icons/SleepIcon";
-import { type Restaurant, type Favorite, type Cuisine } from "@prisma/client";
+import {
+  type Restaurant,
+  type Favorite,
+  type Cuisine,
+  type User,
+} from "@prisma/client";
 import fuzzysort from "fuzzysort";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 
-const HomeBody = ({
-  cuisines,
-  restaurants,
-}: {
+interface HomeBodyProps {
   cuisines: Cuisine[];
   restaurants: (Restaurant & {
     favorite: Favorite[];
   })[];
-}) => {
-  const session = useSession();
+  user: User | null | undefined;
+}
 
+const HomeBody: React.FC<HomeBodyProps> = ({ cuisines, restaurants, user }) => {
   const [selectedCuisine, setSelectedCuisine] = useState<Cuisine | null>(null);
 
   const [restaurantList, setRestaurantList] = useState<
@@ -107,14 +109,17 @@ const HomeBody = ({
     <>
       <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 bg-gradient-to-r p-4 text-white md:p-8">
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-2 rounded-xl bg-white/40 px-4 py-2">
-            <HouseIcon className="md:h-6 md:w-6" />
-            <p className="text-virparyasMainBlue text-xs font-semibold md:text-base md:font-bold">
-              123 34th St
-            </p>
-          </div>
+          {user?.address ? (
+            <Link className="flex items-center gap-2 rounded-xl bg-white/40 px-4 py-2" href="/account/information">
+              <HouseIcon className="md:h-6 md:w-6" />
+              <p className="text-virparyasMainBlue text-xs font-semibold md:text-base md:font-bold">
+                {user.address}
+              </p>
+            </Link>
+          ) : (<div />)}
+
           <div className="flex items-center gap-4">
-            {session.status === "authenticated" ? (
+            {user ? (
               <Link href="/account">
                 <AccountIcon className="h-8 w-8 fill-white md:h-10 md:w-10" />
               </Link>
@@ -213,7 +218,7 @@ const HomeBody = ({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {restaurantList.map((restaurant) => (
                   <RestaurantCard
-                    displayFavorite={session.status === "authenticated"}
+                    displayFavorite={!!user}
                     restaurant={restaurant}
                     key={restaurant.id}
                     setRestaurantList={setRestaurantList}

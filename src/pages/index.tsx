@@ -7,11 +7,11 @@ import { prisma } from "~/server/db";
 
 const Home: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ cuisines, restaurants }) => {
+> = ({ cuisines, restaurants, user }) => {
   return (
     <Guest>
       <>
-        <HomeBody cuisines={cuisines} restaurants={restaurants} />
+        <HomeBody cuisines={cuisines} restaurants={restaurants} user={user} />
       </>
     </Guest>
   );
@@ -23,7 +23,32 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const [cuisines, restaurants] = await Promise.all([
+  if (!session) {
+    const [cuisines, restaurants] = await Promise.all([
+      prisma.cuisine.findMany(),
+      prisma.restaurant.findMany({
+        where: {
+          approved: "APPROVED",
+        },
+        include: {
+          favorite: {
+            where: {
+              userId: "",
+            },
+          },
+          cuisine: true,
+        },
+      }),
+    ]);
+
+    return {
+      props: {
+        cuisines,
+        restaurants,
+      },
+    };
+  }
+  const [cuisines, restaurants, user] = await Promise.all([
     prisma.cuisine.findMany(),
     prisma.restaurant.findMany({
       where: {
@@ -32,18 +57,33 @@ export const getServerSideProps = async (
       include: {
         favorite: {
           where: {
-            userId: session?.user.id || "",
+            userId: session.user.id,
           },
         },
         cuisine: true,
       },
     }),
+    prisma.user.findUnique({
+      where: {
+        id: session.user.id,
+      },
+    }),
   ]);
+
+  if (user && !user.address && !user.phoneNumber && !user.addressId) {
+    return {
+      redirect: {
+        destination: "/account/information",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       cuisines,
       restaurants,
+      user
     },
   };
 };

@@ -65,9 +65,6 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
           onChange={(e) => void handleSearch(e.target.value)}
           placeholder="Fill your address here..."
         />
-        <Combobox.Button className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center p-4">
-          <DropDownIcon />
-        </Combobox.Button>
 
         <Transition
           as={Fragment}
