@@ -1,13 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const defaultTheme = require("tailwindcss/defaultTheme");
+import type { Config } from 'tailwindcss'
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        roboto: ["var(--font-roboto)", ...defaultTheme.fontFamily.sans],
+        roboto: ["var(--font-roboto)"],
       },
       colors: {
         viparyasDarkBlue: "#2722FE",
@@ -23,8 +21,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@headlessui/tailwindcss"),
-    require("@tailwindcss/line-clamp"),
-  ],
-};
+  plugins: [require("@headlessui/tailwindcss")],
+} satisfies Config

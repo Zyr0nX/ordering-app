@@ -17,25 +17,19 @@ const Index: NextPage = () => {
   );
 };
 
-export const getServerSideProps = async (context: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getServerAuthSession(context);
 
   if (!session || session.user.role !== "RESTAURANT") {
     return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
+      notFound: true,
     };
   }
 
   return {
-    props: {
-      session,
-    },
+    props: {},
   };
 };
 

@@ -99,7 +99,7 @@ const AdminRequestsBody: React.FC<AdminRequestsBodyProps> = ({
       <div className="mt-4">
         {pendingList.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
-            <p className="text-xl font-semibold">No restaurants found</p>
+            <p className="text-xl font-semibold">No registrations found</p>
             <SleepIcon />
           </div>
         ) : (

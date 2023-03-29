@@ -12,12 +12,12 @@ import { prisma } from "~/server/db";
 
 const InProgress: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ orderList }) => {
+> = ({ orders }) => {
   return (
     <Restaurant>
       <>
         <ManageRestaurantHeader title="Order Requests" />
-        <ManageRestaurantRequestsBody orderList={orderList} />
+        <ManageRestaurantRequestsBody orders={orders} />
       </>
     </Restaurant>
   );
@@ -30,7 +30,7 @@ export const getServerSideProps = async (
 ) => {
   const session = await getServerAuthSession(context);
 
-  const orderList = await prisma.order.findMany({
+  const orders = await prisma.order.findMany({
     where: {
       restaurant: {
         userId: session?.user.id || "",
@@ -47,7 +47,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      orderList,
+      orders,
     },
   };
 };

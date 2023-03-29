@@ -33,6 +33,8 @@ const HomeBody = ({
     })[]
   >(restaurants);
 
+  const [search, setSearch] = useState("");
+
   const restaurantQuery = api.restaurant.getRestaurantForUser.useQuery(
     undefined,
     {
@@ -41,10 +43,9 @@ const HomeBody = ({
         setRestaurantList(data);
       },
       refetchOnWindowFocus: false,
+      enabled: search === "" && selectedCuisine === null,
     }
   );
-
-  const [search, setSearch] = useState("");
 
   const handleSelectCuisine = (cuisine: Cuisine) => {
     if (selectedCuisine?.id === cuisine.id) {
