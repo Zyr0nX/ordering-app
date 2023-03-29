@@ -1,19 +1,21 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
 import Restaurant from "~/components/layouts/Restaurant";
+import Shipper from "~/components/layouts/Shipper";
 import RestaurantHomeBody from "~/components/ui/RestaurantHomeBody";
 import RestaurantHomeHeader from "~/components/ui/RestaurantHomeHeader";
+import ShipperHomeHeader from "~/components/ui/ShipperHomeHeader";
 import { getServerAuthSession } from "~/server/auth";
 
 const Index: NextPage = () => {
   return (
-    <Restaurant>
+    <Shipper>
       <>
-        <RestaurantHomeHeader />
+        <ShipperHomeHeader />
         <div className="relative -top-8 mx-4 md:-top-16 md:mx-20">
           <RestaurantHomeBody />
         </div>
       </>
-    </Restaurant>
+    </Shipper>
   );
 };
 
@@ -22,7 +24,7 @@ export const getServerSideProps = async (
 ) => {
   const session = await getServerAuthSession(context);
 
-  if (!session || session.user.role !== "RESTAURANT") {
+  if (!session || session.user.role !== "SHIPPER") {
     return {
       notFound: true,
     };

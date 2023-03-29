@@ -144,7 +144,7 @@ model Favorite {
 }
 
 model Shipper {
-  id                   String   @id @default(cuid())
+  id                   String           @id @default(cuid())
   firstName            String
   lastName             String
   dateOfBirth          DateTime
@@ -152,12 +152,25 @@ model Shipper {
   phoneNumber          String
   licensePlate         String
   image                String?
-  approved             Approve  @default(PENDING)
-  userId               String   @unique
-  user                 User     @relation(fields: [userId], references: [id])
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  approved             Approve          @default(PENDING)
+  userId               String           @unique
+  user                 User             @relation(fields: [userId], references: [id])
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
   order                Order[]
+  shipperLocation      ShipperLocation?
+}
+
+model ShipperLocation {
+  id        String   @id @default(cuid())
+  latitude  Float    @db.Double
+  longitude Float    @db.Double
+  shipperId String   @unique
+  shipper   Shipper  @relation(fields: [shipperId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shipperId])
 }
 
 model FoodOption {

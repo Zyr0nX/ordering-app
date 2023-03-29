@@ -1,31 +1,30 @@
 import { TRPCError } from "@trpc/server";
 import { env } from "process";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  restaurantProtectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
 import { transporter } from "~/server/email";
 
+
 export const orderRouter = createTRPCRouter({
-  getPlacedAndPreparingOrders: publicProcedure.query(async ({ ctx }) => {
-    const orders = await ctx.prisma.order.findMany({
-      where: {
-        restaurant: {
-          userId: ctx.session?.user.id || "",
+  getPlacedAndPreparingOrders: restaurantProtectedProcedure.query(
+    async ({ ctx }) => {
+      const orders = await ctx.prisma.order.findMany({
+        where: {
+          restaurant: {
+            userId: ctx.session.user.id,
+          },
+          status: {
+            in: ["PLACED", "PREPARING"],
+          },
         },
-        status: {
-          in: ["PLACED", "PREPARING"],
+        include: {
+          user: true,
+          orderFood: true,
         },
-      },
-      include: {
-        user: true,
-        orderFood: true,
-      },
-    });
-    return orders;
-  }),
+      });
+      return orders;
+    }
+  ),
   prepareOrder: restaurantProtectedProcedure
     .input(
       z.object({
@@ -179,17 +178,15 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      const order = await ctx.prisma.order.updateMany({
+      const order = await ctx.prisma.order.update({
         where: {
           id: input.orderId,
-          restaurant: {
-            userId: ctx.session?.user.id || "",
-          },
         },
         data: {
           status: "READY_FOR_PICKUP",
         },
       });
+
       return order;
     }),
   getRestaurantCompletedOrders: publicProcedure.query(async ({ ctx }) => {

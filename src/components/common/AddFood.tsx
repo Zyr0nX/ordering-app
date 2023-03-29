@@ -152,11 +152,6 @@ const AddFood = () => {
                           ref={descriptionRef}
                         />
                       </div>
-                      {/* <CommonImageInput
-                        image={image}
-                        setImage={setImage}
-                        label="* Image"
-                      /> */}
                       <div className="bg-virparyasSeparator h-0.5" />
                       <div className="flex flex-col gap-4" ref={parent}>
                         {foodCategories.map((foodCategory, index) => (

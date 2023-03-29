@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  shipperProtectedProcedure,
+} from "~/server/api/trpc";
 
 export const shipperRouter = createTRPCRouter({
   registration: protectedProcedure
@@ -34,6 +38,34 @@ export const shipperRouter = createTRPCRouter({
           licensePlate: input.licensePlate,
           phoneNumber: input.phoneNumber,
           userId: ctx.session.user.id,
+        },
+      });
+    }),
+  updateLocation: shipperProtectedProcedure
+    .input(
+      z.object({
+        latitude: z.number(),
+        longitude: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.shipper.update({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        data: {
+          shipperLocation: {
+            upsert: {
+              update: {
+                latitude: input.latitude,
+                longitude: input.longitude,
+              },
+              create: {
+                latitude: input.latitude,
+                longitude: input.longitude,
+              },
+            }
+          }
         },
       });
     }),

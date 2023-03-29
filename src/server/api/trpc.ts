@@ -142,14 +142,6 @@ const enforceAdminIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-/**
- * Protected (authenticated) procedure
- *
- * If you want a query or mutation to ONLY be accessible to logged in users, use this. It verifies
- * the session is valid and guarantees `ctx.session.user` is not null.
- *
- * @see https://trpc.io/docs/procedures
- */
 export const adminProtectedProcedure = t.procedure.use(enforceAdminIsAuthed);
 
 const enforceRestaurantIsAuthed = t.middleware(({ ctx, next }) => {
@@ -168,14 +160,26 @@ const enforceRestaurantIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-/**
- * Protected (authenticated) procedure
- *
- * If you want a query or mutation to ONLY be accessible to logged in users, use this. It verifies
- * the session is valid and guarantees `ctx.session.user` is not null.
- *
- * @see https://trpc.io/docs/procedures
- */
 export const restaurantProtectedProcedure = t.procedure.use(
   enforceRestaurantIsAuthed
+);
+
+const enforceShipperIsAuthed = t.middleware(({ ctx, next }) => {
+  if (
+    !ctx.session ||
+    !ctx.session.user ||
+    ctx.session.user.role !== "SHIPPER"
+  ) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
+export const shipperProtectedProcedure = t.procedure.use(
+  enforceShipperIsAuthed
 );

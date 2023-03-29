@@ -3,8 +3,9 @@ import Loading from "./Loading";
 import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Combobox, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
+import { useDebounce } from "use-debounce";
 import { api } from "~/utils/api";
-import { useDebounce } from "~/utils/useDebounce";
+
 
 interface PlaceAutoCompleteComboboxProps {
   placeAutocomplete: PlaceAutocompleteResult | null;
@@ -23,7 +24,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
 
   const [places, setPlaces] = useState<PlaceAutocompleteResult[]>([]);
 
-  const debouncedQuery = useDebounce<string>(query, 500);
+  const [debouncedQuery] = useDebounce<string>(query, 500);
 
   const [isLoading, setIsLoading] = useState(false);
 

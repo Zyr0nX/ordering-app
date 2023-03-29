@@ -35,6 +35,16 @@ export const getServerSideProps = async (
     };
   }
 
+  const shipper = await prisma.shipper.findMany({
+    where: {
+      shipperLocation: {
+        updatedAt: {
+          gte: new Date(new Date().getTime() - 1000 * 60 * 5).toISOString(),
+        },
+      },
+    },
+  });
+
   const [order] = await Promise.all([
     prisma.order.create({
       data: {
