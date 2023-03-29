@@ -30,7 +30,7 @@ const OrderHistoryCard = ({
           )}
 
           <div
-            className={`absolute top-4 right-4 flex w-fit justify-center rounded-xl px-2 py-1 font-medium ${
+            className={`absolute right-4 top-4 flex w-fit justify-center rounded-xl px-2 py-1 font-medium ${
               order.status === "PLACED" ||
               order.status === "PREPARING" ||
               order.status === "READY_FOR_PICKUP" ||
@@ -62,7 +62,7 @@ const OrderHistoryCard = ({
           </div>
         </div>
 
-        <div className="p-4 text-virparyasMainBlue md:p-6">
+        <div className="text-virparyasMainBlue p-4 md:p-6">
           <div className="my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
               {order.orderFood.map((food) => (
@@ -81,7 +81,7 @@ const OrderHistoryCard = ({
                 </li>
               ))}
             </ul>
-            <div className="h-0.5 bg-virparyasSeparator" />
+            <div className="bg-virparyasSeparator h-0.5" />
             <div className="flex justify-between font-bold md:text-lg">
               <p>Total:</p>
               <p>${total.toFixed(2)}</p>

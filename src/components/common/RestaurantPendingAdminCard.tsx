@@ -1,4 +1,3 @@
-import BluePencil from "../icons/BluePencil";
 import GreenCheckmark from "../icons/GreenCheckmark";
 import InfoIcon from "../icons/InfoIcon";
 import RedCross from "../icons/RedCross";
@@ -123,7 +122,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
             </button>
             <div className="w-2" />
             {approveRestaurantMutation.isLoading ? (
-              <Loading className="h-8 w-8 md:h-10 md:w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+              <Loading className="fill-virparyasMainBlue h-8 w-8 animate-spin text-gray-200 md:h-10 md:w-10" />
             ) : (
               <button
                 type="button"

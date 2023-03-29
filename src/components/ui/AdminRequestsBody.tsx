@@ -82,7 +82,7 @@ const AdminRequestsBody: React.FC<AdminRequestsBodyProps> = ({
   };
 
   return (
-    <div className="m-4 text-virparyasMainBlue">
+    <div className="text-virparyasMainBlue m-4">
       <div className="flex h-12 w-full overflow-hidden rounded-2xl bg-white">
         <input
           type="text"
@@ -92,7 +92,7 @@ const AdminRequestsBody: React.FC<AdminRequestsBodyProps> = ({
           onChange={(e) => handleSearch(e.target.value)}
         />
 
-        <div className="flex items-center bg-virparyasMainBlue px-4">
+        <div className="bg-virparyasMainBlue flex items-center px-4">
           <SearchIcon className="h-8 w-8 fill-white" />
         </div>
       </div>

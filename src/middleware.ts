@@ -1,6 +1,5 @@
-import { env } from "./env.mjs";
+import { redis } from "./server/cache";
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import {
   type NextRequest,
   type NextFetchEvent,
@@ -8,10 +7,7 @@ import {
 } from "next/server";
 
 const ratelimit = new Ratelimit({
-  redis: new Redis({
-    url: env.UPSTASH_REDIS_REST_URL,
-    token: env.UPSTASH_REDIS_REST_TOKEN,
-  }),
+  redis: redis,
   limiter: Ratelimit.cachedFixedWindow(10, "10 s"),
   ephemeralCache: new Map(),
   analytics: true,
@@ -35,14 +31,8 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
     return res;
   }
 
-  if (
-    request.nextUrl.pathname === "/account/restaurant-registration" ||
-    request.nextUrl.pathname === "/checkout" ||
-    request.nextUrl.pathname === "/account/information"
-  ) {
-    const { nextUrl: url, geo } = request;
-    const country = geo?.country || "";
-    url.searchParams.set("country", country);
-    return NextResponse.rewrite(url);
-  }
+  const { nextUrl: url, geo } = request;
+  const country = geo?.country || "";
+  url.searchParams.set("country", country);
+  return NextResponse.rewrite(url);
 }

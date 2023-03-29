@@ -76,11 +76,11 @@ const FoodCard = ({
             priority
           />
         </div>
-        <div className="p-4 text-virparyasMainBlue">
+        <div className="text-virparyasMainBlue p-4">
           <div className="h-full">
-            <h2 className="font-bold line-clamp-1">{food.name}</h2>
+            <h2 className="line-clamp-1 font-bold">{food.name}</h2>
             <p className="mt-1 text-sm">${food.price.toString()}</p>
-            <p className="mt-1 text-xs font-light line-clamp-2 md:line-clamp-4">
+            <p className="mt-1 line-clamp-2 text-xs font-light md:line-clamp-4">
               {food.description}
             </p>
           </div>
@@ -98,7 +98,7 @@ const FoodCard = ({
             alt="Restaurant Image"
             className="object-cover brightness-50"
           />
-          <div className="relative px-6 pt-16 pb-4 text-white md:px-16 md:pt-20 md:pb-6">
+          <div className="relative px-6 pb-4 pt-16 text-white md:px-16 md:pb-6 md:pt-20">
             <h2 className="text-lg font-bold md:text-4xl">{food.name}</h2>
             <p className="mt-1 text-sm md:text-2xl">${food.price.toString()}</p>
           </div>
@@ -117,7 +117,7 @@ const FoodCard = ({
                       />
                       <p>${item.price.toFixed(2)}</p>
                     </div>
-                    <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
+                    <div className="bg-virparyasBackground h-0.5 w-full last:hidden"></div>
                   </Fragment>
                 ))}
               </div>
@@ -126,11 +126,11 @@ const FoodCard = ({
         </div>
         <div className="flex justify-center bg-white px-8 pb-4">
           {addToCartMutation.isLoading ? (
-            <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
+            <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
           ) : session.status === "unauthenticated" ? (
             <Link
               href="/signin"
-              className="flex w-full max-w-md items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+              className="bg-virparyasMainBlue flex w-full max-w-md items-center justify-center rounded-xl p-3 font-bold text-white"
             >
               Login to Add to Cart
             </Link>

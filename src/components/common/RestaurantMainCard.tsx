@@ -104,7 +104,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
             className="object-cover"
           />
         </div>
-        <div className="py-3 px-4">
+        <div className="px-4 py-3">
           <p className="text-xl font-semibold">{restaurant.name}</p>
           <p className="text-xs">$2 - $10 Delivery Fee</p>
         </div>
@@ -112,13 +112,13 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
       {displayFavorite && (
         <>
           {favoriteMutation.isLoading || unfavotiteMutation.isLoading ? (
-            <div className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2">
-              <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
+            <div className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2">
+              <Loading className="fill-virparyasMainBlue h-5 w-5 animate-spin text-gray-200" />
             </div>
           ) : restaurant.favorite.length > 0 ? (
             <button
               type="button"
-              className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+              className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2"
               onClick={handleUnfavorite}
             >
               <HeartIcon className="fill-virparyasMainBlue" />
@@ -126,7 +126,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
           ) : (
             <button
               type="button"
-              className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+              className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2"
               onClick={handleFavorite}
             >
               <HeartIcon />

@@ -14,7 +14,7 @@ const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
         </label>
         <input
           type="text"
-          className="h-10 w-full rounded-xl px-4 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 shadow-sm focus-visible:outline-none focus-visible:ring-2"
           ref={ref}
           disabled={props.disabled}
           {...props}

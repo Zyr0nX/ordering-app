@@ -44,7 +44,7 @@ const CommonDialog: React.FC<CommonDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all md:w-3/4">
+              <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all md:w-3/4">
                 {label && (
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     {label}

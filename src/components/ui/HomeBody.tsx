@@ -105,11 +105,11 @@ const HomeBody = ({
 
   return (
     <>
-      <div className="bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80 p-4 text-white md:p-8">
+      <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 bg-gradient-to-r p-4 text-white md:p-8">
         <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-2 rounded-xl bg-white/40 py-2 px-4">
+          <div className="flex items-center gap-2 rounded-xl bg-white/40 px-4 py-2">
             <HouseIcon className="md:h-6 md:w-6" />
-            <p className="text-xs font-semibold text-virparyasMainBlue md:text-base md:font-bold">
+            <p className="text-virparyasMainBlue text-xs font-semibold md:text-base md:font-bold">
               123 34th St
             </p>
           </div>
@@ -146,7 +146,7 @@ const HomeBody = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4 bg-virparyasBackground px-4 py-6 text-virparyasMainBlue md:flex-row md:gap-8">
+      <div className="bg-virparyasBackground text-virparyasMainBlue flex flex-col gap-4 px-4 py-6 md:flex-row md:gap-8">
         <div className="shrink-0">
           <p className="mb-4 text-xl font-bold">Cuisines</p>
           <div className="grid grid-flow-col grid-rows-2 gap-4 overflow-x-auto md:grid-flow-row md:grid-cols-1 md:grid-rows-none">

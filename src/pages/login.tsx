@@ -7,7 +7,7 @@ import { getServerAuthSession } from "~/server/auth";
 const SignIn: NextPage = () => {
   return (
     <Guest>
-      <div className="flex min-h-screen w-screen items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80">
+      <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 flex min-h-screen w-screen items-center justify-center bg-gradient-to-r">
         <SignInForm />
       </div>
     </Guest>

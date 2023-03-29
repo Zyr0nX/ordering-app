@@ -6,7 +6,7 @@ import React from "react";
 
 const AdminCommonHeader = ({ title }: { title: string }) => {
   return (
-    <div className="flex items-center justify-between bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 p-6 text-white">
+    <div className="from-viparyasDarkBlue/80 to-viparyasTeal/80 flex items-center justify-between bg-gradient-to-r p-6 text-white">
       <Link href="/manage/admin">
         <BackArrowIcon className="h-8 w-8 fill-white" />
       </Link>

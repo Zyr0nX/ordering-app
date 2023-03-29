@@ -45,6 +45,7 @@ model User {
   image             String?
   role              Role
   address           String?
+  addressId         String?
   additionalAddress String?
   phoneNumber       String?
   status            Status      @default(ENABLED)
@@ -72,6 +73,7 @@ model Restaurant {
   id                String     @id @default(cuid())
   name              String
   address           String
+  addressId         String
   additionalAddress String?
   firstName         String
   lastName          String

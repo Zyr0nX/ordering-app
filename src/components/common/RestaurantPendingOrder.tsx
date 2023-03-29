@@ -87,7 +87,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
   const readyOrderMutation = api.order.restaurantReadyOrder.useMutation({
     onSuccess: () => {
       setOrderList(orderList.filter((o) => o.id !== order.id));
-    }
+    },
   });
 
   const handleReady = () => {

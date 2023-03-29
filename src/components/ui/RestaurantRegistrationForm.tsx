@@ -1,4 +1,6 @@
+import PlaceAutoCompleteCombobox from "../common/PlaceAutoCompleteCombobox";
 import DropDownIcon from "../icons/DropDownIcon";
+import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Listbox, Transition } from "@headlessui/react";
 import { type Cuisine } from "@prisma/client";
 import { useSession } from "next-auth/react";
@@ -25,7 +27,20 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
   const [lastName, setLastName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [restaurantName, setRestaurantName] = useState("");
-  const [address, setAddress] = useState("");
+  const [placeAutocomplete, setPlaceAutocomplete] =
+    useState<PlaceAutocompleteResult>({
+      description: "",
+      place_id: "",
+      terms: [],
+      types: [],
+      matched_substrings: [],
+      structured_formatting: {
+        main_text: "",
+        main_text_matched_substrings: [],
+        secondary_text: "",
+        secondary_text_matched_substrings: [],
+      },
+    });
   const [additionalAddress, setAdditionalAddress] = useState("");
   const [cuisine, setCuisine] = useState<Cuisine | null>(null);
 
@@ -75,7 +90,19 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       setLastName("");
       setPhoneNumber("");
       setRestaurantName("");
-      setAddress("");
+      setPlaceAutocomplete({
+        description: "",
+        place_id: "",
+        terms: [],
+        types: [],
+        matched_substrings: [],
+        structured_formatting: {
+          main_text: "",
+          main_text_matched_substrings: [],
+          secondary_text: "",
+          secondary_text_matched_substrings: [],
+        },
+      });
       setAdditionalAddress("");
       setCuisine(null);
     }
@@ -92,7 +119,10 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
       setIsInvalidRestaurantName(false);
     }
 
-    if (!z.string().nonempty().safeParse(address).success) {
+    if (
+      !z.string().nonempty().safeParse(placeAutocomplete?.place_id).success &&
+      !z.string().nonempty().safeParse(placeAutocomplete?.description).success
+    ) {
       setIsInvalidAddress(true);
       isInvalidForm = false;
     } else {
@@ -130,7 +160,8 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
     if (!isInvalidForm) return;
     restaurantRegistrationMutation.mutate({
       restaurantName,
-      address,
+      address: placeAutocomplete.description,
+      addressId: placeAutocomplete.place_id,
       additionalAddress,
       firstName,
       lastName,
@@ -142,7 +173,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
   };
 
   return (
-    <div className="mx-4 mt-6 text-virparyasMainBlue">
+    <div className="text-virparyasMainBlue mx-4 mt-6">
       <div className="flex flex-col gap-2">
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
@@ -153,7 +184,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Restaurant name:
             </label>
             {isInvalidRestaurantName && (
-              <p className="text-xs text-virparyasRed">
+              <p className="text-virparyasRed text-xs">
                 Restaurant name is required
               </p>
             )}
@@ -162,8 +193,8 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="text"
             id="restaurantName"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-              isInvalidRestaurantName ? "ring-2 ring-virparyasRed" : ""
+            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+              isInvalidRestaurantName ? "ring-virparyasRed ring-2" : ""
             }`}
             placeholder="Restaurant name..."
             value={restaurantName || ""}
@@ -177,19 +208,13 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Address:
             </label>
             {isInvalidAddress && (
-              <p className="text-xs text-virparyasRed">Address is required</p>
+              <p className="text-virparyasRed text-xs">Address is required</p>
             )}
           </div>
-
-          <input
-            type="text"
-            id="address"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-              isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
-            }`}
-            placeholder="Address..."
-            value={address || ""}
-            onChange={(e) => setAddress(e.target.value)}
+          <PlaceAutoCompleteCombobox
+            placeAutocomplete={placeAutocomplete}
+            setPlaceAutocomplete={setPlaceAutocomplete}
+            isInvalidAddress={isInvalidAddress}
           />
         </div>
 
@@ -206,7 +231,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="text"
             id="additionalAddress"
-            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
             placeholder="Additional address..."
             value={additionalAddress || ""}
             onChange={(e) => setAdditionalAddress(e.target.value)}
@@ -218,7 +243,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Cuisine:
             </label>
             {isInvalidCuisine && (
-              <p className="text-xs text-virparyasRed">Cuisine is required</p>
+              <p className="text-virparyasRed text-xs">Cuisine is required</p>
             )}
           </div>
 
@@ -228,9 +253,9 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 <Listbox.Button
                   className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                     open
-                      ? "ring-2 ring-virparyasMainBlue"
+                      ? "ring-virparyasMainBlue ring-2"
                       : isInvalidCuisine
-                      ? "ring-2 ring-virparyasRed"
+                      ? "ring-virparyasRed ring-2"
                       : ""
                   }`}
                 >
@@ -248,12 +273,12 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                   >
-                    <Listbox.Options className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                    <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                       {cuisines.map((cuisine) => (
                         <Listbox.Option
                           key={cuisine.id}
                           className={({ active }) =>
-                            `relative cursor-default select-none text-viparyasDarkBlue ${
+                            `text-viparyasDarkBlue relative cursor-default select-none ${
                               active ? "bg-[#E9E9FF]" : "text-gray-900"
                             }`
                           }
@@ -261,7 +286,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                         >
                           {({ selected }) => (
                             <span
-                              className={`block truncate py-2 px-4 ${
+                              className={`block truncate px-4 py-2 ${
                                 selected
                                   ? "bg-virparyasMainBlue font-semibold text-white"
                                   : ""
@@ -289,7 +314,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 * First name:
               </label>
               {isInvalidFirstName && (
-                <p className="text-xs text-virparyasRed">
+                <p className="text-virparyasRed text-xs">
                   First name is required
                 </p>
               )}
@@ -298,8 +323,8 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="firstName"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                isInvalidFirstName ? "ring-2 ring-virparyasRed" : ""
+              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                isInvalidFirstName ? "ring-virparyasRed ring-2" : ""
               }`}
               placeholder="First name..."
               value={firstName || ""}
@@ -315,7 +340,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 * Last name:
               </label>
               {isInvalidLastName && (
-                <p className="text-xs text-virparyasRed">
+                <p className="text-virparyasRed text-xs">
                   Last name is required
                 </p>
               )}
@@ -324,8 +349,8 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="lastName"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                isInvalidLastName ? "ring-2 ring-virparyasRed" : ""
+              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                isInvalidLastName ? "ring-virparyasRed ring-2" : ""
               }`}
               placeholder="Last name..."
               value={lastName || ""}
@@ -343,7 +368,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Phone number:
             </label>
             {isInvalidPhoneNumber && (
-              <p className="text-xs text-virparyasRed">
+              <p className="text-virparyasRed text-xs">
                 Phone number is required
               </p>
             )}
@@ -355,7 +380,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                   <div className="relative w-24 shrink-0">
                     <Listbox.Button
                       className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                        open ? "ring-2 ring-virparyasMainBlue" : ""
+                        open ? "ring-virparyasMainBlue ring-2" : ""
                       }`}
                     >
                       <span className="truncate">{phonePrefix?.dialCode}</span>
@@ -375,7 +400,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                             <Listbox.Option
                               key={country.name}
                               className={({ active }) =>
-                                `relative cursor-default select-none text-viparyasDarkBlue ${
+                                `text-viparyasDarkBlue relative cursor-default select-none ${
                                   active ? "bg-[#E9E9FF]" : "text-gray-900"
                                 }`
                               }
@@ -383,7 +408,7 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                             >
                               {({ selected }) => (
                                 <span
-                                  className={`flex gap-2 truncate py-2 px-4 ${
+                                  className={`flex gap-2 truncate px-4 py-2 ${
                                     selected
                                       ? "bg-virparyasMainBlue font-semibold text-white"
                                       : ""
@@ -410,8 +435,8 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="phoneNumber"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                isInvalidPhoneNumber ? "ring-2 ring-virparyasRed" : ""
+              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                isInvalidPhoneNumber ? "ring-virparyasRed ring-2" : ""
               }`}
               placeholder="Phone number..."
               value={phoneNumber}
@@ -427,20 +452,20 @@ const RestaurantRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="email"
             id="email"
-            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
             disabled
             value={session.data?.user.email || ""}
           />
         </div>
         <div className="mt-4 flex gap-4">
           <button
-            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
             onClick={handleDiscard}
           >
             Discard
           </button>
           <button
-            className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
+            className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
             onClick={handleSendRegistrationRequest}
           >
             Confirm

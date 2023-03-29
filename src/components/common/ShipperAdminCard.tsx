@@ -320,7 +320,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit {shipper.firstName} {shipper.lastName}
                   </Dialog.Title>
@@ -336,7 +336,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                               * First name:
                             </label>
                             {isInvalidFirstName && (
-                              <p className="text-xs text-virparyasRed">
+                              <p className="text-virparyasRed text-xs">
                                 First name is required
                               </p>
                             )}
@@ -345,9 +345,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                           <input
                             type="text"
                             id="firstName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                               isInvalidFirstName
-                                ? "ring-2 ring-virparyasRed"
+                                ? "ring-virparyasRed ring-2"
                                 : ""
                             }`}
                             placeholder="First name..."
@@ -364,7 +364,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                               * Last name:
                             </label>
                             {isInvalidLastName && (
-                              <p className="text-xs text-virparyasRed">
+                              <p className="text-virparyasRed text-xs">
                                 Last name is required
                               </p>
                             )}
@@ -373,9 +373,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                           <input
                             type="text"
                             id="lastName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                               isInvalidLastName
-                                ? "ring-2 ring-virparyasRed"
+                                ? "ring-virparyasRed ring-2"
                                 : ""
                             }`}
                             placeholder="Last name..."
@@ -394,12 +394,12 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Date of birth:
                           </label>
                           {isInvalidDateOfBirth && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Date of birth is invalid
                             </p>
                           )}
                           {isUnder18YearsOld && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               You have to be over 18 years old
                             </p>
                           )}
@@ -414,9 +414,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                 <Listbox.Button
                                   className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                                     open
-                                      ? "ring-2 ring-virparyasMainBlue"
+                                      ? "ring-virparyasMainBlue ring-2"
                                       : isInvalidDateOfBirth
-                                      ? "ring-2 ring-virparyasRed"
+                                      ? "ring-virparyasRed ring-2"
                                       : ""
                                   }`}
                                 >
@@ -439,7 +439,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         <Listbox.Option
                                           key={day.id}
                                           className={({ active }) =>
-                                            `relative cursor-default select-none text-viparyasDarkBlue ${
+                                            `text-viparyasDarkBlue relative cursor-default select-none ${
                                               active
                                                 ? "bg-[#E9E9FF]"
                                                 : "text-gray-900"
@@ -449,7 +449,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         >
                                           {({ selected }) => (
                                             <span
-                                              className={`block truncate py-2 px-4 ${
+                                              className={`block truncate px-4 py-2 ${
                                                 selected
                                                   ? "bg-virparyasMainBlue font-semibold text-white"
                                                   : ""
@@ -475,9 +475,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                 <Listbox.Button
                                   className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                                     open
-                                      ? "ring-2 ring-virparyasMainBlue"
+                                      ? "ring-virparyasMainBlue ring-2"
                                       : isInvalidDateOfBirth
-                                      ? "ring-2 ring-virparyasRed"
+                                      ? "ring-virparyasRed ring-2"
                                       : ""
                                   }`}
                                 >
@@ -500,7 +500,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         <Listbox.Option
                                           key={month.id}
                                           className={({ active }) =>
-                                            `relative cursor-default select-none text-viparyasDarkBlue ${
+                                            `text-viparyasDarkBlue relative cursor-default select-none ${
                                               active
                                                 ? "bg-[#E9E9FF]"
                                                 : "text-gray-900"
@@ -510,7 +510,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         >
                                           {({ selected }) => (
                                             <span
-                                              className={`block truncate py-2 px-4 ${
+                                              className={`block truncate px-4 py-2 ${
                                                 selected
                                                   ? "bg-virparyasMainBlue font-semibold text-white"
                                                   : ""
@@ -536,10 +536,10 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                 <Listbox.Button
                                   className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                                     open
-                                      ? "ring-2 ring-virparyasMainBlue"
+                                      ? "ring-virparyasMainBlue ring-2"
                                       : isInvalidDateOfBirth ||
                                         isUnder18YearsOld
-                                      ? "ring-2 ring-virparyasRed"
+                                      ? "ring-virparyasRed ring-2"
                                       : ""
                                   }`}
                                 >
@@ -562,7 +562,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         <Listbox.Option
                                           key={year.id}
                                           className={({ active }) =>
-                                            `relative cursor-default select-none text-viparyasDarkBlue ${
+                                            `text-viparyasDarkBlue relative cursor-default select-none ${
                                               active
                                                 ? "bg-[#E9E9FF]"
                                                 : "text-gray-900"
@@ -572,7 +572,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                                         >
                                           {({ selected }) => (
                                             <span
-                                              className={`block truncate py-2 px-4 ${
+                                              className={`block truncate px-4 py-2 ${
                                                 selected
                                                   ? "bg-virparyasMainBlue font-semibold text-white"
                                                   : ""
@@ -601,7 +601,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Identification number:
                           </label>
                           {isInvalidIdentificationNumber && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Identification number is required
                             </p>
                           )}
@@ -610,9 +610,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="identificationNumber"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                             isInvalidIdentificationNumber
-                              ? "ring-2 ring-virparyasRed"
+                              ? "ring-virparyasRed ring-2"
                               : ""
                           }`}
                           placeholder="Identification number..."
@@ -632,7 +632,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * License plate:
                           </label>
                           {isInvalidLicensePlate && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               License plate is required
                             </p>
                           )}
@@ -641,9 +641,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="licensePlate"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                             isInvalidLicensePlate
-                              ? "ring-2 ring-virparyasRed"
+                              ? "ring-virparyasRed ring-2"
                               : ""
                           }`}
                           placeholder="License plate..."
@@ -661,7 +661,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Phone number:
                           </label>
                           {isInvalidPhoneNumber && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Phone number is required
                             </p>
                           )}
@@ -670,9 +670,9 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="licensePlate"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                             isInvalidPhoneNumber
-                              ? "ring-2 ring-virparyasRed"
+                              ? "ring-virparyasRed ring-2"
                               : ""
                           }`}
                           placeholder="Phone number..."
@@ -690,7 +690,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Image:
                           </label>
                           {isInvalidImage && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Image is required
                             </p>
                           )}
@@ -698,7 +698,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
 
                         <div
                           className={`relative h-[125px] w-full overflow-hidden rounded-xl ${
-                            isInvalidImage ? "ring-2 ring-virparyasRed" : ""
+                            isInvalidImage ? "ring-virparyasRed ring-2" : ""
                           }`}
                         >
                           <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
@@ -734,7 +734,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                         </div>
                         <div className="mt-4 grid grid-cols-2 gap-4">
                           <button
-                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
                             onClick={handleDiscard}
                           >
                             Discard
@@ -742,11 +742,11 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                           {cloudinaryUploadMutation.isLoading ||
                           editShipperMutation.isLoading ? (
                             <div className="flex justify-center">
-                              <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                              <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                             </div>
                           ) : (
                             <button
-                              className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
+                              className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
                               onClick={() => void handleEditRestaurant()}
                             >
                               Confirm
@@ -791,7 +791,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Disable {shipper.firstName} {shipper.lastName}
                   </Dialog.Title>
@@ -804,7 +804,7 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                         * Reason for disabling account:
                       </label>
                       {isInvalidReason && (
-                        <p className="text-xs text-virparyasRed">
+                        <p className="text-virparyasRed text-xs">
                           Reason is required
                         </p>
                       )}
@@ -812,8 +812,8 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
 
                     <textarea
                       id="phoneNumber"
-                      className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                        isInvalidReason ? "ring-2 ring-virparyasRed" : ""
+                      className={`focus-visible:ring-virparyasMainBlue h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                        isInvalidReason ? "ring-virparyasRed ring-2" : ""
                       }`}
                       placeholder="Reason for disabling account..."
                       value={reason}
@@ -823,11 +823,11 @@ const ShipperAdminCard: React.FC<ShipperAdminCardProps> = ({
                   <div className="mt-4 flex justify-center gap-4">
                     {disableShipperMutation.isLoading ? (
                       <div className="flex justify-center">
-                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                        <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                       </div>
                     ) : (
                       <button
-                        className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                        className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
                         onClick={() => void handleDisable()}
                       >
                         Disable account

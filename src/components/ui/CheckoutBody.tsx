@@ -1,7 +1,9 @@
 import CommonButton from "../common/CommonButton";
 import Loading from "../common/Loading";
+import PlaceAutoCompleteCombobox from "../common/PlaceAutoCompleteCombobox";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
+import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
 import {
   type User,
@@ -33,7 +35,20 @@ const CheckoutBody = ({
 }) => {
   const router = useRouter();
   const [name, setName] = useState(user.name);
-  const [address, setAddress] = useState(user.address);
+  const [placeAutocomplete, setPlaceAutocomplete] =
+    useState<PlaceAutocompleteResult>({
+      description: user.address || "",
+      place_id: user.addressId || "",
+      terms: [],
+      types: [],
+      matched_substrings: [],
+      structured_formatting: {
+        main_text: "",
+        main_text_matched_substrings: [],
+        secondary_text: "",
+        secondary_text_matched_substrings: [],
+      },
+    });
   const [additionalAddress, setAdditionalAddress] = useState(
     user.additionalAddress
   );
@@ -136,7 +151,10 @@ const CheckoutBody = ({
       setIsInvalidName(false);
     }
 
-    if (!z.string().nonempty().safeParse(address).success) {
+    if (
+      !z.string().nonempty().safeParse(placeAutocomplete.description).success ||
+      !z.string().nonempty().safeParse(placeAutocomplete.place_id).success
+    ) {
       setIsInvalidAddress(true);
       isInvalidForm = false;
     } else {
@@ -152,15 +170,21 @@ const CheckoutBody = ({
 
     if (!isInvalidForm) return;
     await updateUserMutation.mutateAsync({
-      name: name,
-      address: address,
+      name: name as string,
+      address: placeAutocomplete.description,
+      addressId: placeAutocomplete.place_id,
       additionalAddress: additionalAddress,
       phoneNumber: `${
         phonePrefix?.dialCode ? `(${phonePrefix?.dialCode}) ` : ""
       }${phoneNumber || ""}`,
     });
     setIsOpen(false);
-    if (name && phoneNumber && address) {
+    if (
+      name &&
+      phoneNumber &&
+      placeAutocomplete.description &&
+      placeAutocomplete.place_id
+    ) {
       setIsDisabled(false);
       return;
     }
@@ -187,9 +211,50 @@ const CheckoutBody = ({
     setPhoneNumber(formattedValue);
   };
 
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+
+  api.maps.getReverseGeocode.useQuery(
+    {
+      query: `${lat as number},${lng as number}`,
+    },
+    {
+      enabled: !!lat && !!lng,
+      onSuccess: (data) => {
+        if (!data) return;
+        setPlaceAutocomplete({
+          description: data.formatted_address,
+          place_id: data.place_id,
+          terms: [],
+          types: [],
+          matched_substrings: [],
+          structured_formatting: {
+            main_text: "",
+            main_text_matched_substrings: [],
+            secondary_text: "",
+            secondary_text_matched_substrings: [],
+          },
+        });
+      },
+      staleTime: Infinity,
+    }
+  );
+
+  const handleCurrentAddress = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setLat(latitude);
+        setLng(longitude);
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
   return (
     <>
-      <div className="m-4 flex flex-col gap-4 text-virparyasMainBlue md:mx-32 md:my-8 md:flex-row md:gap-8">
+      <div className="text-virparyasMainBlue m-4 flex flex-col gap-4 md:mx-32 md:my-8 md:flex-row md:gap-8">
         <div className="relative flex h-fit shrink-0 flex-col rounded-2xl bg-white p-4 shadow-md md:w-96 md:gap-4 md:p-8">
           <p className="text-xl font-bold md:text-3xl">Shipping address</p>
           <div className="flex flex-col text-sm md:gap-0.5 md:text-lg">
@@ -211,7 +276,7 @@ const CheckoutBody = ({
             </p>
           </div>
           <button
-            className="absolute top-4 right-4 md:top-8 md:right-8"
+            className="absolute right-4 top-4 md:right-8 md:top-8"
             onClick={() => setIsOpen(true)}
           >
             <BluePencil />
@@ -226,7 +291,7 @@ const CheckoutBody = ({
                 <p>{restaurant?.address}</p>
               </div>
             </div>
-            <div className="h-0.5 w-full bg-virparyasBackground" />
+            <div className="bg-virparyasBackground h-0.5 w-full" />
             <ul className="flex list-decimal flex-col gap-2 pl-4 md:gap-4">
               {cartQuery.data?.cartItem.map((cardItem) => (
                 <li
@@ -256,7 +321,7 @@ const CheckoutBody = ({
                 </li>
               ))}
             </ul>
-            <div className="h-0.5 w-full bg-virparyasBackground" />
+            <div className="bg-virparyasBackground h-0.5 w-full" />
             <div className="text-sm md:text-base">
               <div className="flex justify-between">
                 <p>Items:</p>
@@ -273,7 +338,7 @@ const CheckoutBody = ({
                 <p>$5.00</p>
               </div>
             </div>
-            <div className="h-0.5 w-full bg-virparyasBackground" />
+            <div className="bg-virparyasBackground h-0.5 w-full" />
             <div className="flex justify-between font-bold md:text-2xl">
               <p>Total:</p>
               <p>
@@ -287,7 +352,7 @@ const CheckoutBody = ({
           </div>
           <div className="flex justify-center">
             {isLoading ? (
-              <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
+              <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
             ) : (
               <CommonButton
                 text={`Proceed to Payment - $${(total + 5).toLocaleString(
@@ -333,7 +398,7 @@ const CheckoutBody = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all md:p-12">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 max-w-md transform overflow-hidden rounded-2xl p-6 transition-all md:p-12">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit Infomation
                   </Dialog.Title>
@@ -345,7 +410,7 @@ const CheckoutBody = ({
                             * Name:
                           </label>
                           {isInvalidName && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Name is required
                             </p>
                           )}
@@ -354,8 +419,8 @@ const CheckoutBody = ({
                         <input
                           type="text"
                           id="name"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                            isInvalidName ? "ring-2 ring-virparyasRed" : ""
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                            isInvalidName ? "ring-virparyasRed ring-2" : ""
                           }`}
                           placeholder="Name..."
                           value={name || ""}
@@ -368,7 +433,7 @@ const CheckoutBody = ({
                             * Phone number:
                           </label>
                           {isInvalidPhoneNumber && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Phone number is required
                             </p>
                           )}
@@ -384,7 +449,7 @@ const CheckoutBody = ({
                                   <Listbox.Button
                                     className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                                       open
-                                        ? "ring-2 ring-virparyasMainBlue"
+                                        ? "ring-virparyasMainBlue ring-2"
                                         : ""
                                     }`}
                                   >
@@ -407,7 +472,7 @@ const CheckoutBody = ({
                                           <Listbox.Option
                                             key={country.name}
                                             className={({ active }) =>
-                                              `relative cursor-default select-none text-viparyasDarkBlue ${
+                                              `text-viparyasDarkBlue relative cursor-default select-none ${
                                                 active
                                                   ? "bg-[#E9E9FF]"
                                                   : "text-gray-900"
@@ -417,7 +482,7 @@ const CheckoutBody = ({
                                           >
                                             {({ selected }) => (
                                               <span
-                                                className={`flex gap-2 truncate py-2 px-4 ${
+                                                className={`flex gap-2 truncate px-4 py-2 ${
                                                   selected
                                                     ? "bg-virparyasMainBlue font-semibold text-white"
                                                     : ""
@@ -444,9 +509,9 @@ const CheckoutBody = ({
                           <input
                             type="text"
                             id="phoneNumber"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                               isInvalidPhoneNumber
-                                ? "ring-2 ring-virparyasRed"
+                                ? "ring-virparyasRed ring-2"
                                 : ""
                             }`}
                             placeholder="Phone..."
@@ -469,22 +534,20 @@ const CheckoutBody = ({
                             * Address:
                           </label>
                           {isInvalidAddress && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Address is required
                             </p>
                           )}
                         </div>
 
-                        <input
-                          type="text"
-                          id="address"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
-                          }`}
-                          placeholder="Address..."
-                          value={address || ""}
-                          onChange={(e) => setAddress(e.target.value)}
+                        <PlaceAutoCompleteCombobox
+                          placeAutocomplete={placeAutocomplete}
+                          setPlaceAutocomplete={setPlaceAutocomplete}
+                          isInvalidAddress={isInvalidAddress}
                         />
+                        <button onClick={handleCurrentAddress}>
+                          Use your current address
+                        </button>
                       </div>
                       <div className="flex flex-col">
                         <label
@@ -496,7 +559,7 @@ const CheckoutBody = ({
                         <input
                           type="text"
                           id="additionalAddress"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           placeholder="Additional address..."
                           value={additionalAddress || ""}
                           onChange={(e) => setAdditionalAddress(e.target.value)}
@@ -505,18 +568,18 @@ const CheckoutBody = ({
                     </div>
                     <div className="px-auto mt-4 flex w-full justify-center gap-4">
                       {updateUserMutation.isLoading ? (
-                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                        <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                       ) : (
                         <>
                           <button
                             type="button"
-                            className="w-36 rounded-xl bg-virparyasRed py-2 px-10 font-medium text-white"
+                            className="bg-virparyasRed w-36 rounded-xl px-10 py-2 font-medium text-white"
                           >
                             Discard
                           </button>
                           <button
                             type="button"
-                            className="w-36 rounded-xl bg-virparyasGreen py-2 px-10 font-medium text-white"
+                            className="bg-virparyasGreen w-36 rounded-xl px-10 py-2 font-medium text-white"
                             onClick={() => void handleUpdateUser()}
                           >
                             Confirm

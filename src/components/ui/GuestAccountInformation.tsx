@@ -1,5 +1,7 @@
 import Loading from "../common/Loading";
+import PlaceAutoCompleteCombobox from "../common/PlaceAutoCompleteCombobox";
 import DropDownIcon from "../icons/DropDownIcon";
+import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Listbox, Transition } from "@headlessui/react";
 import { type User } from "@prisma/client";
 import Image from "next/image";
@@ -17,7 +19,20 @@ const GuestAccountInformation = ({
   country: string;
 }) => {
   const [name, setName] = useState(user.name);
-  const [address, setAddress] = useState(user.address);
+  const [placeAutocomplete, setPlaceAutocomplete] =
+    useState<PlaceAutocompleteResult>({
+      description: user.address || "",
+      place_id: user.addressId || "",
+      terms: [],
+      types: [],
+      matched_substrings: [],
+      structured_formatting: {
+        main_text: "",
+        main_text_matched_substrings: [],
+        secondary_text: "",
+        secondary_text_matched_substrings: [],
+      },
+    });
   const [additionalAddress, setAdditionalAddress] = useState(
     user.additionalAddress
   );
@@ -65,7 +80,10 @@ const GuestAccountInformation = ({
       setIsInvalidName(false);
     }
 
-    if (!z.string().nonempty().safeParse(address).success) {
+    if (
+      !z.string().nonempty().safeParse(placeAutocomplete.description).success ||
+      !z.string().nonempty().safeParse(placeAutocomplete.place_id).success
+    ) {
       setIsInvalidAddress(true);
       isInvalidForm = false;
     } else {
@@ -81,8 +99,9 @@ const GuestAccountInformation = ({
 
     if (!isInvalidForm) return;
     await updateUserMutation.mutateAsync({
-      name: name,
-      address: address,
+      name: name as string,
+      address: placeAutocomplete.description,
+      addressId: placeAutocomplete.place_id,
       additionalAddress: additionalAddress,
       phoneNumber: `${
         phonePrefix?.dialCode ? `(${phonePrefix?.dialCode})` : ""
@@ -103,8 +122,49 @@ const GuestAccountInformation = ({
     );
     setPhoneNumber(formattedValue);
   };
+
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+
+  api.maps.getReverseGeocode.useQuery(
+    {
+      query: `${lat as number},${lng as number}`,
+    },
+    {
+      enabled: !!lat && !!lng,
+      onSuccess: (data) => {
+        if (!data) return;
+        setPlaceAutocomplete({
+          description: data.formatted_address,
+          place_id: data.place_id,
+          terms: [],
+          types: [],
+          matched_substrings: [],
+          structured_formatting: {
+            main_text: "",
+            main_text_matched_substrings: [],
+            secondary_text: "",
+            secondary_text_matched_substrings: [],
+          },
+        });
+      },
+      staleTime: Infinity,
+    }
+  );
+
+  const handleCurrentAddress = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setLat(latitude);
+        setLng(longitude);
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
   return (
-    <div className="m-4 text-virparyasMainBlue md:m-8">
+    <div className="text-virparyasMainBlue m-4 md:m-8">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex flex-col">
           <div className="flex items-center justify-between">
@@ -112,15 +172,15 @@ const GuestAccountInformation = ({
               * Name:
             </label>
             {isInvalidName && (
-              <p className="text-xs text-virparyasRed">Name is required</p>
+              <p className="text-virparyasRed text-xs">Name is required</p>
             )}
           </div>
 
           <input
             type="text"
             id="name"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-              isInvalidName ? "ring-2 ring-virparyasRed" : ""
+            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+              isInvalidName ? "ring-virparyasRed ring-2" : ""
             }`}
             placeholder="Name..."
             value={name || ""}
@@ -133,20 +193,18 @@ const GuestAccountInformation = ({
               * Address:
             </label>
             {isInvalidAddress && (
-              <p className="text-xs text-virparyasRed">Address is required</p>
+              <p className="text-virparyasRed text-xs">Address is required</p>
             )}
           </div>
 
-          <input
-            type="text"
-            id="address"
-            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-              isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
-            }`}
-            placeholder="Address..."
-            value={address || ""}
-            onChange={(e) => setAddress(e.target.value)}
+          <PlaceAutoCompleteCombobox
+            placeAutocomplete={placeAutocomplete}
+            setPlaceAutocomplete={setPlaceAutocomplete}
+            isInvalidAddress={isInvalidAddress}
           />
+          <button onClick={handleCurrentAddress}>
+            Use your current address
+          </button>
         </div>
         <div className="flex flex-col">
           <label htmlFor="additionalAddress" className="font-medium">
@@ -155,7 +213,7 @@ const GuestAccountInformation = ({
           <input
             type="text"
             id="additionalAddress"
-            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
             placeholder="Additional address..."
             value={additionalAddress || ""}
             onChange={(e) => setAdditionalAddress(e.target.value)}
@@ -167,7 +225,7 @@ const GuestAccountInformation = ({
               * Phone number:
             </label>
             {isInvalidPhoneNumber && (
-              <p className="text-xs text-virparyasRed">
+              <p className="text-virparyasRed text-xs">
                 Phone number is required
               </p>
             )}
@@ -179,7 +237,7 @@ const GuestAccountInformation = ({
                   <div className="relative w-24 shrink-0">
                     <Listbox.Button
                       className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                        open ? "ring-2 ring-virparyasMainBlue" : ""
+                        open ? "ring-virparyasMainBlue ring-2" : ""
                       }`}
                     >
                       <span className="truncate">{phonePrefix?.dialCode}</span>
@@ -199,7 +257,7 @@ const GuestAccountInformation = ({
                             <Listbox.Option
                               key={country.name}
                               className={({ active }) =>
-                                `relative cursor-default select-none text-viparyasDarkBlue ${
+                                `text-viparyasDarkBlue relative cursor-default select-none ${
                                   active ? "bg-[#E9E9FF]" : "text-gray-900"
                                 }`
                               }
@@ -207,7 +265,7 @@ const GuestAccountInformation = ({
                             >
                               {({ selected }) => (
                                 <span
-                                  className={`flex gap-2 truncate py-2 px-4 ${
+                                  className={`flex gap-2 truncate px-4 py-2 ${
                                     selected
                                       ? "bg-virparyasMainBlue font-semibold text-white"
                                       : ""
@@ -234,8 +292,8 @@ const GuestAccountInformation = ({
             <input
               type="text"
               id="phoneNumber"
-              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                isInvalidPhoneNumber ? "ring-2 ring-virparyasRed" : ""
+              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                isInvalidPhoneNumber ? "ring-virparyasRed ring-2" : ""
               }`}
               placeholder="Phone..."
               value={
@@ -255,13 +313,13 @@ const GuestAccountInformation = ({
           <>
             <button
               type="button"
-              className="w-36 rounded-xl bg-virparyasRed py-2 px-10 font-medium text-white"
+              className="bg-virparyasRed w-36 rounded-xl px-10 py-2 font-medium text-white"
             >
               Discard
             </button>
             <button
               type="button"
-              className="w-36 rounded-xl bg-virparyasGreen py-2 px-10 font-medium text-white"
+              className="bg-virparyasGreen w-36 rounded-xl px-10 py-2 font-medium text-white"
               onClick={() => void handleUpdateUser()}
             >
               Confirm

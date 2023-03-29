@@ -15,7 +15,7 @@ const MainButton: React.FC<AdminMainButtonProps> = ({ text, icon, href }) => {
     >
       <div>{icon}</div>
 
-      <p className="text-center text-xl font-medium text-virparyasMainBlue md:text-4xl">
+      <p className="text-virparyasMainBlue text-center text-xl font-medium md:text-4xl">
         {text}
       </p>
     </Link>

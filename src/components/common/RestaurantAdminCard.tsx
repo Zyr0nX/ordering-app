@@ -300,7 +300,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit {restaurant.name}
                   </Dialog.Title>
@@ -315,7 +315,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             * Cuisine:
                           </label>
                           {isInvalidCuisine && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Cuisine is required
                             </p>
                           )}
@@ -327,9 +327,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                               <Listbox.Button
                                 className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                                   open
-                                    ? "ring-2 ring-virparyasMainBlue"
+                                    ? "ring-virparyasMainBlue ring-2"
                                     : isInvalidCuisine
-                                    ? "ring-2 ring-virparyasRed"
+                                    ? "ring-virparyasRed ring-2"
                                     : ""
                                 }`}
                               >
@@ -347,12 +347,12 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                                   leaveFrom="opacity-100"
                                   leaveTo="opacity-0"
                                 >
-                                  <Listbox.Options className="absolute mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                                  <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                                     {cuisines.map((cuisine) => (
                                       <Listbox.Option
                                         key={cuisine.id}
                                         className={({ active }) =>
-                                          `relative cursor-default select-none text-viparyasDarkBlue ${
+                                          `text-viparyasDarkBlue relative cursor-default select-none ${
                                             active
                                               ? "bg-[#E9E9FF]"
                                               : "text-gray-900"
@@ -362,7 +362,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                                       >
                                         {({ selected }) => (
                                           <span
-                                            className={`block truncate py-2 px-4 ${
+                                            className={`block truncate px-4 py-2 ${
                                               selected
                                                 ? "bg-virparyasMainBlue font-semibold text-white"
                                                 : ""
@@ -389,7 +389,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             * Restaurant name:
                           </label>
                           {isInvalidRestaurantName && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Restaurant name is required
                             </p>
                           )}
@@ -398,9 +398,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         <input
                           type="text"
                           id="restaurantName"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                             isInvalidRestaurantName
-                              ? "ring-2 ring-virparyasRed"
+                              ? "ring-virparyasRed ring-2"
                               : ""
                           }`}
                           placeholder="Restaurant name..."
@@ -418,7 +418,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             * Address:
                           </label>
                           {isInvalidAddress && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Address is required
                             </p>
                           )}
@@ -427,8 +427,8 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         <input
                           type="text"
                           id="address"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                            isInvalidAddress ? "ring-virparyasRed ring-2" : ""
                           }`}
                           placeholder="Address..."
                           value={address}
@@ -449,7 +449,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         <input
                           type="text"
                           id="additionalAddress"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           placeholder="Additional address..."
                           value={additionalAddress || ""}
                           onChange={(e) => setAdditionalAddress(e.target.value)}
@@ -466,7 +466,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                               * First name:
                             </label>
                             {isInvalidFirstName && (
-                              <p className="text-xs text-virparyasRed">
+                              <p className="text-virparyasRed text-xs">
                                 First name is required
                               </p>
                             )}
@@ -475,9 +475,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           <input
                             type="text"
                             id="firstName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                               isInvalidFirstName
-                                ? "ring-2 ring-virparyasRed"
+                                ? "ring-virparyasRed ring-2"
                                 : ""
                             }`}
                             placeholder="First name..."
@@ -494,7 +494,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                               * Last name:
                             </label>
                             {isInvalidLastName && (
-                              <p className="text-xs text-virparyasRed">
+                              <p className="text-virparyasRed text-xs">
                                 Last name is required
                               </p>
                             )}
@@ -503,9 +503,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           <input
                             type="text"
                             id="lastName"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                               isInvalidLastName
-                                ? "ring-2 ring-virparyasRed"
+                                ? "ring-virparyasRed ring-2"
                                 : ""
                             }`}
                             placeholder="Last name..."
@@ -523,7 +523,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             * Phone number:
                           </label>
                           {isInvalidPhoneNumber && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Address is required
                             </p>
                           )}
@@ -532,9 +532,9 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         <input
                           type="text"
                           id="phoneNumber"
-                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
                             isInvalidPhoneNumber
-                              ? "ring-2 ring-virparyasRed"
+                              ? "ring-virparyasRed ring-2"
                               : ""
                           }`}
                           placeholder="Address..."
@@ -553,7 +553,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         <input
                           type="email"
                           id="email"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           disabled
                           value={restaurant.user.email || ""}
                         />
@@ -567,7 +567,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                             * Image:
                           </label>
                           {isInvalidImage && (
-                            <p className="text-xs text-virparyasRed">
+                            <p className="text-virparyasRed text-xs">
                               Image is required
                             </p>
                           )}
@@ -575,7 +575,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
 
                         <div
                           className={`relative h-[125px] w-full overflow-hidden rounded-xl ${
-                            isInvalidImage ? "ring-2 ring-virparyasRed" : ""
+                            isInvalidImage ? "ring-virparyasRed ring-2" : ""
                           }`}
                         >
                           <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
@@ -609,7 +609,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         </div>
                         <div className="mt-4 grid grid-cols-2 gap-4">
                           <button
-                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
                             onClick={handleDiscard}
                           >
                             Discard
@@ -617,11 +617,11 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                           {cloudinaryUploadMutation.isLoading ||
                           editRestaurantMutation.isLoading ? (
                             <div className="flex justify-center">
-                              <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                              <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                             </div>
                           ) : (
                             <button
-                              className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
+                              className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
                               onClick={() => void handleEditRestaurant()}
                             >
                               Confirm
@@ -666,7 +666,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Disable {restaurant.name}
                   </Dialog.Title>
@@ -679,7 +679,7 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                         * Reason for disabling account:
                       </label>
                       {isInvalidReason && (
-                        <p className="text-xs text-virparyasRed">
+                        <p className="text-virparyasRed text-xs">
                           Reason is required
                         </p>
                       )}
@@ -687,8 +687,8 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
 
                     <textarea
                       id="phoneNumber"
-                      className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                        isInvalidReason ? "ring-2 ring-virparyasRed" : ""
+                      className={`focus-visible:ring-virparyasMainBlue h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                        isInvalidReason ? "ring-virparyasRed ring-2" : ""
                       }`}
                       placeholder="Reason for disabling account..."
                       value={reason}
@@ -698,11 +698,11 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
                   <div className="mt-4 flex justify-center gap-4">
                     {disableRestaurantMutation.isLoading ? (
                       <div className="flex justify-center">
-                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                        <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                       </div>
                     ) : (
                       <button
-                        className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                        className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
                         onClick={() => void handleDisable()}
                       >
                         Disable account

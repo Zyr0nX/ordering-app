@@ -66,7 +66,7 @@ const CartCard = ({
       </Link>
 
       <div>
-        <div className="m-4 text-virparyasMainBlue md:m-6">
+        <div className="text-virparyasMainBlue m-4 md:m-6">
           <div className="mx-4 my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
               {cardItems.map((cardItem) => (
@@ -82,14 +82,14 @@ const CartCard = ({
             </ul>
             <div className="flex justify-center">
               {isLoading ? (
-                <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
+                <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
               ) : (
                 <Link
                   href={{
                     pathname: "/checkout",
                     query: { id: item.restaurant.id },
                   }}
-                  className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
+                  className="bg-virparyasMainBlue flex max-w-xs grow items-center justify-center rounded-xl p-3 font-bold text-white"
                 >
                   Checkout -{" "}
                   {totalPrice.toLocaleString("en-US", {

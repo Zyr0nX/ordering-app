@@ -72,7 +72,7 @@ const CartBody = ({
 
   if (cartList.length === 0) {
     return (
-      <div className="m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue md:w-fit">
+      <div className="text-virparyasMainBlue m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 md:w-fit">
         <NoCartIcon className="md:h-32 md:w-32" />
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-semibold md:text-3xl">

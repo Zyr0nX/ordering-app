@@ -155,7 +155,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
+                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit {shipper.firstName} {shipper.lastName}
                   </Dialog.Title>
@@ -173,7 +173,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                           <input
                             type="text"
                             id="firstName"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                             placeholder="First name..."
                             value={shipper.firstName}
                             disabled
@@ -190,7 +190,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                           <input
                             type="text"
                             id="lastName"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                             placeholder="Last name..."
                             value={shipper.lastName}
                             disabled
@@ -210,7 +210,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             <input
                               type="text"
                               id="date"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                               placeholder="First name..."
                               value={shipper.dateOfBirth.toLocaleString(
                                 "en-US",
@@ -221,7 +221,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             <input
                               type="text"
                               id="firstName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                               placeholder="First name..."
                               value={shipper.dateOfBirth.toLocaleString(
                                 "en-US",
@@ -232,7 +232,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                             <input
                               type="text"
                               id="firstName"
-                              className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                              className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                               placeholder="First name..."
                               value={shipper.dateOfBirth.toLocaleString(
                                 "en-US",
@@ -250,7 +250,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="cuisine"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           placeholder="Cuisine..."
                           value={shipper.identificationNumber}
                           disabled
@@ -264,7 +264,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="phoneNumber"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           placeholder="Restaurant name..."
                           value={shipper.phoneNumber}
                           disabled
@@ -279,7 +279,7 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                         <input
                           type="email"
                           id="email"
-                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
                           placeholder="Email..."
                           value={shipper.user.email || ""}
                           disabled
@@ -288,11 +288,11 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                       <div className="mt-4 grid grid-cols-2 gap-4">
                         {rejectShipperMutation.isLoading ? (
                           <div className="flex justify-center">
-                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                            <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                           </div>
                         ) : (
                           <button
-                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
                             onClick={() => void handleReject()}
                           >
                             Reject
@@ -300,11 +300,11 @@ const ShipperPendingAdminCard: React.FC<ShipperPendingAdminCardProps> = ({
                         )}
                         {approveShipperMutation.isLoading ? (
                           <div className="flex justify-center">
-                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                            <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
                           </div>
                         ) : (
                           <button
-                            className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
+                            className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
                             onClick={() => void handleApprove()}
                           >
                             Approve

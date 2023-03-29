@@ -3,7 +3,6 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(

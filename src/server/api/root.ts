@@ -3,6 +3,7 @@ import { cartRouter } from "./routers/cart";
 import { cloudinaryRouter } from "./routers/cloudinary";
 import { cuisineRouter } from "./routers/cuisine";
 import { foodRouter } from "./routers/food";
+import { mapsRouter } from "./routers/maps";
 import { orderRouter } from "./routers/order";
 import { restaurantRouter } from "./routers/restaurant";
 import { shipperRouter } from "./routers/shipper";
@@ -28,6 +29,7 @@ export const appRouter = createTRPCRouter({
   stripe: stripeRouter,
   user: userRouter,
   shipper: shipperRouter,
+  maps: mapsRouter,
 });
 
 // export type definition of API

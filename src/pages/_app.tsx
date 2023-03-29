@@ -20,7 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <main
-        className={`${roboto.variable} min-h-screen bg-virparyasBackground font-roboto`}
+        className={`${roboto.variable} bg-virparyasBackground font-roboto min-h-screen`}
       >
         <NextNProgress />
         <Component {...pageProps} />

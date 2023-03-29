@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 const GuestCommonHeader = ({ text }: { text: string }) => {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-between bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80 p-4 text-white md:p-6">
+    <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 flex items-center justify-between bg-gradient-to-r p-4 text-white md:p-6">
       <button onClick={router.back}>
         <BackArrowIcon className="fill-white md:h-10 md:w-10" />
       </button>

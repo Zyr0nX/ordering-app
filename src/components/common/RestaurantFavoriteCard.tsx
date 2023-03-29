@@ -70,19 +70,19 @@ const RestaurantFavoriteCard: React.FC<RestaurantFavoriteCardProps> = ({
             className="object-cover"
           />
         </div>
-        <div className="py-3 px-4">
+        <div className="px-4 py-3">
           <p className="text-xl font-semibold">{restaurant.name}</p>
           <p className="text-xs">$2 - $10 Delivery Fee</p>
         </div>
       </Link>
       {unfavotiteMutation.isLoading ? (
-        <div className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2">
-          <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
+        <div className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2">
+          <Loading className="fill-virparyasMainBlue h-5 w-5 animate-spin text-gray-200" />
         </div>
       ) : (
         <button
           type="button"
-          className="absolute top-0 right-0 z-10 m-2 rounded-full bg-white p-2"
+          className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2"
           onClick={() => handleUnfavorite(restaurant.id)}
         >
           <HeartIcon className="fill-virparyasMainBlue" />

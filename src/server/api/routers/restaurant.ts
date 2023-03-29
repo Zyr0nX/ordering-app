@@ -11,6 +11,7 @@ export const restaurantRouter = createTRPCRouter({
       z.object({
         restaurantName: z.string(),
         address: z.string(),
+        addressId: z.string(),
         additionalAddress: z.string().nullish(),
         firstName: z.string(),
         lastName: z.string(),
@@ -26,6 +27,7 @@ export const restaurantRouter = createTRPCRouter({
         update: {
           name: input.restaurantName,
           address: input.address,
+          addressId: input.addressId,
           additionalAddress: input.additionalAddress,
           firstName: input.firstName,
           lastName: input.lastName,
@@ -35,39 +37,13 @@ export const restaurantRouter = createTRPCRouter({
         create: {
           name: input.restaurantName,
           address: input.address,
+          addressId: input.addressId,
           additionalAddress: input.additionalAddress,
           firstName: input.firstName,
           lastName: input.lastName,
           phoneNumber: input.phoneNumber,
           userId: ctx.session.user.id,
           cuisineId: input.cuisineId,
-        },
-      });
-    }),
-  create: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        address: z.string(),
-        additionaladdress: z.string().nullish(),
-        firstname: z.string(),
-        lastname: z.string(),
-        phonenumber: z.string(),
-        userId: z.string().cuid(),
-        restaurantTypeId: z.string().cuid(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.restaurant.create({
-        data: {
-          name: input.name,
-          address: input.address,
-          additionalAddress: input.additionaladdress,
-          firstName: input.firstname,
-          lastName: input.lastname,
-          phoneNumber: input.phonenumber,
-          userId: ctx.session?.user?.id as string,
-          cuisineId: input.restaurantTypeId,
         },
       });
     }),
