@@ -11,12 +11,16 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const RestaurantDetailHeader = ({
+interface RestaurantDetailHeaderProps {
+  restaurant: Restaurant;
+  rating: number | null;
+  distance: number | null;
+}
+
+const RestaurantDetailHeader: React.FC<RestaurantDetailHeaderProps> = ({
   restaurant,
   rating,
-}: {
-  restaurant: Restaurant | null;
-  rating: number | null;
+  distance,
 }) => {
   const session = useSession();
   const roundedRating = Math.round((rating || 5) * 2) / 2;
@@ -53,11 +57,15 @@ const RestaurantDetailHeader = ({
           </div>
         </div>
         <div className="mt-4 md:mx-32 md:mt-2">
-          <h1 className="text-2xl font-bold md:text-5xl">{restaurant?.name}</h1>
-          <p className="mt-2 text-sm md:text-2xl">
-            10am - 10pm, $2 - $10 Delivery Fee
-          </p>
-          <p className="mt-1 text-xs md:text-base">{restaurant?.address}</p>
+          <h1 className="text-2xl font-bold md:text-5xl">{restaurant.name}</h1>
+          {distance && (
+            <p className="mt-2 text-sm md:text-2xl">
+              ${Math.round(distance * 1.2)} - ${Math.round(distance * 1.4)}{" "}
+              Delivery Fee
+            </p>
+          )}
+
+          <p className="mt-1 text-xs md:text-base">{restaurant.address}</p>
           <div className="mt-2 flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => {
               const ratingDiff = i - roundedRating;

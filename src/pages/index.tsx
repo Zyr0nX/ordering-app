@@ -10,9 +10,7 @@ const Home: NextPage<
 > = ({ cuisines, restaurants, user }) => {
   return (
     <Guest>
-      <>
         <HomeBody cuisines={cuisines} restaurants={restaurants} user={user} />
-      </>
     </Guest>
   );
 };

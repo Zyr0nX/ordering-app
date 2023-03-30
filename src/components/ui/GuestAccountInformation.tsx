@@ -6,6 +6,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { type User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { Fragment, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
@@ -18,7 +19,8 @@ const GuestAccountInformation = ({
   user: User;
   country: string;
 }) => {
-  const [name, setName] = useState(user.name);
+  const router = useRouter();
+  const [name, setName] = useState(user.name || "");
   const [placeAutocomplete, setPlaceAutocomplete] =
     useState<PlaceAutocompleteResult>({
       description: user.address || "",
@@ -36,7 +38,16 @@ const GuestAccountInformation = ({
   const [additionalAddress, setAdditionalAddress] = useState(
     user.additionalAddress
   );
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phonePrefix, setPhonePrefix] = useState(
+    countries.find((c) => c.isoCode === country)
+  );
+  const [phoneNumber, setPhoneNumber] = useState(
+    !user.phoneNumber
+      ? ""
+      : user.phoneNumber.startsWith(phonePrefix?.dialCode || "")
+      ? user.phoneNumber.slice(phonePrefix?.dialCode.length)
+      : user.phoneNumber
+  );
 
   const [isInvalidName, setIsInvalidName] = useState<boolean | null>(null);
   const [isInvalidAddress, setIsInvalidAddress] = useState<boolean | null>(
@@ -45,10 +56,6 @@ const GuestAccountInformation = ({
   const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = useState<
     boolean | null
   >(null);
-
-  const [phonePrefix, setPhonePrefix] = useState(
-    countries.find((c) => c.isoCode === country)
-  );
 
   const utils = api.useContext();
 
@@ -99,7 +106,7 @@ const GuestAccountInformation = ({
 
     if (!isInvalidForm) return;
     await updateUserMutation.mutateAsync({
-      name: name as string,
+      name: name,
       address: placeAutocomplete.description,
       addressId: placeAutocomplete.place_id,
       additionalAddress: additionalAddress,
@@ -107,6 +114,7 @@ const GuestAccountInformation = ({
         phonePrefix?.dialCode ? `(${phonePrefix?.dialCode})` : ""
       }${phoneNumber}`,
     });
+    void router.push("/");
   };
 
   const formatPhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {

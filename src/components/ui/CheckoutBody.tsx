@@ -5,19 +5,14 @@ import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
-import {
-  type User,
-  type CartItem,
-  type Food,
-  type FoodOptionItem,
-  type Restaurant,
-} from "@prisma/client";
+import { type User, type CartItem, type Food, type FoodOptionItem, type Restaurant } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
+
 
 interface CheckoutBodyProps {
   user: User & {
@@ -250,19 +245,21 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
           },
         });
       },
-      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   );
 
   api.maps.getDistanceMatrix.useQuery(
     {
       origins: {
-        lat: lat as number,
-        lng: lng as number,
-      },
-      destinations: {
         lat: restaurant?.latitude as number,
         lng: restaurant?.longitude as number,
+      },
+      destinations: {
+        lat: lat as number,
+        lng: lng as number,
       },
     },
     {
@@ -272,7 +269,9 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
         setShippingFee(Math.round(data / 500) / 2);
         setTotal(itemTotal + Math.round(data / 500) / 2);
       },
-      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }
   );
 

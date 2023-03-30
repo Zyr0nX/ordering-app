@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
+import haversine from "~/utils/haversine";
 
 interface HomeBodyProps {
   cuisines: Cuisine[];
@@ -210,6 +211,16 @@ const HomeBody: React.FC<HomeBodyProps> = ({ cuisines, restaurants, user }) => {
                         key={restaurant.id}
                         setRestaurantList={setRestaurantList}
                         restaurantList={restaurantList}
+                        distance={
+                          !user || !user.latitude || !user.longitude
+                            ? null
+                            : haversine(
+                                restaurant.latitude,
+                                restaurant.longitude,
+                                user.latitude,
+                                user.longitude
+                              )
+                        }
                       />
                     ))}
                 </div>
@@ -228,6 +239,16 @@ const HomeBody: React.FC<HomeBodyProps> = ({ cuisines, restaurants, user }) => {
                     key={restaurant.id}
                     setRestaurantList={setRestaurantList}
                     restaurantList={restaurantList}
+                    distance={
+                      !user || !user.latitude || !user.longitude
+                        ? null
+                        : haversine(
+                            restaurant.latitude,
+                            restaurant.longitude,
+                            user.latitude,
+                            user.longitude
+                          )
+                    }
                   />
                 ))}
               </div>

@@ -22,6 +22,7 @@ interface RestaurantMainCardProps {
   restaurantList: (Restaurant & {
     favorite: Favorite[];
   })[];
+  distance: number | null;
 }
 
 const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
@@ -29,6 +30,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
   restaurant,
   setRestaurantList,
   restaurantList,
+  distance,
 }) => {
   const utils = api.useContext();
   const favoriteMutation = api.user.favoriteRestaurant.useMutation({
@@ -106,7 +108,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
         </div>
         <div className="px-4 py-3">
           <p className="text-xl font-semibold">{restaurant.name}</p>
-          <p className="text-xs">$2 - $10 Delivery Fee</p>
+          {distance && <p className="text-xs">${Math.round(distance * 1.2)} - ${Math.round(distance * 1.5)} Delivery Fee</p>}
         </div>
       </Link>
       {displayFavorite && (
