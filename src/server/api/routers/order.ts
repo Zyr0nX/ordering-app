@@ -1,9 +1,15 @@
 import { TRPCError } from "@trpc/server";
 import { env } from "process";
+import { setIntervalAsync, clearIntervalAsync } from "set-interval-async";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+  restaurantProtectedProcedure,
+} from "~/server/api/trpc";
 import { transporter } from "~/server/email";
-
+import haversine from "~/utils/haversine";
 
 export const orderRouter = createTRPCRouter({
   getPlacedAndPreparingOrders: restaurantProtectedProcedure.query(
@@ -163,6 +169,7 @@ export const orderRouter = createTRPCRouter({
               userId: true,
             },
           },
+          shipperId: true,
         },
       });
       if (!query) {
@@ -177,7 +184,6 @@ export const orderRouter = createTRPCRouter({
           message: "You are not the owner of this restaurant",
         });
       }
-
       const order = await ctx.prisma.order.update({
         where: {
           id: input.orderId,
@@ -223,4 +229,93 @@ export const orderRouter = createTRPCRouter({
     });
     return orders;
   }),
+  findShipper: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.number(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      const intervalId = setIntervalAsync(async () => {
+        const [onlineShippers, order] = await Promise.all([
+          ctx.prisma.shipper.findMany({
+            where: {
+              shipperLocation: {
+                updatedAt: {
+                  gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+                },
+              },
+              order: {
+                every: {
+                  status: {
+                    in: ["DELIVERED"],
+                  },
+                },
+              },
+            },
+            include: {
+              shipperLocation: true,
+            },
+          }),
+          ctx.prisma.order.findUnique({
+            where: {
+              id: input.orderId,
+            },
+            select: {
+              restaurant: {
+                select: {
+                  latitude: true,
+                  longitude: true,
+                },
+              },
+            },
+          }),
+        ]);
+
+        if (!order) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Order not found",
+          });
+        }
+        if (!onlineShippers.length) {
+          return;
+        }
+
+        const nearestShipper = onlineShippers.reduce((prev, curr) => {
+          if (!prev.shipperLocation) return curr;
+          if (!curr.shipperLocation) return prev;
+
+          if (
+            haversine(
+              order?.restaurant.latitude,
+              order?.restaurant.longitude,
+              prev?.shipperLocation?.latitude,
+              prev.shipperLocation?.longitude
+            ) >
+            haversine(
+              order?.restaurant.latitude,
+              order?.restaurant.longitude,
+              curr?.shipperLocation?.latitude,
+              curr.shipperLocation?.longitude
+            )
+          )
+            return curr;
+          return prev;
+        });
+
+        await Promise.all([
+          ctx.prisma.order.update({
+            where: {
+              id: input.orderId,
+            },
+            data: {
+              shipperId: nearestShipper.id,
+              status: "DELIVERING",
+            },
+          }),
+          clearIntervalAsync(intervalId),
+        ]);
+      }, 10000);
+    }),
 });

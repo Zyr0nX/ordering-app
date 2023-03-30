@@ -29,6 +29,7 @@ import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
+import { redis } from "~/server/cache";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -53,6 +54,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     prisma,
     stripe,
     maps,
+    redis,
     req,
     res,
   };

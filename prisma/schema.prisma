@@ -46,6 +46,8 @@ model User {
   role              Role
   address           String?
   addressId         String?
+  latitude          Float?      @db.Double
+  longitude         Float?      @db.Double
   additionalAddress String?
   phoneNumber       String?
   status            Status      @default(ENABLED)
@@ -74,6 +76,8 @@ model Restaurant {
   name              String
   address           String
   addressId         String
+  latitude          Float      @db.Double
+  longitude         Float      @db.Double
   additionalAddress String?
   firstName         String
   lastName          String

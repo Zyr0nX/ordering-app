@@ -83,6 +83,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
     await rejectOrderMutation.mutateAsync({ orderId: order.id, reason });
     setIsRejectOpen(false);
   };
+  const findShipperMutation = api.order.findShipper.useMutation();
 
   const readyOrderMutation = api.order.restaurantReadyOrder.useMutation({
     onSuccess: () => {
@@ -90,8 +91,12 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
     },
   });
 
-  const handleReady = () => {
-    readyOrderMutation.mutate({ orderId: order.id });
+  const handleReady = async () => {
+    const readyOrder = await readyOrderMutation.mutateAsync({
+      orderId: order.id,
+    });
+    if (readyOrder.shipperId !== null)
+      findShipperMutation.mutate({ orderId: order.id });
   };
 
   const totalPrice = order.orderFood.reduce(
@@ -152,7 +157,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                 <button
                   type="button"
                   className="relative z-10"
-                  onClick={handleReady}
+                  onClick={() => void handleReady()}
                 >
                   <TruckIcon className="fill-virparyasLightBlue h-8 w-8 md:h-10 md:w-10" />
                 </button>

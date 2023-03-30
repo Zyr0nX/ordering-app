@@ -7,8 +7,11 @@ import React from "react";
 import Guest from "~/components/layouts/Guest";
 import CheckoutBody from "~/components/ui/CheckoutBody";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
+import { env } from "~/env.mjs";
 import { getServerAuthSession } from "~/server/auth";
+import { redis } from "~/server/cache";
 import { prisma } from "~/server/db";
+import { maps } from "~/server/maps";
 
 const Checkout: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
@@ -76,10 +79,61 @@ export const getServerSideProps = async (
     };
   }
 
-  return {
-    props: {
-      user,
-      country: country as string,
-    },
-  };
+  if (!user.cartItem[0]) {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (!user.latitude || !user.longitude) {
+    return {
+      props: {
+        user,
+        country: country as string,
+      },
+    };
+  }
+  let distance;
+  const restaurant = user.cartItem[0].food.restaurant;
+  const cached = await redis.get(
+    `placeAutocomplete?query=${restaurant.latitude},${restaurant.longitude},${user.latitude},${user.longitude}`
+  );
+
+  if (cached) {
+    distance = cached as number;
+  } else {
+    const distanceMatrix = await maps.distancematrix({
+      params: {
+        origins: [
+          {
+            lat: restaurant.latitude,
+            lng: restaurant.longitude,
+          },
+        ],
+        destinations: [
+          {
+            lat: user.latitude,
+            lng: user.longitude,
+          },
+        ],
+        key: env.GOOGLE_MAPS_API_KEY,
+      },
+    });
+
+    await redis.set(
+      `placeAutocomplete?query=${restaurant.latitude},${restaurant.longitude},${user.latitude},${user.longitude}`,
+      distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
+      { ex: 60 * 60 * 24 * 365 }
+    );
+
+    distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
+
+    return {
+      props: {
+        user,
+        country: country as string,
+        distance,
+      },
+    };
+  }
 };
