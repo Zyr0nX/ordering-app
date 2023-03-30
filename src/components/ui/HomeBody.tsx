@@ -110,13 +110,18 @@ const HomeBody: React.FC<HomeBodyProps> = ({ cuisines, restaurants, user }) => {
       <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 bg-gradient-to-r p-4 text-white md:p-8">
         <div className="flex w-full items-center justify-between">
           {user?.address ? (
-            <Link className="flex items-center gap-2 rounded-xl bg-white/40 px-4 py-2" href="/account/information">
+            <Link
+              className="flex items-center gap-2 rounded-xl bg-white/40 px-4 py-2"
+              href="/account/information"
+            >
               <HouseIcon className="md:h-6 md:w-6" />
               <p className="text-virparyasMainBlue text-xs font-semibold md:text-base md:font-bold">
                 {user.address}
               </p>
             </Link>
-          ) : (<div />)}
+          ) : (
+            <div />
+          )}
 
           <div className="flex items-center gap-4">
             {user ? (

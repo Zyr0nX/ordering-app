@@ -6,7 +6,6 @@ import { Fragment, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { api } from "~/utils/api";
 
-
 interface PlaceAutoCompleteComboboxProps {
   placeAutocomplete: PlaceAutocompleteResult | null;
   setPlaceAutocomplete: React.Dispatch<

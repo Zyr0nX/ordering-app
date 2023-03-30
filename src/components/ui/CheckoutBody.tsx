@@ -19,10 +19,7 @@ import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
 
-const CheckoutBody = ({
-  user,
-  country,
-}: {
+interface CheckoutBodyProps {
   user: User & {
     cartItem: (CartItem & {
       food: Food & {
@@ -32,6 +29,13 @@ const CheckoutBody = ({
     })[];
   };
   country: string;
+  distance: number | undefined;
+}
+
+const CheckoutBody: React.FC<CheckoutBodyProps> = ({
+  user,
+  country,
+  distance,
 }) => {
   const router = useRouter();
   const [name, setName] = useState(user.name);
@@ -62,6 +66,12 @@ const CheckoutBody = ({
     boolean | null
   >(null);
 
+  const [shippingFee, setShippingFee] = useState<number | null>(() => {
+    if (distance) {
+      return Math.round(distance / 500) / 2;
+    }
+    return null;
+  });
   const restaurant = user.cartItem[0]?.food.restaurant;
 
   const cartQuery = api.user.getCart.useQuery(
@@ -75,7 +85,7 @@ const CheckoutBody = ({
     countries.find((c) => c.isoCode === country)
   );
 
-  const total = user.cartItem.reduce(
+  const itemTotal = user.cartItem.reduce(
     (acc, item) =>
       acc +
       (item.food.price +
@@ -85,6 +95,8 @@ const CheckoutBody = ({
         item.quantity,
     0
   );
+
+  const [total, setTotal] = useState<number>(itemTotal + (shippingFee || 0));
 
   const stripeMutation = api.stripe.createCheckoutSession.useMutation({
     onMutate: () => {
@@ -112,7 +124,6 @@ const CheckoutBody = ({
           item.foodOption.reduce((acc, item) => acc + item.price, 0),
       })),
       restaurantId: restaurant?.id as string,
-      deliveryAddress: user.address || "",
     });
   };
 
@@ -128,6 +139,7 @@ const CheckoutBody = ({
               ...data,
               name: newUser.name,
               address: newUser.address,
+              addressId: newUser.addressId,
               additionalAddress: newUser.additionalAddress,
               phoneNumber: newUser.phoneNumber,
             };
@@ -135,6 +147,8 @@ const CheckoutBody = ({
           return data;
         }
       );
+      setLat(newUser.latitude);
+      setLng(newUser.longitude);
     },
     onSettled: () => {
       void utils.user.getCart.invalidate();
@@ -193,7 +207,7 @@ const CheckoutBody = ({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(
-    user.address && user.phoneNumber ? false : true
+    user.address && user.phoneNumber && distance ? false : true
   );
   const [isOpen, setIsOpen] = useState(false);
 
@@ -211,8 +225,8 @@ const CheckoutBody = ({
     setPhoneNumber(formattedValue);
   };
 
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
+  const [lat, setLat] = useState<number | null>(user.latitude || null);
+  const [lng, setLng] = useState<number | null>(user.longitude || null);
 
   api.maps.getReverseGeocode.useQuery(
     {
@@ -235,6 +249,28 @@ const CheckoutBody = ({
             secondary_text_matched_substrings: [],
           },
         });
+      },
+      staleTime: Infinity,
+    }
+  );
+
+  api.maps.getDistanceMatrix.useQuery(
+    {
+      origins: {
+        lat: lat as number,
+        lng: lng as number,
+      },
+      destinations: {
+        lat: restaurant?.latitude as number,
+        lng: restaurant?.longitude as number,
+      },
+    },
+    {
+      enabled: !!lat && !!lng,
+      onSuccess: (data) => {
+        if (!data) return;
+        setShippingFee(Math.round(data / 500) / 2);
+        setTotal(itemTotal + Math.round(data / 500) / 2);
       },
       staleTime: Infinity,
     }
@@ -327,7 +363,7 @@ const CheckoutBody = ({
                 <p>Items:</p>
                 <p>
                   $
-                  {total.toLocaleString("en-US", {
+                  {itemTotal.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -335,7 +371,14 @@ const CheckoutBody = ({
               </div>
               <div className="flex justify-between">
                 <p>Shipping:</p>
-                <p>$5.00</p>
+                <p>
+                  {shippingFee
+                    ? `${shippingFee.toLocaleString("en-US", {
+                        currency: "USD",
+                        style: "currency",
+                      })}`
+                    : "N/A"}
+                </p>
               </div>
             </div>
             <div className="bg-virparyasBackground h-0.5 w-full" />
@@ -343,7 +386,7 @@ const CheckoutBody = ({
               <p>Total:</p>
               <p>
                 $
-                {(total + 5).toLocaleString("en-US", {
+                {total.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -355,13 +398,10 @@ const CheckoutBody = ({
               <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
             ) : (
               <CommonButton
-                text={`Proceed to Payment - $${(total + 5).toLocaleString(
-                  "en-US",
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }
-                )}`}
+                text={`Proceed to Payment - $${total.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`}
                 onClick={() => void handleCheckout()}
                 disabled={isDisabled}
               ></CommonButton>

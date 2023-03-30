@@ -83,7 +83,7 @@ export const getServerSideProps = async (
     props: {
       cuisines,
       restaurants,
-      user
+      user,
     },
   };
 };

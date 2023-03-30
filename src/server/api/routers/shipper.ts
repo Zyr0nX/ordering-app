@@ -64,8 +64,8 @@ export const shipperRouter = createTRPCRouter({
                 latitude: input.latitude,
                 longitude: input.longitude,
               },
-            }
-          }
+            },
+          },
         },
       });
     }),

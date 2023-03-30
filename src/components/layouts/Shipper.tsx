@@ -4,10 +4,8 @@ import React from "react";
 import { useThrottledCallback } from "use-debounce";
 import { api } from "~/utils/api";
 
-
 export default function Shipper({ children }: { children: ReactElement }) {
-  const updateLocationMutatation =
-    api.shipper.updateLocation.useMutation();
+  const updateLocationMutatation = api.shipper.updateLocation.useMutation();
 
   const updateLocationMutateThrottled = useThrottledCallback(
     (position: GeolocationPosition) => {
@@ -19,10 +17,10 @@ export default function Shipper({ children }: { children: ReactElement }) {
     10000,
     { trailing: true }
   );
-  
+
   useEffect(() => {
     const watchId = navigator.geolocation.watchPosition(
-      updateLocationMutateThrottled,
+      updateLocationMutateThrottled
     );
     return () => {
       navigator.geolocation.clearWatch(watchId);

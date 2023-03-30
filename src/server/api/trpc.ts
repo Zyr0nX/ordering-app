@@ -26,10 +26,10 @@ import { type NextApiRequest, type NextApiResponse } from "next";
 import { type Session } from "next-auth";
 import superjson from "superjson";
 import { getServerAuthSession } from "~/server/auth";
+import { redis } from "~/server/cache";
 import { prisma } from "~/server/db";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
-import { redis } from "~/server/cache";
 
 type CreateContextOptions = {
   session: Session | null;

@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -19,20 +20,104 @@ export const stripeRouter = createTRPCRouter({
           })
         ),
         restaurantId: z.string().cuid(),
-        deliveryAddress: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { stripe, session, prisma, req } = ctx;
 
-      const customerId = await getOrCreateStripeCustomerIdForUser({
-        prisma,
-        stripe,
-        userId: session.user?.id,
-      });
-
+      const [customerId, user, restaurant] = await Promise.all([
+        getOrCreateStripeCustomerIdForUser({
+          prisma,
+          stripe,
+          userId: session.user?.id,
+        }),
+        prisma.user.findUnique({
+          where: {
+            id: session.user?.id,
+          },
+        }),
+        prisma.restaurant.findUnique({
+          where: {
+            id: input.restaurantId,
+          },
+        }),
+      ]);
       if (!customerId) {
-        throw new Error("Could not create customer");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not create Stripe customer",
+        });
+      }
+
+      if (!user) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not find user",
+        });
+      }
+
+      if (!restaurant) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Restaurant does not exist",
+        });
+      }
+
+      if (
+        !user.address ||
+        !user.addressId ||
+        !user.phoneNumber ||
+        !user.name ||
+        !user.latitude ||
+        !user.longitude
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User is missing required information",
+        });
+      }
+
+      let distance;
+
+      const cached = await ctx.redis.get(
+        `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`
+      );
+      if (cached) {
+        distance = cached as number;
+      } else {
+        const distanceMatrix = await ctx.maps.distancematrix({
+          params: {
+            origins: [
+              {
+                lat: restaurant.latitude,
+                lng: restaurant.longitude,
+              },
+            ],
+            destinations: [
+              {
+                lat: user.latitude,
+                lng: user.longitude,
+              },
+            ],
+            key: env.GOOGLE_MAPS_API_KEY,
+          },
+        });
+
+        if (distanceMatrix.data.status !== "OK") {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Could not calculate distance",
+          });
+        }
+
+        await ctx.redis.set(
+          `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`,
+          distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
+          { ex: 60 * 60 * 24 * 365 }
+        );
+
+        distance = distanceMatrix.data.rows[0]?.elements[0]?.distance
+          .value as number;
       }
 
       const baseUrl =
@@ -43,7 +128,7 @@ export const stripeRouter = createTRPCRouter({
       const checkoutSession = await stripe.checkout.sessions.create({
         metadata: {
           restaurantId: input.restaurantId,
-          deliveryAddress: input.deliveryAddress,
+          deliveryAddress: user.address,
         },
         customer: customerId,
         client_reference_id: session.user?.id,
@@ -67,7 +152,7 @@ export const stripeRouter = createTRPCRouter({
               display_name: "Shipping fee",
               type: "fixed_amount",
               fixed_amount: {
-                amount: 500,
+                amount: (Math.round(distance / 500) / 2) * 100,
                 currency: "usd",
               },
             },

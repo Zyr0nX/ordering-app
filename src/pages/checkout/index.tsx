@@ -15,12 +15,12 @@ import { maps } from "~/server/maps";
 
 const Checkout: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ user, country }) => {
+> = ({ user, country, distance }) => {
   return (
     <Guest>
       <>
         <GuestCommonHeader text="Checkout" />
-        <CheckoutBody user={user} country={country} />
+        <CheckoutBody user={user} country={country} distance={distance} />
       </>
     </Guest>
   );
@@ -73,13 +73,7 @@ export const getServerSideProps = async (
     },
   });
 
-  if (!user) {
-    return {
-      notFound: true,
-    };
-  }
-
-  if (!user.cartItem[0]) {
+  if (!user || !user.cartItem[0]) {
     return {
       notFound: true,
     };
@@ -98,6 +92,12 @@ export const getServerSideProps = async (
   const cached = await redis.get(
     `placeAutocomplete?query=${restaurant.latitude},${restaurant.longitude},${user.latitude},${user.longitude}`
   );
+
+  if (cached === "notFound") {
+    return {
+      notFound: true,
+    };
+  }
 
   if (cached) {
     distance = cached as number;
@@ -120,6 +120,20 @@ export const getServerSideProps = async (
       },
     });
 
+    if (
+      distanceMatrix.data.status !== "OK" ||
+      distanceMatrix.data.rows[0]?.elements[0]?.status !== "OK"
+    ) {
+      await redis.set(
+        `placeAutocomplete?query=${restaurant.latitude},${restaurant.longitude},${user.latitude},${user.longitude}`,
+        "notFound",
+        { ex: 60 * 60 * 24 * 365 }
+      );
+      return {
+        notFound: true,
+      };
+    }
+
     await redis.set(
       `placeAutocomplete?query=${restaurant.latitude},${restaurant.longitude},${user.latitude},${user.longitude}`,
       distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
@@ -127,13 +141,12 @@ export const getServerSideProps = async (
     );
 
     distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
-
-    return {
-      props: {
-        user,
-        country: country as string,
-        distance,
-      },
-    };
   }
+  return {
+    props: {
+      user,
+      country: country as string,
+      distance: distance,
+    },
+  };
 };

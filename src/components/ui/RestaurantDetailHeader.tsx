@@ -19,7 +19,7 @@ const RestaurantDetailHeader = ({
   rating: number | null;
 }) => {
   const session = useSession();
-  const roundedRating = Math.round(((rating || 5) * 2) / 2);
+  const roundedRating = Math.round((rating || 5) * 2) / 2;
   return (
     <div className="relative">
       {restaurant?.image && (

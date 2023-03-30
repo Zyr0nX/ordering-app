@@ -18,7 +18,7 @@ export default {
         virparyasGreen: "#2C9A44",
         virparyasPurple: "#8F34C7",
         virparyasSeparator: "#E0E0E0",
-        virparyasLightRed: "#C73434"
+        virparyasLightRed: "#C73434",
       },
     },
   },

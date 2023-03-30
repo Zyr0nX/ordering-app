@@ -64,4 +64,52 @@ export const mapsRouter = createTRPCRouter({
 
       return reverseGeocode.data.results[0];
     }),
+  getDistanceMatrix: protectedProcedure
+    .input(
+      z.object({
+        origins: z.object({
+          lat: z.number(),
+          lng: z.number(),
+        }),
+        destinations: z.object({
+          lat: z.number(),
+          lng: z.number(),
+        }),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const cached = await redis.get(
+        `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`
+      );
+
+      if (cached) {
+        return cached as number;
+      }
+
+      const distanceMatrix = await ctx.maps.distancematrix({
+        params: {
+          origins: [
+            {
+              lat: input.origins.lat,
+              lng: input.origins.lng,
+            },
+          ],
+          destinations: [
+            {
+              lat: input.destinations.lat,
+              lng: input.destinations.lng,
+            },
+          ],
+          key: env.GOOGLE_MAPS_API_KEY,
+        },
+      });
+
+      await redis.set(
+        `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`,
+        distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
+        { ex: 60 * 60 * 24 * 365 }
+      );
+
+      return distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
+    }),
 });

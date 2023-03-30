@@ -5,7 +5,6 @@ import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe";
 import haversine from "~/utils/haversine";
 
-
 const Success: NextPage = () => {
   return null;
 };
@@ -142,19 +141,21 @@ export const getServerSideProps = async (
       haversine(
         restaurant.latitude,
         restaurant.longitude,
-        prev?.shipperLocation?.latitude,
-        prev.shipperLocation?.longitude
+        prev.shipperLocation.latitude,
+        prev.shipperLocation.longitude
       ) >
       haversine(
-        restaurant?.latitude,
-        restaurant?.longitude,
-        curr?.shipperLocation?.latitude,
-        curr.shipperLocation?.longitude
+        restaurant.latitude,
+        restaurant.longitude,
+        curr.shipperLocation.latitude,
+        curr.shipperLocation.longitude
       )
     )
       return curr;
     return prev;
   });
+
+  console.log(checkoutSession);
 
   //Create the order
   const [order] = await Promise.all([
