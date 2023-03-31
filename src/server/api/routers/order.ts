@@ -7,6 +7,7 @@ import {
   protectedProcedure,
   publicProcedure,
   restaurantProtectedProcedure,
+  shipperProtectedProcedure,
 } from "~/server/api/trpc";
 import { transporter } from "~/server/email";
 import haversine from "~/utils/haversine";
@@ -63,12 +64,9 @@ export const orderRouter = createTRPCRouter({
         });
       }
 
-      const order = await ctx.prisma.order.updateMany({
+      const order = await ctx.prisma.order.update({
         where: {
           id: input.orderId,
-          restaurant: {
-            userId: ctx.session.user.id,
-          },
         },
         data: {
           status: "PREPARING",
@@ -236,13 +234,68 @@ export const orderRouter = createTRPCRouter({
       })
     )
     .mutation(({ ctx, input }) => {
+      let timesRun = 0;
       const intervalId = setIntervalAsync(async () => {
+        timesRun += 1;
+        console.log(timesRun);
+        // stop after 30 times
+        if (timesRun >= 30) {
+          const [query] = await Promise.all([
+            ctx.prisma.order.findUnique({
+              where: {
+                id: input.orderId,
+              },
+              select: {
+                paymentIntentId: true,
+                user: {
+                  select: {
+                    email: true,
+                  },
+                },
+              },
+            }),
+            ctx.prisma.order.update({
+              where: {
+                id: input.orderId,
+              },
+              data: {
+                status: "REJECTED_BY_SHIPPER",
+              },
+            }),
+          ]);
+
+          if (!query) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Order not found",
+            });
+          }
+
+          if (query.user.email) {
+            await transporter.sendMail({
+              from: env.EMAIL_FROM,
+              to: query.user.email,
+              subject: "Your order has been rejected",
+              text: `Your order has been rejected because we can not find a shipper`,
+            });
+          }
+
+          await ctx.stripe.refunds.create({
+            payment_intent: query.paymentIntentId,
+          });
+          await clearIntervalAsync(intervalId)
+        }
         const [onlineShippers, order] = await Promise.all([
           ctx.prisma.shipper.findMany({
             where: {
               shipperLocation: {
                 updatedAt: {
                   gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+                },
+              },
+              user: {
+                id: {
+                  not: ctx.session.user.id,
                 },
               },
               order: {
@@ -317,5 +370,118 @@ export const orderRouter = createTRPCRouter({
           clearIntervalAsync(intervalId),
         ]);
       }, 10000);
+    }),
+  getShipperInProgressOrders: shipperProtectedProcedure.query(
+    async ({ ctx }) => {
+      const order = await ctx.prisma.order.findFirst({
+        where: {
+          status: {
+            notIn: [
+              "PLACED",
+              "REJECTED_BY_RESTAURANT",
+              "REJECTED_BY_SHIPPER",
+              "DELIVERED",
+            ],
+          },
+          shipper: {
+            userId: ctx.session.user.id,
+          },
+        },
+        include: {
+          user: true,
+          orderFood: true,
+          restaurant: true,
+        },
+      });
+      return order;
+    }
+  ),
+  shipperCompleteOrder: shipperProtectedProcedure.mutation(async ({ ctx }) => {
+    const order = await ctx.prisma.order.updateMany({
+      where: {
+        shipperId: ctx.session.user.id,
+        status: {
+          in: "DELIVERING",
+        },
+      },
+      data: {
+        status: "DELIVERED",
+      },
+    });
+    return order;
+  }),
+  shipperRejectOrder: shipperProtectedProcedure
+    .input(
+      z.object({
+        orderId: z.number(),
+        reason: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const query = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          shipper: {
+            select: {
+              userId: true,
+            },
+          },
+          paymentIntentId: true,
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!query) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order not found",
+        });
+      }
+      if (ctx.session?.user.id !== query.shipper?.userId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to reject this order",
+        });
+      }
+
+      if (query.user.email) {
+        const [order] = await Promise.all([
+          ctx.prisma.order.update({
+            where: {
+              id: input.orderId,
+            },
+            data: {
+              shipperId: null,
+              status: "READY_FOR_PICKUP",
+            },
+          }),
+          transporter.sendMail({
+            from: env.EMAIL_FROM,
+            to: query.user.email,
+            subject: "Your order has been rejected",
+            text: `Your order has been rejected by the shipper for the following reason: ${input.reason}, we will find you another shipper soon`,
+          }),
+        ]);
+        return order;
+      }
+      const [order] = await Promise.all([
+        ctx.prisma.order.update({
+          where: {
+            id: input.orderId,
+          },
+          data: {
+            status: "READY_FOR_PICKUP",
+          },
+        }),
+        ctx.stripe.refunds.create({
+          payment_intent: query.paymentIntentId,
+        }),
+      ]);
+      return order;
     }),
 });

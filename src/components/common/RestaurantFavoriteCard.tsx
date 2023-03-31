@@ -74,7 +74,7 @@ const RestaurantFavoriteCard: React.FC<RestaurantFavoriteCardProps> = ({
         </div>
         <div className="px-4 py-3">
           <p className="text-xl font-semibold">{restaurant.name}</p>
-          {distance && <p className="text-xs">${Math.round(distance * 1.2)} - ${Math.round(distance * 1.5)} Delivery Fee</p>}
+          {distance && <p className="text-xs">${Math.max(Math.round(distance * 1.2), 5)} - ${Math.max(Math.round(distance * 1.5), 6)} Delivery Fee</p>}
         </div>
       </Link>
       {unfavotiteMutation.isLoading ? (

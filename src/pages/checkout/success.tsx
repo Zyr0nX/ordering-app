@@ -155,8 +155,6 @@ export const getServerSideProps = async (
     return prev;
   });
 
-  console.log(checkoutSession);
-
   //Create the order
   const [order] = await Promise.all([
     prisma.order.create({

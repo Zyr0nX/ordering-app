@@ -4,6 +4,7 @@ import React from "react";
 import { useThrottledCallback } from "use-debounce";
 import { api } from "~/utils/api";
 
+
 export default function Shipper({ children }: { children: ReactElement }) {
   const updateLocationMutatation = api.shipper.updateLocation.useMutation();
 
@@ -31,7 +32,7 @@ export default function Shipper({ children }: { children: ReactElement }) {
     <>
       <Head>
         <title>Shipper Panel</title>
-        <meta name="description" content="Restaurant Panel - Home" />
+        <meta name="description" content="Shipper Panel" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {children}

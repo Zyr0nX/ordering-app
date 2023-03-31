@@ -63,7 +63,7 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
 
   const [shippingFee, setShippingFee] = useState<number | null>(() => {
     if (distance) {
-      return Math.round(distance / 500) / 2;
+      return Math.max(Math.round(distance / 500) / 2, 5);
     }
     return null;
   });
@@ -248,6 +248,7 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      staleTime: Infinity,
     }
   );
 
@@ -266,8 +267,9 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
       enabled: !!lat && !!lng,
       onSuccess: (data) => {
         if (!data) return;
-        setShippingFee(Math.round(data / 500) / 2);
-        setTotal(itemTotal + Math.round(data / 500) / 2);
+        
+        setShippingFee(Math.max(Math.round(data / 500) / 2, 5));
+        setTotal(itemTotal + Math.max(Math.round(data / 500) / 2, 5));
       },
       refetchOnMount: false,
       refetchOnWindowFocus: false,

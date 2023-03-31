@@ -164,7 +164,6 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     ) {
       setIsInvalidImage(true);
       isValidForm = false;
-      console.log("image is invalid");
     } else {
       setIsInvalidImage(false);
     }
@@ -237,8 +236,6 @@ const RestaurantAdminCard: React.FC<RestaurantAdminCardProps> = ({
     setIsInvalidCuisine(null);
     setIsInvalidImage(null);
     setIsEditOpen(false);
-    console.log(imageFile);
-    console.log(base64Image);
   };
 
   return (

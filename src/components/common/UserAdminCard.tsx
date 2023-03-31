@@ -104,7 +104,6 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
     ) {
       setIsInvalidImage(true);
       isValidForm = false;
-      console.log("image is invalid");
     } else {
       setIsInvalidImage(false);
     }

@@ -39,7 +39,6 @@ const AdminRestaurantsBody: React.FC<AdminRestaurantsBodyProps> = ({
   const handleSearch = (query: string) => {
     setSearch(query);
     if (query === "") {
-      console.log("here");
       setRestaurantList(restaurantQuery.data);
       return;
     }

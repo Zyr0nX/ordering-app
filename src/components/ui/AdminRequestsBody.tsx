@@ -66,7 +66,6 @@ const AdminRequestsBody: React.FC<AdminRequestsBodyProps> = ({
   const handleSearch = (query: string) => {
     setSearch(query);
     if (query === "") {
-      console.log("here");
       setPendingList(pendingQuery.data);
       return;
     }

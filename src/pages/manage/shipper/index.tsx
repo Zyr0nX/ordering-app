@@ -1,8 +1,6 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
-import Restaurant from "~/components/layouts/Restaurant";
 import Shipper from "~/components/layouts/Shipper";
-import RestaurantHomeBody from "~/components/ui/RestaurantHomeBody";
-import RestaurantHomeHeader from "~/components/ui/RestaurantHomeHeader";
+import ShipperHomeBody from "~/components/ui/ShipperHomeBody";
 import ShipperHomeHeader from "~/components/ui/ShipperHomeHeader";
 import { getServerAuthSession } from "~/server/auth";
 
@@ -12,7 +10,7 @@ const Index: NextPage = () => {
       <>
         <ShipperHomeHeader />
         <div className="relative -top-8 mx-4 md:-top-16 md:mx-20">
-          <RestaurantHomeBody />
+          <ShipperHomeBody />
         </div>
       </>
     </Shipper>

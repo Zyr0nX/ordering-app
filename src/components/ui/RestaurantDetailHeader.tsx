@@ -60,7 +60,7 @@ const RestaurantDetailHeader: React.FC<RestaurantDetailHeaderProps> = ({
           <h1 className="text-2xl font-bold md:text-5xl">{restaurant.name}</h1>
           {distance && (
             <p className="mt-2 text-sm md:text-2xl">
-              ${Math.round(distance * 1.2)} - ${Math.round(distance * 1.4)}{" "}
+              ${Math.max(Math.round(distance * 1.2), 5)} - ${Math.max(Math.round(distance * 1.5), 6)}{" "}
               Delivery Fee
             </p>
           )}
