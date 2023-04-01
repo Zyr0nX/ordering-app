@@ -15,7 +15,7 @@ import {
 import fuzzysort from "fuzzysort";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/utils/api";
 import haversine from "~/utils/haversine";
 
@@ -41,7 +41,6 @@ const HomeBody: React.FC<HomeBodyProps> = ({ cuisines, restaurants, user }) => {
   const restaurantQuery = api.restaurant.getRestaurantForUser.useQuery(
     undefined,
     {
-      initialData: restaurants,
       onSuccess: (data) => {
         setRestaurantList(data);
       },

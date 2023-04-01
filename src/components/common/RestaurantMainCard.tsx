@@ -60,6 +60,7 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
   });
 
   const unfavotiteMutation = api.user.unfavoriteRestaurant.useMutation({
+    
     onSuccess: () => {
       setRestaurantList(
         restaurantList.map((r) => {

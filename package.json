@@ -38,12 +38,14 @@
     "nodemailer": "^6.9.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
     "react-use": "^17.4.0",
     "set-interval-async": "^3.0.3",
     "stripe": "^11.15.0",
     "superjson": "^1.12.2",
     "use-debounce": "^9.0.3",
-    "zod": "^3.18.0"
+    "zod": "^3.18.0",
+    "zustand": "^4.3.7"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^4.24.11",

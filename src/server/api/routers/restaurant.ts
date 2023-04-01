@@ -144,10 +144,14 @@ export const restaurantRouter = createTRPCRouter({
         id: true,
         name: true,
         address: true,
+        additionalAddress: true,
+        latitude: true,
+        longitude: true,
         image: true,
-        cuisine: {
-          select: {
-            name: true,
+        cuisineId: true,
+        favorite: {
+          where: {
+            userId: ctx.session?.user.id || "",
           },
         },
       },
