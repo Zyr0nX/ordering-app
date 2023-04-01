@@ -58,7 +58,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
           return o;
         }),
       ]);
-      if (data.shipperId !== null)
+      if (data.shipperId === null)
         findShipperMutation.mutate({ orderId: order.id });
     },
     onSettled: () => {
