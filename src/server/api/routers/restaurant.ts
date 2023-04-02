@@ -136,7 +136,7 @@ export const restaurantRouter = createTRPCRouter({
       return restaurant;
     }),
   getAllApproved: publicProcedure.query(async ({ ctx }) => {
-    const restaurants = await ctx.prisma.restaurant.findMany({
+    return await ctx.prisma.restaurant.findMany({
       where: {
         approved: "APPROVED",
       },
@@ -156,7 +156,6 @@ export const restaurantRouter = createTRPCRouter({
         },
       },
     });
-    return restaurants;
   }),
   getRestaurantForUser: publicProcedure.query(async ({ ctx }) => {
     const restaurants = await ctx.prisma.restaurant.findMany({

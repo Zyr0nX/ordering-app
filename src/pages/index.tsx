@@ -1,5 +1,5 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import { inferProcedureInput, inferProcedureOutput } from "@trpc/server";
+import { type inferProcedureOutput } from "@trpc/server";
 import fuzzysort from "fuzzysort";
 import { type GetServerSidePropsContext, type NextPage } from "next";
 import { type InferGetServerSidePropsType } from "next";
@@ -69,10 +69,10 @@ const Home: NextPage<
 const HomeHeader: React.FC = () => {
   const searchQuery = useHomeStore((state) => state.searchQuery);
   const search = useHomeStore((state) => state.search);
-
   const { data: user } = api.user.getUser.useQuery(undefined, {
-    refetchOnWindowFocus: false,
+    refetchOnMount: false,
     refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
   return (
     <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 bg-gradient-to-r p-4 text-white md:p-8">
@@ -135,22 +135,17 @@ const HomeBody: React.FC = () => {
   const selectACuisine = useHomeStore((state) => state.selectACuisine);
   const unselectCuisine = useHomeStore((state) => state.unselectCuisine);
   const setRestaurantList = useHomeStore((state) => state.setRestaurantList);
+  console.log(selectedCuisine);
   //get all approved restaurants prefetched on server side and store in restaurantList state on client side
-const { data: restaurantsData } = api.restaurant.getAllApproved.useQuery(
-  undefined,
-  {
-    onSuccess: (data) => {
-      setRestaurantList(data);
-    },
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-  }
-);
+  const { data: restaurantsData } = api.restaurant.getAllApproved.useQuery(
+    undefined,
+    {
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    }
+  );
   useEffect(() => {
-    
-    
-
     if (!restaurantsData) {
       return;
     }
@@ -162,12 +157,12 @@ const { data: restaurantsData } = api.restaurant.getAllApproved.useQuery(
   ) => {
     //if the selected cuisine is the same as the current selected cuisine, set the restaurant list to all restaurants and set the selected cuisine to null
     if (selectedCuisine?.id === cuisine.id) {
-      selectACuisine(cuisine);
+      unselectCuisine();
       return;
     }
 
     //if the selected cuisine is not the same as the current selected cuisine, set the restaurant list to all restaurants filtered by cuisine and set the selected cuisine to the selected cuisine
-    unselectCuisine();
+    selectACuisine(cuisine);
   };
 
   const { data: cuisines } = api.cuisine.getAll.useQuery(undefined, {
