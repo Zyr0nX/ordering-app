@@ -18,22 +18,17 @@ const RestaurantHomeBody = () => {
         <MainButton
           text="Completed Orders"
           icon={<CompleteIcon className="md:h-24 md:w-24" />}
-          href="/admin/users"
-        />
-        <MainButton
-          text="Cancelled Orders"
-          icon={<CancelOrderIcon className="md:h-24 md:w-24" />}
-          href="/admin/requests"
+          href="/manage/restaurant/history"
         />
         <MainButton
           text="Edit Menu"
           icon={<BookIcon className="md:h-24 md:w-24" />}
-          href="/admin/requests"
+          href="/manage/restaurant/menu"
         />
         <MainButton
-          text="Settings"
+          text="Profile"
           icon={<SettingsIcon className="md:h-24 md:w-24" />}
-          href="/admin/categories"
+          href="/manage/restaurant/profile"
         />
       </div>
     </>

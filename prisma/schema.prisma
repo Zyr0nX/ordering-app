@@ -200,21 +200,29 @@ model FoodOptionItem {
 }
 
 model Order {
-  id               Int         @id @default(autoincrement())
-  userId           String
-  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  restaurantId     String
-  restaurant       Restaurant  @relation(fields: [restaurantId], references: [id])
-  shipperId        String?
-  shipper          Shipper?    @relation(fields: [shipperId], references: [id])
-  shippingFee      Float       @db.Float
-  restaurantRating Int?
-  shipperRating    Int?
-  paymentIntentId  String      @unique
-  status           OrderStatus @default(PLACED)
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  orderFood        OrderFood[]
+  id                  Int         @id @default(autoincrement())
+  userId              String
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAddress         String
+  userAddressId       String
+  userLatitude        Float       @db.Double
+  userLongitude       Float       @db.Double
+  restaurantId        String
+  restaurant          Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantAddress   String
+  restaurantAddressId String
+  restaurantLatitude  Float       @db.Double
+  restaurantLongitude Float       @db.Double
+  shipperId           String?
+  shipper             Shipper?    @relation(fields: [shipperId], references: [id])
+  shippingFee         Float       @db.Float
+  restaurantRating    Int?
+  shipperRating       Int?
+  paymentIntentId     String      @unique
+  status              OrderStatus @default(PLACED)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  orderFood           OrderFood[]
 
   @@index([userId])
   @@index([shipperId])

@@ -16,14 +16,14 @@ export const getServerSideProps = async (
 ) => {
   //Retrieve the session_id from the query
   const { session_id } = context.query;
-  if (!session_id)
+  if (!session_id || Array.isArray(session_id))
     return {
       notFound: true,
     };
   //Retrieve the session from Stripe
   const [session, checkoutSession] = await Promise.all([
     getServerAuthSession(context),
-    stripe.checkout.sessions.retrieve(session_id as string, {
+    stripe.checkout.sessions.retrieve(session_id, {
       expand: ["payment_intent", "line_items.data.price.product"],
     }),
   ]);
@@ -32,7 +32,7 @@ export const getServerSideProps = async (
     !session ||
     !checkoutSession ||
     !checkoutSession.payment_intent ||
-    checkoutSession.payment_status === "unpaid"
+    checkoutSession.payment_status !== "paid"
   ) {
     return {
       notFound: true,
@@ -49,9 +49,15 @@ export const getServerSideProps = async (
 
   //Check if the session has a restaurantId
   if (!checkoutSession.metadata?.restaurantId) {
-    await stripe.refunds.create({
-      payment_intent: checkoutSession.payment_intent as string,
-    });
+    if (typeof checkoutSession.payment_intent === "string") {
+      await stripe.refunds.create({
+        payment_intent: checkoutSession.payment_intent,
+      });
+    } else {
+      await stripe.refunds.create({
+        payment_intent: checkoutSession.payment_intent.id,
+      });
+    }
     context.res.statusCode = 500;
     return {
       notFound: true,
@@ -59,108 +65,51 @@ export const getServerSideProps = async (
   }
 
   //Find the restaurant and the shipper
-  const [restaurant, onlineShippers] = await Promise.all([
+  const [restaurant, user] = await Promise.all([
     prisma.restaurant.findUnique({
       where: {
         id: checkoutSession.metadata?.restaurantId,
       },
     }),
-    prisma.shipper.findMany({
+    prisma.user.findUnique({
       where: {
-        shipperLocation: {
-          updatedAt: {
-            gte: new Date(new Date().getTime() - 1000 * 60 * 5),
-          },
-        },
-      },
-      include: {
-        shipperLocation: true,
+        id: session.user.id,
       },
     }),
   ]);
 
   //If the restaurant doesn't exist, return 400
-  if (!restaurant) {
-    await stripe.refunds.create({
-      payment_intent: checkoutSession.payment_intent as string,
-    });
+  if (
+    !checkoutSession.line_items ||
+    !checkoutSession.shipping_cost ||
+    !restaurant ||
+    !user ||
+    !user.address ||
+    !user.addressId ||
+    !user.latitude ||
+    !user.longitude
+  ) {
+    if (typeof checkoutSession.payment_intent === "string") {
+      await stripe.refunds.create({
+        payment_intent: checkoutSession.payment_intent,
+      });
+    } else {
+      await stripe.refunds.create({
+        payment_intent: checkoutSession.payment_intent.id,
+      });
+    }
     context.res.statusCode = 400;
     return {
       notFound: true,
     };
   }
 
-  //If there is no shipper, create the order without a shipper
-  if (!onlineShippers.length) {
-    //Create the order
-    const [order] = await Promise.all([
-      prisma.order.create({
-        data: {
-          orderFood: {
-            create: checkoutSession.line_items?.data.map((item) => ({
-              foodName: (item.price?.product as Stripe.Product).name,
-              foodOption:
-                (item.price?.product as Stripe.Product).description || "",
-              quantity: item.quantity as number,
-              price: (item.price?.unit_amount as number) / 100,
-            })),
-          },
-          userId: session?.user.id,
-          restaurantId: checkoutSession.metadata?.restaurantId,
-          shippingFee: 5,
-          paymentIntentId: (
-            checkoutSession.payment_intent as Stripe.PaymentIntent
-          ).id,
-        },
-      }),
-      prisma.cartItem.deleteMany({
-        where: {
-          userId: session?.user.id,
-          food: {
-            restaurant: {
-              id: checkoutSession.metadata?.restaurantId,
-            },
-          },
-        },
-      }),
-    ]);
-
-    return {
-      redirect: {
-        destination: `/orders/VP-${order.id}`,
-        permanent: false,
-      },
-    };
-  }
-  //Find the nearest shipper
-  const nearestShipper = onlineShippers.reduce((prev, curr) => {
-    if (!prev.shipperLocation) return curr;
-    if (!curr.shipperLocation) return prev;
-
-    if (
-      haversine(
-        restaurant.latitude,
-        restaurant.longitude,
-        prev.shipperLocation.latitude,
-        prev.shipperLocation.longitude
-      ) >
-      haversine(
-        restaurant.latitude,
-        restaurant.longitude,
-        curr.shipperLocation.latitude,
-        curr.shipperLocation.longitude
-      )
-    )
-      return curr;
-    return prev;
-  });
-
   //Create the order
   const [order] = await Promise.all([
     prisma.order.create({
       data: {
         orderFood: {
-          create: checkoutSession.line_items?.data.map((item) => ({
+          create: checkoutSession.line_items.data.map((item) => ({
             foodName: (item.price?.product as Stripe.Product).name,
             foodOption:
               (item.price?.product as Stripe.Product).description || "",
@@ -168,13 +117,21 @@ export const getServerSideProps = async (
             price: (item.price?.unit_amount as number) / 100,
           })),
         },
-        userId: session?.user.id,
+        userId: session.user.id,
+        userAddress: user.address,
+        userAddressId: user.addressId,
+        userLatitude: user.latitude,
+        userLongitude: user.longitude,
         restaurantId: checkoutSession.metadata?.restaurantId,
-        shippingFee: 5,
-        paymentIntentId: (
-          checkoutSession.payment_intent as Stripe.PaymentIntent
-        ).id,
-        shipperId: nearestShipper.id,
+        restaurantAddress: restaurant.address,
+        restaurantAddressId: restaurant.addressId,
+        restaurantLatitude: restaurant.latitude,
+        restaurantLongitude: restaurant.longitude,
+        shippingFee: checkoutSession.shipping_cost.amount_total / 100,
+        paymentIntentId:
+          typeof checkoutSession.payment_intent === "string"
+            ? checkoutSession.payment_intent
+            : checkoutSession.payment_intent.id,
       },
     }),
     prisma.cartItem.deleteMany({

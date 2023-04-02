@@ -478,10 +478,24 @@ export const orderRouter = createTRPCRouter({
             status: "READY_FOR_PICKUP",
           },
         }),
-        ctx.stripe.refunds.create({
-          payment_intent: query.paymentIntentId,
-        }),
       ]);
       return order;
     }),
+  getRestaurantOrderHistory: restaurantProtectedProcedure
+    .query(async ({ ctx }) => {
+      const orders = await ctx.prisma.order.findMany({
+        where: {
+          restaurantId: ctx.session.user.id,
+          status: {
+            notIn: ["PLACED", "PREPARING", "REJECTED_BY_RESTAURANT", "READY_FOR_PICKUP"],
+          },
+        },
+        include: {
+          user: true,
+          orderFood: true,
+        },
+      });
+      return orders;
+    }
+  ),
 });

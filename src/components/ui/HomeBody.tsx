@@ -15,7 +15,7 @@ import {
 import fuzzysort from "fuzzysort";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/utils/api";
 import haversine from "~/utils/haversine";
 

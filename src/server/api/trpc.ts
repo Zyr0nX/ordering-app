@@ -20,9 +20,9 @@
  *
  * This is where the tRPC API is initialized, connecting the context and transformer.
  */
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
 import { TRPCError, initTRPC } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type NextApiRequest, type NextApiResponse } from "next";
 import { type Session } from "next-auth";
 import superjson from "superjson";
 import { getServerAuthSession } from "~/server/auth";
@@ -30,11 +30,11 @@ import { redis } from "~/server/cache";
 import { prisma } from "~/server/db";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
+import { appRouter } from './root';
+
 
 type CreateContextOptions = {
   session: Session | null;
-  req: NextApiRequest;
-  res: NextApiResponse;
 };
 
 /**
@@ -48,15 +48,12 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
-  const { req, res } = opts;
   return {
     session: opts.session,
     prisma,
     stripe,
     maps,
     redis,
-    req,
-    res,
   };
 };
 
@@ -74,8 +71,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   return createInnerTRPCContext({
     session,
-    req,
-    res,
   });
 };
 
