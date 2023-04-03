@@ -13,8 +13,8 @@ import { create } from "zustand";
 import InfoIcon from "~/components/icons/InfoIcon";
 import SearchIcon from "~/components/icons/SearchIcon";
 import SleepIcon from "~/components/icons/SleepIcon";
-import Restaurant from "~/components/layouts/Restaurant";
-import ManageRestaurantHeader from "~/components/ui/ManageRestaurantHeader";
+import Shipper from "~/components/layouts/Shipper";
+import ManageShipperHeader from "~/components/ui/ManageShipperHeader";
 import { type AppRouter, appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
@@ -24,7 +24,7 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  if (!session || session.user.role !== "RESTAURANT") {
+  if (!session || session.user.role !== "SHIPPER") {
     return {
       notFound: true,
     };
@@ -46,7 +46,7 @@ export const getServerSideProps = async (
   };
 };
 
-interface ManageRestaurantOrderHistoryState {
+interface ManageShipperOrderHistoryState {
   searchQuery: string;
   orderHistory: inferProcedureOutput<
     AppRouter["order"]["getShipperOrderHistory"]
@@ -57,8 +57,8 @@ interface ManageRestaurantOrderHistoryState {
   search: (searchQuery: string) => void;
 }
 
-const useManageRestaurantOrderHistoryStore =
-  create<ManageRestaurantOrderHistoryState>((set) => ({
+const useManageShipperOrderHistoryStore =
+  create<ManageShipperOrderHistoryState>((set) => ({
     searchQuery: "",
     orderHistory: [],
     orderHistoryData: [],
@@ -74,21 +74,23 @@ const useManageRestaurantOrderHistoryStore =
       }));
     },
   }));
+
+
 const History: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = () => {
   return (
-    <Restaurant>
+    <Shipper>
       <>
-        <ManageRestaurantHeader title="Order History" />
-        <ManageRestaurantOrderHistoryBody />
+        <ManageShipperHeader title="Order History" />
+        <ManageShipperOrderHistoryBody />
       </>
-    </Restaurant>
+    </Shipper>
   );
 };
 
-const ManageRestaurantOrderHistoryBody: React.FC = () => {
-  const { data: restaurantOrderHistoryData } =
+const ManageShipperOrderHistoryBody: React.FC = () => {
+  const { data: shipperOrderHistoryData } =
     api.order.getShipperOrderHistory.useQuery(undefined, {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
@@ -96,17 +98,17 @@ const ManageRestaurantOrderHistoryBody: React.FC = () => {
       refetchInterval: 5000,
     });
   useEffect(() => {
-    if (useManageRestaurantOrderHistoryStore.getState().searchQuery) {
-      useManageRestaurantOrderHistoryStore.setState({
-        orderHistoryData: restaurantOrderHistoryData,
+    if (useManageShipperOrderHistoryStore.getState().searchQuery) {
+      useManageShipperOrderHistoryStore.setState({
+        orderHistoryData: shipperOrderHistoryData,
       });
       return;
     }
-    useManageRestaurantOrderHistoryStore.setState({
-      orderHistoryData: restaurantOrderHistoryData,
-      orderHistory: restaurantOrderHistoryData,
+    useManageShipperOrderHistoryStore.setState({
+      orderHistoryData: shipperOrderHistoryData,
+      orderHistory: shipperOrderHistoryData,
     });
-  }, [restaurantOrderHistoryData]);
+  }, [shipperOrderHistoryData]);
 
   return (
     <div className="text-virparyasMainBlue m-4">
@@ -119,8 +121,8 @@ const ManageRestaurantOrderHistoryBody: React.FC = () => {
 };
 
 const Search: React.FC = () => {
-  const search = useManageRestaurantOrderHistoryStore((state) => state.search);
-  const searchQuery = useManageRestaurantOrderHistoryStore(
+  const search = useManageShipperOrderHistoryStore((state) => state.search);
+  const searchQuery = useManageShipperOrderHistoryStore(
     (state) => state.searchQuery
   );
 
@@ -142,7 +144,7 @@ const Search: React.FC = () => {
 };
 
 const OrderHistory: React.FC = () => {
-  const orderHistory = useManageRestaurantOrderHistoryStore(
+  const orderHistory = useManageShipperOrderHistoryStore(
     (state) => state.orderHistory
   );
 
@@ -183,7 +185,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
         <div className="flex w-full items-center justify-between">
           <div
             className={
-              order.status === "REJECTED_BY_RESTAURANT"
+              order.status === "REJECTED_BY_SHIPPER"
                 ? "text-virparyasRed"
                 : "text-virparyasGreen"
             }
@@ -288,7 +290,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
                         })}
                       </p>
                     </div>
-                    {order.status === "REJECTED_BY_RESTAURANT" && (
+                    {order.status === "REJECTED_BY_SHIPPER" && (
                       <>
                         <div className="bg-virparyasSeparator h-0.5" />
                         <p>

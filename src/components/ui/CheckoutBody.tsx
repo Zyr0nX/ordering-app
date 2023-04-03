@@ -5,14 +5,19 @@ import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
 import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
-import { type User, type CartItem, type Food, type FoodOptionItem, type Restaurant } from "@prisma/client";
+import {
+  type User,
+  type CartItem,
+  type Food,
+  type FoodOptionItem,
+  type Restaurant,
+} from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
-
 
 interface CheckoutBodyProps {
   user: User & {
@@ -67,6 +72,10 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     }
     return null;
   });
+
+  const [lat, setLat] = useState<number | null>(user.latitude || null);
+  const [lng, setLng] = useState<number | null>(user.longitude || null);
+
   const restaurant = user.cartItem[0]?.food.restaurant;
 
   const cartQuery = api.user.getCart.useQuery(
@@ -150,6 +159,34 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     },
   });
 
+  const reverseGeocodeQuery = api.maps.getReverseGeocode.useQuery(
+    {
+      query: `${lat as number},${lng as number}`,
+    },
+    {
+      onSuccess: (data) => {
+        if (!data) return;
+        setPlaceAutocomplete({
+          description: data.formatted_address,
+          place_id: data.place_id,
+          terms: [],
+          types: [],
+          matched_substrings: [],
+          structured_formatting: {
+            main_text: "",
+            main_text_matched_substrings: [],
+            secondary_text: "",
+            secondary_text_matched_substrings: [],
+          },
+        });
+      },
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: Infinity,
+    }
+  );
+
   const handleUpdateUser = async () => {
     let isInvalidForm = true;
 
@@ -187,6 +224,7 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
         phonePrefix?.dialCode ? `(${phonePrefix?.dialCode}) ` : ""
       }${phoneNumber || ""}`,
     });
+    await reverseGeocodeQuery.refetch();
     setIsOpen(false);
     if (
       name &&
@@ -220,38 +258,6 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     setPhoneNumber(formattedValue);
   };
 
-  const [lat, setLat] = useState<number | null>(user.latitude || null);
-  const [lng, setLng] = useState<number | null>(user.longitude || null);
-
-  api.maps.getReverseGeocode.useQuery(
-    {
-      query: `${lat as number},${lng as number}`,
-    },
-    {
-      enabled: !!lat && !!lng,
-      onSuccess: (data) => {
-        if (!data) return;
-        setPlaceAutocomplete({
-          description: data.formatted_address,
-          place_id: data.place_id,
-          terms: [],
-          types: [],
-          matched_substrings: [],
-          structured_formatting: {
-            main_text: "",
-            main_text_matched_substrings: [],
-            secondary_text: "",
-            secondary_text_matched_substrings: [],
-          },
-        });
-      },
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      staleTime: Infinity,
-    }
-  );
-
   api.maps.getDistanceMatrix.useQuery(
     {
       origins: {
@@ -267,7 +273,7 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
       enabled: !!lat && !!lng,
       onSuccess: (data) => {
         if (!data) return;
-        
+
         setShippingFee(Math.max(Math.round(data / 500) / 2, 5));
         setTotal(itemTotal + Math.max(Math.round(data / 500) / 2, 5));
       },

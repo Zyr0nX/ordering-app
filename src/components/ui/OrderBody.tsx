@@ -132,7 +132,7 @@ const OrderBody = ({
               })}
             </p>
             <p>{order.restaurant.name}</p>
-            <p>{order.restaurant.address}</p>
+            <p>{order.restaurantAddress}</p>
           </div>
           <div className="bg-virparyasSeparator h-0.5" />
           <ul className="ml-4 flex list-decimal flex-col gap-2">

@@ -1,8 +1,15 @@
 import { TRPCError } from "@trpc/server";
+import { Session } from "inspector";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
+
+
+const baseUrl =
+  env.NODE_ENV === "development"
+    ? `http://${"localhost:3000"}`
+    : env.NEXTAUTH_URL;
 
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
@@ -23,7 +30,7 @@ export const stripeRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { stripe, session, prisma, req } = ctx;
+      const { stripe, session, prisma } = ctx;
 
       const [customerId, user, restaurant] = await Promise.all([
         getOrCreateStripeCustomerIdForUser({
@@ -120,11 +127,6 @@ export const stripeRouter = createTRPCRouter({
           .value as number;
       }
 
-      const baseUrl =
-        env.NODE_ENV === "development"
-          ? `http://${req.headers.host ?? "localhost:3000"}`
-          : `https://${req.headers.host ?? env.NEXTAUTH_URL}`;
-
       const checkoutSession = await stripe.checkout.sessions.create({
         metadata: {
           restaurantId: input.restaurantId,
@@ -159,7 +161,7 @@ export const stripeRouter = createTRPCRouter({
           },
         ],
         success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: req.headers.referer,
+        cancel_url: `${baseUrl}/checkout?id=${input.restaurantId}}`,
       });
 
       if (!checkoutSession) {
@@ -188,4 +190,52 @@ export const stripeRouter = createTRPCRouter({
       }
       return checkoutSession;
     }),
+  createRestaurantConnectedAccount: protectedProcedure
+    .mutation(async ({ ctx, input }) => {
+      const { stripe, prisma } = ctx;
+
+      const restaurant = await prisma.restaurant.findUnique({
+        where: {
+          userId: ctx.session.user?.id,
+        },
+      });
+      if (!restaurant) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Restaurant does not exist",
+        });
+      }
+
+      const account = await stripe.accounts.create({
+        type: "express",
+      });
+
+      if (!account) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not create Stripe account",
+        });
+      }
+
+      const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: `${baseUrl}/dashboard`,
+        return_url: `${baseUrl}/dashboard`,
+        type: "account_onboarding",
+      });
+
+      
+
+      // await prisma.restaurant.update({
+      //   where: {
+      //     id: input.restaurantId,
+      //   },
+      //   data: {
+      //     stripeAccountId: account.id,
+      //   },
+      // });
+
+      return accountLink.url;
+    }
+  ),
 });

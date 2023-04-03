@@ -283,7 +283,7 @@ export const orderRouter = createTRPCRouter({
           await ctx.stripe.refunds.create({
             payment_intent: query.paymentIntentId,
           });
-          await clearIntervalAsync(intervalId)
+          await clearIntervalAsync(intervalId);
         }
         const [onlineShippers, order] = await Promise.all([
           ctx.prisma.shipper.findMany({
@@ -481,13 +481,33 @@ export const orderRouter = createTRPCRouter({
       ]);
       return order;
     }),
-  getRestaurantOrderHistory: restaurantProtectedProcedure
-    .query(async ({ ctx }) => {
+  getRestaurantOrderHistory: restaurantProtectedProcedure.query(
+    async ({ ctx }) => {
       const orders = await ctx.prisma.order.findMany({
         where: {
-          restaurantId: ctx.session.user.id,
+          restaurant: {
+            userId: ctx.session.user.id,
+          },
           status: {
-            notIn: ["PLACED", "PREPARING", "REJECTED_BY_RESTAURANT", "READY_FOR_PICKUP"],
+            notIn: ["PLACED", "PREPARING", "READY_FOR_PICKUP"],
+          },
+        },
+        include: {
+          user: true,
+          orderFood: true,
+        },
+      });
+      return orders;
+    }),
+  getShipperOrderHistory: shipperProtectedProcedure.query(
+    async ({ ctx }) => {
+      const orders = await ctx.prisma.order.findMany({
+        where: {
+          shipper: {
+            userId: ctx.session.user.id,
+          },
+          status: {
+            in: ["DELIVERED"],
           },
         },
         include: {
@@ -498,4 +518,5 @@ export const orderRouter = createTRPCRouter({
       return orders;
     }
   ),
+
 });
