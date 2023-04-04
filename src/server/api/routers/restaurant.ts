@@ -129,14 +129,49 @@ export const restaurantRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
-        include: {
-          food: true,
-        },
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          additionalAddress: true,
+          latitude: true,
+          longitude: true,
+          image: true,
+          favorite: {
+            where: {
+              userId: ctx.session?.user.id || "",
+            },
+          },
+          rating: true,
+          food: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              image: true,
+              quantity: true,
+              foodOption: {
+                select: {
+                  id: true,
+                  name: true,
+                  foodOptionItem: {
+                    select: {
+                      id: true,
+                      name: true,
+                      price: true,
+                    },
+                  },
+                },
+              },
+            },
+          }
+        }
       });
       return restaurant;
     }),
   getAllApproved: publicProcedure.query(async ({ ctx }) => {
-    const restaurants = await ctx.prisma.restaurant.findMany({
+    return await ctx.prisma.restaurant.findMany({
       where: {
         approved: "APPROVED",
       },
@@ -144,15 +179,19 @@ export const restaurantRouter = createTRPCRouter({
         id: true,
         name: true,
         address: true,
+        additionalAddress: true,
+        latitude: true,
+        longitude: true,
         image: true,
-        cuisine: {
-          select: {
-            name: true,
+        cuisineId: true,
+        rating: true,
+        favorite: {
+          where: {
+            userId: ctx.session?.user.id || "",
           },
         },
       },
     });
-    return restaurants;
   }),
   getRestaurantForUser: publicProcedure.query(async ({ ctx }) => {
     const restaurants = await ctx.prisma.restaurant.findMany({

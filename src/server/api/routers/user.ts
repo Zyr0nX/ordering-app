@@ -3,7 +3,24 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const userRouter = createTRPCRouter({
+  getUser: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        name: true,
+        address: true,
+        addressId: true,
+        additionalAddress: true,
+        latitude: true,
+        longitude: true,
+        phoneNumber: true,
+      },
+    });
+  }),
   favoriteRestaurant: protectedProcedure
     .input(
       z.object({
@@ -11,7 +28,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.favorite.create({
+      return await ctx.prisma.favorite.create({
         data: {
           userId: ctx.session.user.id,
           restaurantId: input.restaurantId,
@@ -25,7 +42,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.favorite.delete({
+      return await ctx.prisma.favorite.delete({
         where: {
           userId_restaurantId: {
             userId: ctx.session.user.id,

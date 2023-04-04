@@ -93,6 +93,7 @@ model Restaurant {
   cuisineId         String
   favorite          Favorite[]
   order             Order[]
+  rating            Float?     @db.Double
 
   @@index([cuisineId])
 }
