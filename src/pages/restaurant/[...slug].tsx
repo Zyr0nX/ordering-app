@@ -83,7 +83,7 @@ interface RestaurantDetailState {
   user: inferProcedureOutput<AppRouter["user"]["getUser"]>;
 }
 
-const useRestaurantDetailStore = create<RestaurantDetailState>((set) => ({
+const useRestaurantDetailStore = create<RestaurantDetailState>(() => ({
   restaurant: null,
   user: null,
 }));
