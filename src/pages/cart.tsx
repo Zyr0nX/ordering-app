@@ -1,9 +1,14 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
-import { inferProcedureOutput } from "@trpc/server";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import { type inferProcedureOutput } from "@trpc/server";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import { useDebouncedCallback } from "use-debounce";
 import { create } from "zustand";
@@ -13,12 +18,10 @@ import NoCartIcon from "~/components/icons/NoCartIcon";
 import RedTrashCan from "~/components/icons/RedTrashCan";
 import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
-import { AppRouter, appRouter } from "~/server/api/root";
+import { type AppRouter, appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -49,83 +52,103 @@ export const getServerSideProps = async (
 };
 
 interface CartState {
-  cart: inferProcedureOutput<AppRouter["cart"]["getCart"]>;
-  total: number;
+  cart: {
+    restaurant: inferProcedureOutput<
+      AppRouter["cart"]["getCart"]
+    >[number]["food"]["restaurant"];
+    items: inferProcedureOutput<AppRouter["cart"]["getCart"]>;
+    total: number;
+  }[];
+
   removeCartItem: (id: string) => void;
-  increaseCartItemQuantity: (id: string) => void;
-  decreaseCartItemQuantity: (id: string) => void;
+  updateCartItemQuantity: (id: string, quantity: number) => void;
 }
 
 const useCartStore = create<CartState>(() => ({
   cart: [],
-  total: 0,
   removeCartItem: (id: string) => {
-    const newCart = useCartStore
-      .getState()
-      .cart.filter((item) => item.id !== id);
-    useCartStore.setState({ cart: newCart });
-    useCartStore.setState({
-      total:
-        useCartStore.getState().total -
-        useCartStore
-          .getState()
-          .cart.filter((item) => item.id === id)
-          .map((item) => item.food.price * item.quantity)
-          .reduce((a, b) => a + b, 0),
-    });
-  },
+    if (
+      useCartStore.getState().cart.length === 1 &&
+      useCartStore.getState().cart[0]?.items.length === 1
+    ) {
+      useCartStore.setState({ cart: [] });
+      return;
+    }
 
-  increaseCartItemQuantity: (id: string) => {
     const newCart = useCartStore.getState().cart.map((item) => {
-      if (item.id === id) {
-        item.quantity += 1;
-      }
+      item.items = item.items.filter((item) => item.id !== id);
+      item.total = item.items.reduce(
+        (a, b) =>
+          a +
+          (b.food.price + b.foodOption.reduce((a, b) => a + b.price, 0)) *
+            b.quantity,
+        0
+      );
       return item;
     });
     useCartStore.setState({ cart: newCart });
-    useCartStore.setState({
-      total:
-        useCartStore.getState().total +
-        useCartStore
-          .getState()
-          .cart.filter((item) => item.id === id)
-          .map((item) => item.food.price)
-          .reduce((a, b) => a + b, 0),
-    });
   },
 
-  decreaseCartItemQuantity: (id: string) => {
+  updateCartItemQuantity: (id: string, quantity: number) => {
     const newCart = useCartStore.getState().cart.map((item) => {
-      if (item.id === id) {
-        item.quantity -= 1;
-      }
+      item.items = item.items.map((item) => {
+        if (item.id === id) {
+          item.quantity = quantity;
+        }
+        return item;
+      });
+      item.items = item.items.filter((item) => item.quantity > 0);
+      item.total = item.items.reduce(
+        (a, b) =>
+          a +
+          (b.food.price + b.foodOption.reduce((a, b) => a + b.price, 0)) *
+            b.quantity,
+        0
+      );
       return item;
     });
     useCartStore.setState({ cart: newCart });
-    useCartStore.setState({
-      total:
-        useCartStore.getState().total -
-        useCartStore
-          .getState()
-          .cart.filter((item) => item.id === id)
-          .map((item) => item.food.price)
-          .reduce((a, b) => a + b, 0),
-    });
   },
 }));
 
 const Cart: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = () => {
-  const { data: cart } = api.cart.getCart.useQuery(undefined, {
+  const { data: cartData } = api.cart.getCart.useQuery(undefined, {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
 
   useEffect(() => {
-    useCartStore.setState({ cart });
-  }, [cart]);
+    if (!cartData) return;
+    useCartStore.setState({
+      cart: cartData
+        .map((item) => item.food.restaurant)
+        .filter(
+          (value, index, self) =>
+            index === self.findIndex((t) => t.id === value.id)
+        )
+        .map((restaurant) => {
+          return {
+            restaurant,
+            items: cartData.filter(
+              (item) => item.food.restaurant.id === restaurant.id
+            ),
+            total: cartData
+              .filter((item) => item.food.restaurant.id === restaurant.id)
+              .reduce(
+                (a, b) =>
+                  a +
+                  (b.food.price +
+                    b.foodOption.reduce((a, b) => a + b.price, 0)) *
+                    b.quantity,
+                0
+              ),
+          };
+        }),
+    });
+  }, [cartData]);
 
   return (
     <Guest>
@@ -142,27 +165,13 @@ interface Cart {
     AppRouter["cart"]["getCart"]
   >[number]["food"]["restaurant"];
   items: inferProcedureOutput<AppRouter["cart"]["getCart"]>;
+  total: number;
 }
 
 const CartBody: React.FC = () => {
   const cartData = useCartStore((state) => state.cart);
 
-  //group cart by restaurant
-  const carts: Cart[] = cartData
-    .map((item) => item.food.restaurant)
-    .filter(
-      (value, index, self) => index === self.findIndex((t) => t.id === value.id)
-    )
-    .map((restaurant) => {
-      return {
-        restaurant,
-        items: cartData.filter(
-          (item) => item.food.restaurant.id === restaurant.id
-        ),
-      };
-    });
-
-  if (carts.length === 0) {
+  if (cartData.length === 0) {
     return (
       <div className="text-virparyasMainBlue m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 md:w-fit">
         <NoCartIcon className="md:h-32 md:w-32" />
@@ -183,7 +192,7 @@ const CartBody: React.FC = () => {
   }
   return (
     <div className="mx-4 my-6 grid grid-cols-1 gap-4 md:mx-32 md:my-8 md:grid-cols-2 md:gap-8">
-      {carts.map((cart) => (
+      {cartData.map((cart) => (
         <CartCard cart={cart} key={cart.restaurant.id} />
       ))}
     </div>
@@ -192,19 +201,6 @@ const CartBody: React.FC = () => {
 
 const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const [totalPrice, setTotalPrice] = useState(
-    cart.items.reduce((acc, cur) => {
-      return (
-        acc +
-        (cur.food.price +
-          cur.foodOption
-            .map((option) => option.price)
-            .reduce((a, b) => a + b, 0)) *
-          cur.quantity
-      );
-    }, 0)
-  );
 
   if (!cart.items) return null;
 
@@ -240,8 +236,6 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
                 <ItemCart
                   cardItem={cardItem}
                   key={cardItem.id}
-                  setTotalPrice={setTotalPrice}
-                  totalPrice={totalPrice}
                   setIsLoading={setIsLoading}
                 />
               ))}
@@ -258,7 +252,7 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
                   className="bg-virparyasMainBlue flex max-w-xs grow items-center justify-center rounded-xl p-3 font-bold text-white"
                 >
                   Checkout -{" "}
-                  {totalPrice.toLocaleString("en-US", {
+                  {cart.total.toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
@@ -274,67 +268,65 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
 
 interface ItemCartProps {
   cardItem: inferProcedureOutput<AppRouter["cart"]["getCart"]>[number];
-  totalPrice: number;
-  setTotalPrice: React.Dispatch<React.SetStateAction<number>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ItemCart: React.FC<ItemCartProps> = ({
-  cardItem,
-  totalPrice,
-  setTotalPrice,
-  setIsLoading,
-}) => {
-  const cart1 = useCartStore((state) => state.cart);
+const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
+  const removeCartItem = useCartStore((state) => state.removeCartItem);
+  const updateCartItemQuantity = useCartStore(
+    (state) => state.updateCartItemQuantity
+  );
 
-  const updateItemQuantityMutation = api.cart.updateItemQuantity.useMutation();
+  const updateItemQuantityMutation = api.cart.updateItemQuantity.useMutation({
+    onMutate: () => {
+      setIsLoading(true);
+    },
+  });
   const utils = api.useContext();
-  const [quantity, setQuantity] = React.useState(cardItem.quantity);
-
   const updateDebounce = useDebouncedCallback(async () => {
-    await updateItemQuantityMutation.mutateAsync({
-      cartItemId: cardItem.id,
-      quantity: quantity,
-    });
+    await toast.promise(
+      updateItemQuantityMutation.mutateAsync({
+        cartItemId: cardItem.id,
+        quantity: cardItem.quantity,
+      }),
+      {
+        loading: "Updating...",
+        success: "Updated!",
+        error: "Error updating",
+      }
+    );
     setIsLoading(false);
   }, 500);
 
-  const handleDecrement = () => {
-    if (quantity <= 1) return;
+  const handleUpdateQuantity = async (quantity: number) => {
+    if (quantity === cardItem.quantity) return;
+    if (quantity === 0 && cardItem.quantity === 1) return;
+
+    if (quantity <= 0) {
+      updateCartItemQuantity(cardItem.id, 1);
+      setIsLoading(true);
+      await updateDebounce();
+      return;
+    }
+    updateCartItemQuantity(cardItem.id, quantity);
     setIsLoading(true);
-    setQuantity(quantity - 1);
-    setTotalPrice(totalPrice - cardItem.food.price);
-    void updateDebounce();
+    await updateDebounce();
   };
 
-  const handleIncrement = () => {
-    if (quantity >= Number(cardItem.food.quantity)) return;
-    setIsLoading(true);
-    setQuantity(quantity + 1);
-    setTotalPrice(totalPrice + cardItem.food.price);
-    void updateDebounce();
-  };
+  const removeItemMutation = api.cart.removeItem.useMutation();
 
-  const handleUpdateQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRemoveItem = async () => {
     setIsLoading(true);
-    setQuantity(Number(e.target.value));
-    setTotalPrice(
-      totalPrice -
-        cardItem.food.price * quantity +
-        cardItem.food.price * Number(e.target.value)
+    removeCartItem(cardItem.id);
+    await toast.promise(
+      removeItemMutation.mutateAsync({ cartItemId: cardItem.id }),
+      {
+        loading: "Removing...",
+        success: "Removed!",
+        error: "Error removing",
+      }
     );
-    void updateDebounce();
-  };
-
-  const removeItemMutation = api.cart.removeItem.useMutation({
-    onSettled: () => {
-      void utils.cart.getCart.invalidate();
-      setIsLoading(false);
-    },
-  });
-
-  const handleRemoveItem = () => {
-    removeItemMutation.mutate({ cartItemId: cardItem.id });
+    setIsLoading(false);
   };
 
   const price =
@@ -342,7 +334,7 @@ const ItemCart: React.FC<ItemCartProps> = ({
       cardItem.foodOption
         .map((option) => option.price)
         .reduce((a, b) => a + b, 0)) *
-    quantity;
+    cardItem.quantity;
 
   return (
     <li className="marker:font-bold md:marker:text-lg">
@@ -356,7 +348,11 @@ const ItemCart: React.FC<ItemCartProps> = ({
       </p>
       <div className="flex items-center gap-4">
         <div className="bg-virparyasBackground flex w-fit items-center rounded-lg text-sm font-medium">
-          <button type="button" className="px-2 py-1" onClick={handleDecrement}>
+          <button
+            type="button"
+            className="px-2 py-1"
+            onClick={() => void handleUpdateQuantity(cardItem.quantity - 1)}
+          >
             -
           </button>
           <input
@@ -364,14 +360,18 @@ const ItemCart: React.FC<ItemCartProps> = ({
             className="w-8 bg-transparent text-center focus-within:outline-none"
             min={1}
             max={Number(cardItem.food.quantity)}
-            value={quantity}
-            onChange={handleUpdateQuantity}
+            value={cardItem.quantity}
+            onChange={(e) => void handleUpdateQuantity(Number(e.target.value))}
           />
-          <button type="button" className="px-2 py-1" onClick={handleIncrement}>
+          <button
+            type="button"
+            className="px-2 py-1"
+            onClick={() => void handleUpdateQuantity(cardItem.quantity + 1)}
+          >
             +
           </button>
         </div>
-        <button type="button" onClick={handleRemoveItem}>
+        <button type="button" onClick={() => void handleRemoveItem()}>
           <RedTrashCan />
         </button>
       </div>
