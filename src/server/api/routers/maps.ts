@@ -68,16 +68,19 @@ export const mapsRouter = createTRPCRouter({
     .input(
       z.object({
         origins: z.object({
-          lat: z.number(),
-          lng: z.number(),
+          lat: z.number().nullish(),
+          lng: z.number().nullish(),
         }),
         destinations: z.object({
-          lat: z.number(),
-          lng: z.number(),
+          lat: z.number().nullish(),
+          lng: z.number().nullish(),
         }),
       })
     )
     .query(async ({ ctx, input }) => {
+      if (!input.origins.lat || !input.origins.lng || !input.destinations.lat || !input.destinations.lng) {
+        return null;
+      }
       const cached = await redis.get(
         `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`
       );

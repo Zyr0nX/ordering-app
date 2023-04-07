@@ -282,7 +282,7 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
       setIsLoading(true);
     },
   });
-  const utils = api.useContext();
+
   const updateDebounce = useDebouncedCallback(async () => {
     await toast.promise(
       updateItemQuantityMutation.mutateAsync({
