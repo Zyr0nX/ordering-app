@@ -1,6 +1,10 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { type inferProcedureOutput } from "@trpc/server";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -18,7 +22,6 @@ import { type AppRouter, appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -296,45 +299,24 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
     setIsLoading(false);
   }, 500);
 
-  const precalculateMaxQuantity = cartItem.food.quantity;
-
-  const MaxOption =
-    cartItem.quantity +
-    precalculateMaxQuantity -
-    cart
-      .filter((item) => {
-        return (
-          item.items.filter((i) => {
-            return i.food.id === cartItem.food.id;
-          }).length > 0
-        );
-      })
-      .map((item) =>
-        item.items
-          .filter((i) => {
-            return i.food.id === cartItem.food.id;
-          })
-          .reduce((a, b) => a + b.quantity, 0)
-      )[0] +
-    1;
-
-  console.log(
-    cart.filter((item) => {
-      return item.items.filter((i) => {
-        return i.food.id === cartItem.food.id;
-      }
-      ).length > 0;
-    }).map((item) =>
-      item.items
-        .filter((i) => {
-          return i.food.id === cartItem.food.id;
-        })
-        .reduce((a, b) => a + b.quantity, 0)
-    )
+  const matchingItem = cart.find((item) =>
+    item.items.some((i) => i.food.id === cartItem.food.id)
   );
 
+  const matchingQuantity = matchingItem
+    ? matchingItem.items
+        .filter((i) => i.food.id === cartItem.food.id)
+        .reduce((acc, curr) => acc + curr.quantity, 0)
+    : 0;
+
+  const maxOption =
+    cartItem.quantity + cartItem.food.quantity - matchingQuantity + 1;
+
   const handleUpdateQuantity = async (quantity: number) => {
-    if (quantity >= MaxOption) return;
+    if (quantity >= maxOption) {
+      updateCartItemQuantity(cartItem.id, maxOption - 1);
+      return;
+    }
     if (quantity === cartItem.quantity) return;
     if (quantity === 0 && cartItem.quantity === 1) return;
 
@@ -365,10 +347,6 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
     setIsLoading(false);
   };
 
-  
-  
-
-  
   const price =
     (cartItem.food.price +
       cartItem.foodOption
@@ -399,7 +377,7 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
             type="number"
             className="w-8 bg-transparent text-center focus-within:outline-none"
             min={1}
-            max={MaxOption}
+            max={maxOption}
             value={cartItem.quantity}
             onChange={(e) => void handleUpdateQuantity(Number(e.target.value))}
           />

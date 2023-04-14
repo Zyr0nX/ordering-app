@@ -23,7 +23,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <main
         className={`${roboto.variable} bg-virparyasBackground font-roboto min-h-screen`}
       >
-        <NextNProgress color="#2722FE" height={2} />
+        <NextNProgress color="#2722FE" height={2} options={{ showSpinner: false }} />
         <Component {...pageProps} />
         <Toaster />
         <Analytics />
