@@ -19,32 +19,45 @@ export const cartRouter = createTRPCRouter({
         throw new Error("Quantity must be greater than 0");
       }
 
-      const isFoodOptionValid = await ctx.prisma.foodOptionItem.findMany({
-        where: {
-          id: {
-            in: input.foodOptionids,
+      const [food, isFoodOptionValid, cartItems] = await Promise.all([
+        ctx.prisma.food.findUnique({
+          where: {
+            id: input.foodId,
           },
-          foodOption: {
+          select: {
+            quantity: true,
+          },
+        }),
+        ctx.prisma.foodOptionItem.findMany({
+          where: {
+            id: {
+              in: input.foodOptionids,
+            },
+            foodOption: {
+              foodId: input.foodId,
+            },
+          },
+        }),
+        ctx.prisma.cartItem.findMany({
+          where: {
             foodId: input.foodId,
+            userId: ctx.session?.user?.id,
           },
-        },
-      });
+          include: {
+            foodOption: true,
+          },
+        }),
+      ]);
 
       if (isFoodOptionValid.length !== input.foodOptionids.length) {
         throw new Error("Invalid food option");
       }
 
-      const existCartItems = await ctx.prisma.cartItem.findMany({
-        where: {
-          foodId: input.foodId,
-          userId: ctx.session?.user?.id,
-        },
-        include: {
-          foodOption: true,
-        },
-      });
+      if (!food) {
+        throw new Error("Food not found");
+      }
 
-      const existCartItem = existCartItems.find((item) => {
+      const existCartItem = cartItems.find((item) => {
         const foodOptionIds = item.foodOption.map((option) => option.id);
         return (
           foodOptionIds.length === input.foodOptionids.length &&
@@ -53,6 +66,9 @@ export const cartRouter = createTRPCRouter({
       });
 
       if (existCartItem) {
+        if (food.quantity < existCartItem.quantity + input.quantity) {
+          throw new Error("Quantity is not enough");
+        }
         await ctx.prisma.cartItem.update({
           where: {
             id: existCartItem.id,
@@ -64,6 +80,9 @@ export const cartRouter = createTRPCRouter({
           },
         });
       } else {
+        if (food.quantity < input.quantity) {
+          throw new Error("Quantity is not enough");
+        }
         await ctx.prisma.cartItem.create({
           data: {
             quantity: input.quantity,
@@ -86,6 +105,27 @@ export const cartRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const cartItem = await ctx.prisma.cartItem.findUnique({
+        where: {
+          id: input.cartItemId,
+        },
+        select: {
+          food: {
+            select: {
+              quantity: true,
+            },
+          },
+        },
+      });
+
+      if (!cartItem) {
+        throw new Error("Cart item not found");
+      }
+
+      if (cartItem.food.quantity < input.quantity) {
+        throw new Error("Quantity is not enough");
+      }
+
       await ctx.prisma.cartItem.update({
         where: {
           id: input.cartItemId,

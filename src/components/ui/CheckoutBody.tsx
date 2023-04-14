@@ -15,6 +15,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
+import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
@@ -114,8 +115,8 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     },
   });
 
-  const handleCheckout = () => {
-    stripeMutation.mutate({
+  const handleCheckout = async () => {
+    await toast.promise(stripeMutation.mutateAsync({
       items: user.cartItem.map((item) => ({
         id: item.foodId,
         name: item.food.name,
@@ -128,6 +129,10 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
           item.foodOption.reduce((acc, item) => acc + item.price, 0),
       })),
       restaurantId: restaurant?.id as string,
+    }), {
+      loading: "Creating checkout link...",
+      success: "Checkout link created! Redirecting...",
+      error: "Failed to create checkout link",
     });
   };
 

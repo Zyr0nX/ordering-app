@@ -31,7 +31,7 @@ export const stripeRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { stripe, session, prisma } = ctx;
 
-      const [customerId, user, restaurant] = await Promise.all([
+      const [customerId, user, restaurant, food] = await Promise.all([
         getOrCreateStripeCustomerIdForUser({
           prisma,
           stripe,
@@ -47,7 +47,31 @@ export const stripeRouter = createTRPCRouter({
             id: input.restaurantId,
           },
         }),
+        prisma.food.findMany({
+          where: {
+            id: {
+              in: input.items.map((item) => item.id),
+            },
+          },
+        }),
       ]);
+
+      input.items.forEach((item) => {
+        const foodItem = food.find((food) => food.id === item.id);
+        if (!foodItem) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Food item does not exist",
+          });
+        }
+        if (foodItem.quantity < item.quantity) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Food item quantity is not available",
+          });
+        }
+      });
+      
       if (!customerId) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -160,7 +184,7 @@ export const stripeRouter = createTRPCRouter({
           },
         ],
         success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/checkout?id=${input.restaurantId}}`,
+        cancel_url: `${baseUrl}/checkout?id=${input.restaurantId}`,
       });
 
       if (!checkoutSession) {
