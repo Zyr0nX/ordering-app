@@ -3,15 +3,10 @@ import Loading from "../common/Loading";
 import PlaceAutoCompleteCombobox from "../common/PlaceAutoCompleteCombobox";
 import BluePencil from "../icons/BluePencil";
 import DropDownIcon from "../icons/DropDownIcon";
+import LocationIcon from "../icons/LocationIcon";
 import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Transition, Dialog, Listbox } from "@headlessui/react";
-import {
-  type User,
-  type CartItem,
-  type Food,
-  type FoodOptionItem,
-  type Restaurant,
-} from "@prisma/client";
+import { type User, type CartItem, type Food, type FoodOptionItem, type Restaurant } from "@prisma/client";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
@@ -19,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { z } from "zod";
 import { api } from "~/utils/api";
 import countries from "~/utils/countries.json";
+
 
 interface CheckoutBodyProps {
   user: User & {
@@ -74,8 +70,8 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     return null;
   });
 
-  const [lat, setLat] = useState<number | null>(user.latitude || null);
-  const [lng, setLng] = useState<number | null>(user.longitude || null);
+  const [latTemp, setLatTemp] = useState<number | null>(user.latitude || null);
+  const [lngTemp, setLngTemp] = useState<number | null>(user.longitude || null);
 
   const restaurant = user.cartItem[0]?.food.restaurant;
 
@@ -116,24 +112,27 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
   });
 
   const handleCheckout = async () => {
-    await toast.promise(stripeMutation.mutateAsync({
-      items: user.cartItem.map((item) => ({
-        id: item.foodId,
-        name: item.food.name,
-        description: item.foodOption.map((option) => option.name).join(", "),
-        image: item.food.image,
-        amount: item.quantity,
-        quantity: item.quantity,
-        price:
-          item.food.price +
-          item.foodOption.reduce((acc, item) => acc + item.price, 0),
-      })),
-      restaurantId: restaurant?.id as string,
-    }), {
-      loading: "Creating checkout link...",
-      success: "Checkout link created! Redirecting...",
-      error: "Failed to create checkout link",
-    });
+    await toast.promise(
+      stripeMutation.mutateAsync({
+        items: user.cartItem.map((item) => ({
+          id: item.foodId,
+          name: item.food.name,
+          description: item.foodOption.map((option) => option.name).join(", "),
+          image: item.food.image,
+          amount: item.quantity,
+          quantity: item.quantity,
+          price:
+            item.food.price +
+            item.foodOption.reduce((acc, item) => acc + item.price, 0),
+        })),
+        restaurantId: restaurant?.id as string,
+      }),
+      {
+        loading: "Creating checkout link...",
+        success: "Checkout link created! Redirecting...",
+        error: "Failed to create checkout link",
+      }
+    );
   };
 
   const utils = api.useContext();
@@ -156,17 +155,15 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
           return data;
         }
       );
-      setLat(newUser.latitude);
-      setLng(newUser.longitude);
     },
     onSettled: () => {
       void utils.user.getCart.invalidate();
     },
   });
 
-  const reverseGeocodeQuery = api.maps.getReverseGeocode.useQuery(
+  api.maps.getReverseGeocode.useQuery(
     {
-      query: `${lat as number},${lng as number}`,
+      query: `${latTemp as number},${lngTemp as number}`,
     },
     {
       onSuccess: (data) => {
@@ -220,7 +217,7 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     }
 
     if (!isInvalidForm) return;
-    await updateUserMutation.mutateAsync({
+    const user = await updateUserMutation.mutateAsync({
       name: name as string,
       address: placeAutocomplete.description,
       addressId: placeAutocomplete.place_id,
@@ -229,7 +226,8 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
         phonePrefix?.dialCode ? `(${phonePrefix?.dialCode}) ` : ""
       }${phoneNumber || ""}`,
     });
-    await reverseGeocodeQuery.refetch();
+    setLat(user.latitude);
+    setLng(user.longitude);
     setIsOpen(false);
     if (
       name &&
@@ -263,7 +261,10 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
     setPhoneNumber(formattedValue);
   };
 
-  api.maps.getDistanceMatrix.useQuery(
+  const [lat, setLat] = useState<number | null>(user.latitude || null);
+  const [lng, setLng] = useState<number | null>(user.longitude || null);
+
+  const distanceMatrixQuery = api.maps.getDistanceMatrix.useQuery(
     {
       origins: {
         lat: restaurant?.latitude as number,
@@ -275,10 +276,9 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
       },
     },
     {
-      enabled: !!lat && !!lng,
       onSuccess: (data) => {
+        console.log("here");
         if (!data) return;
-
         setShippingFee(Math.max(Math.round(data / 500) / 2, 5));
         setTotal(itemTotal + Math.max(Math.round(data / 500) / 2, 5));
       },
@@ -290,10 +290,11 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
 
   const handleCurrentAddress = () => {
     if (navigator.geolocation) {
+      console.log("here");
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        setLat(latitude);
-        setLng(longitude);
+        setLatTemp(latitude);
+        setLngTemp(longitude);
       });
     } else {
       alert("Geolocation is not supported by this browser.");
@@ -347,7 +348,9 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
                   key={cardItem.id}
                 >
                   <div className="flex justify-between font-bold md:text-xl">
-                    <p>{cardItem.food.name}</p>
+                    <p>
+                      {cardItem.food.name} ×{cardItem.quantity}
+                    </p>
                     <p>
                       $
                       {(
@@ -592,14 +595,22 @@ const CheckoutBody: React.FC<CheckoutBodyProps> = ({
                           )}
                         </div>
 
-                        <PlaceAutoCompleteCombobox
-                          placeAutocomplete={placeAutocomplete}
-                          setPlaceAutocomplete={setPlaceAutocomplete}
-                          isInvalidAddress={isInvalidAddress}
-                        />
-                        <button onClick={handleCurrentAddress}>
-                          Use your current address
-                        </button>
+                        <div className="flex gap-2">
+                          <div className="grow">
+                            <PlaceAutoCompleteCombobox
+                              placeAutocomplete={placeAutocomplete}
+                              setPlaceAutocomplete={setPlaceAutocomplete}
+                              isInvalidAddress={isInvalidAddress}
+                            />
+                          </div>
+
+                          <button
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-white"
+                            onClick={handleCurrentAddress}
+                          >
+                            <LocationIcon />
+                          </button>
+                        </div>
                       </div>
                       <div className="flex flex-col">
                         <label

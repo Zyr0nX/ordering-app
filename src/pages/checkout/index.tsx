@@ -74,6 +74,7 @@ export const getServerSideProps = async (
   });
 
   if (!user || !user.cartItem[0]) {
+    
     return {
       notFound: true,
     };
