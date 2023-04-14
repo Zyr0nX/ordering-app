@@ -1,4 +1,4 @@
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type inferProcedureOutput } from "@trpc/server";
 import {
   type GetServerSidePropsContext,
@@ -27,7 +27,7 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const ssg = createProxySSGHelpers({
+  const ssg = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({ session: session }),
     transformer: SuperJSON,

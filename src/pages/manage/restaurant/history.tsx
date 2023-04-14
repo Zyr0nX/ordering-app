@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type inferProcedureOutput } from "@trpc/server";
 import fuzzysort from "fuzzysort";
 import {
@@ -29,7 +29,7 @@ export const getServerSideProps = async (
       notFound: true,
     };
   }
-  const ssg = createProxySSGHelpers({
+  const ssg = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({
       session,
