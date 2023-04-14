@@ -7,8 +7,8 @@ import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webho
 
 const baseUrl =
   env.NODE_ENV === "development"
-    ? `http://localhost:3000`
-    : env.NEXTAUTH_URL;
+    ? "http://localhost:3000"
+    : env.SITE_URL;
 
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
@@ -246,17 +246,6 @@ export const stripeRouter = createTRPCRouter({
         return_url: `${baseUrl}/dashboard`,
         type: "account_onboarding",
       });
-
-      
-
-      // await prisma.restaurant.update({
-      //   where: {
-      //     id: input.restaurantId,
-      //   },
-      //   data: {
-      //     stripeAccountId: account.id,
-      //   },
-      // });
 
       return accountLink.url;
     }

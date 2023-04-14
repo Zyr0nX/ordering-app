@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+
 /**
  * Specify your server-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars.
@@ -36,6 +37,7 @@ const server = z.object({
   STRIPE_SECRET_KEY: z.string(),
   STRIPE_WEBHOOK_SECRET: z.string(),
   GOOGLE_MAPS_API_KEY: z.string(),
+  SITE_URL: z.string().url(),
 });
 
 /**
@@ -75,6 +77,7 @@ const processEnv = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+  SITE_URL: process.env.SITE_URL,
 };
 
 // Don't touch the part below
