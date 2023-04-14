@@ -1,10 +1,6 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { type inferProcedureOutput } from "@trpc/server";
-import {
-  type GetServerSidePropsContext,
-  type InferGetServerSidePropsType,
-  type NextPage,
-} from "next";
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -22,6 +18,7 @@ import { type AppRouter, appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
+
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -232,10 +229,10 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
         <div className="text-virparyasMainBlue m-4 md:m-6">
           <div className="mx-4 my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
-              {cart.items.map((cardItem) => (
+              {cart.items.map((cartItem) => (
                 <ItemCart
-                  cardItem={cardItem}
-                  key={cardItem.id}
+                  cartItem={cartItem}
+                  key={cartItem.id}
                   setIsLoading={setIsLoading}
                 />
               ))}
@@ -267,11 +264,12 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
 };
 
 interface ItemCartProps {
-  cardItem: inferProcedureOutput<AppRouter["cart"]["getCart"]>[number];
+  cartItem: inferProcedureOutput<AppRouter["cart"]["getCart"]>[number];
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
+const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
+  const cart = useCartStore((state) => state.cart);
   const removeCartItem = useCartStore((state) => state.removeCartItem);
   const updateCartItemQuantity = useCartStore(
     (state) => state.updateCartItemQuantity
@@ -282,12 +280,12 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
       setIsLoading(true);
     },
   });
-  const utils = api.useContext();
+
   const updateDebounce = useDebouncedCallback(async () => {
     await toast.promise(
       updateItemQuantityMutation.mutateAsync({
-        cartItemId: cardItem.id,
-        quantity: cardItem.quantity,
+        cartItemId: cartItem.id,
+        quantity: cartItem.quantity,
       }),
       {
         loading: "Updating...",
@@ -298,17 +296,55 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
     setIsLoading(false);
   }, 500);
 
+  const precalculateMaxQuantity = cartItem.food.quantity;
+
+  const MaxOption =
+    cartItem.quantity +
+    precalculateMaxQuantity -
+    cart
+      .filter((item) => {
+        return (
+          item.items.filter((i) => {
+            return i.food.id === cartItem.food.id;
+          }).length > 0
+        );
+      })
+      .map((item) =>
+        item.items
+          .filter((i) => {
+            return i.food.id === cartItem.food.id;
+          })
+          .reduce((a, b) => a + b.quantity, 0)
+      )[0] +
+    1;
+
+  console.log(
+    cart.filter((item) => {
+      return item.items.filter((i) => {
+        return i.food.id === cartItem.food.id;
+      }
+      ).length > 0;
+    }).map((item) =>
+      item.items
+        .filter((i) => {
+          return i.food.id === cartItem.food.id;
+        })
+        .reduce((a, b) => a + b.quantity, 0)
+    )
+  );
+
   const handleUpdateQuantity = async (quantity: number) => {
-    if (quantity === cardItem.quantity) return;
-    if (quantity === 0 && cardItem.quantity === 1) return;
+    if (quantity >= MaxOption) return;
+    if (quantity === cartItem.quantity) return;
+    if (quantity === 0 && cartItem.quantity === 1) return;
 
     if (quantity <= 0) {
-      updateCartItemQuantity(cardItem.id, 1);
+      updateCartItemQuantity(cartItem.id, 1);
       setIsLoading(true);
       await updateDebounce();
       return;
     }
-    updateCartItemQuantity(cardItem.id, quantity);
+    updateCartItemQuantity(cartItem.id, quantity);
     setIsLoading(true);
     await updateDebounce();
   };
@@ -317,9 +353,9 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
 
   const handleRemoveItem = async () => {
     setIsLoading(true);
-    removeCartItem(cardItem.id);
+    removeCartItem(cartItem.id);
     await toast.promise(
-      removeItemMutation.mutateAsync({ cartItemId: cardItem.id }),
+      removeItemMutation.mutateAsync({ cartItemId: cartItem.id }),
       {
         loading: "Removing...",
         success: "Removed!",
@@ -329,29 +365,33 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
     setIsLoading(false);
   };
 
+  
+  
+
+  
   const price =
-    (cardItem.food.price +
-      cardItem.foodOption
+    (cartItem.food.price +
+      cartItem.foodOption
         .map((option) => option.price)
         .reduce((a, b) => a + b, 0)) *
-    cardItem.quantity;
+    cartItem.quantity;
 
   return (
     <li className="marker:font-bold md:marker:text-lg">
       <div className="flex justify-between font-bold md:text-lg">
-        <p>{cardItem.food.name}</p>
+        <p>{cartItem.food.name}</p>
         <p>${price.toFixed(2)}</p>
       </div>
 
       <p className="my-1 text-sm font-light md:font-normal">
-        {cardItem.foodOption.map((option) => option.name).join(", ")}
+        {cartItem.foodOption.map((option) => option.name).join(", ")}
       </p>
       <div className="flex items-center gap-4">
         <div className="bg-virparyasBackground flex w-fit items-center rounded-lg text-sm font-medium">
           <button
             type="button"
             className="px-2 py-1"
-            onClick={() => void handleUpdateQuantity(cardItem.quantity - 1)}
+            onClick={() => void handleUpdateQuantity(cartItem.quantity - 1)}
           >
             -
           </button>
@@ -359,14 +399,14 @@ const ItemCart: React.FC<ItemCartProps> = ({ cardItem, setIsLoading }) => {
             type="number"
             className="w-8 bg-transparent text-center focus-within:outline-none"
             min={1}
-            max={Number(cardItem.food.quantity)}
-            value={cardItem.quantity}
+            max={MaxOption}
+            value={cartItem.quantity}
             onChange={(e) => void handleUpdateQuantity(Number(e.target.value))}
           />
           <button
             type="button"
             className="px-2 py-1"
-            onClick={() => void handleUpdateQuantity(cardItem.quantity + 1)}
+            onClick={() => void handleUpdateQuantity(cartItem.quantity + 1)}
           >
             +
           </button>

@@ -1,5 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import { Session } from "inspector";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -8,7 +7,7 @@ import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webho
 
 const baseUrl =
   env.NODE_ENV === "development"
-    ? `http://${"localhost:3000"}`
+    ? `http://localhost:3000`
     : env.NEXTAUTH_URL;
 
 export const stripeRouter = createTRPCRouter({

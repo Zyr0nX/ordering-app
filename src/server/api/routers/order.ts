@@ -237,7 +237,6 @@ export const orderRouter = createTRPCRouter({
       let timesRun = 0;
       const intervalId = setIntervalAsync(async () => {
         timesRun += 1;
-        console.log(timesRun);
         // stop after 30 times
         if (timesRun >= 30) {
           const [query] = await Promise.all([
