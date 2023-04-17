@@ -40,11 +40,12 @@ export const mapsRouter = createTRPCRouter({
   getReverseGeocode: protectedProcedure
     .input(
       z.object({
-        query: z.string().nonempty(),
+        lat: z.number(),
+        lng: z.number(),
       })
     )
-    .query(async ({ ctx, input }) => {
-      const cached = await redis.get(`reverseGeocode?query=${input.query}`);
+    .mutation(async ({ ctx, input }) => {
+      const cached = await redis.get(`reverseGeocode?query=${input.lat},${input.lng}}`);
 
       if (cached) {
         return cached as GeocodeResult;
@@ -52,13 +53,13 @@ export const mapsRouter = createTRPCRouter({
 
       const reverseGeocode = await ctx.maps.reverseGeocode({
         params: {
-          latlng: input.query,
+          latlng: `${input.lat},${input.lng}`,
           key: env.GOOGLE_MAPS_API_KEY,
         },
       });
 
       await redis.set(
-        `placeAutocomplete?query=${input.query}`,
+        `placeAutocomplete?query=${input.lat},${input.lng}`,
         reverseGeocode.data.results[0],
         { ex: 60 * 60 * 24 * 365 }
       );

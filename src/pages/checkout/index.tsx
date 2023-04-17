@@ -22,7 +22,7 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 
 
 export const getServerSideProps = async (
