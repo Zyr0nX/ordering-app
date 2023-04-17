@@ -28,7 +28,7 @@ const config = {
       },
       {
         protocol: "https",
-        hostname: "via.placeholder.com",
+        hostname: "flagsapi.com",
       },
       {
         protocol: "https",

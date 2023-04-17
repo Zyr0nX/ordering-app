@@ -31,6 +31,7 @@
     "cloudinary": "^1.34.0",
     "formik": "^2.2.9",
     "fuzzysort": "^2.0.4",
+    "libphonenumber-js": "^1.10.26",
     "micro": "^10.0.1",
     "next": "13.2.3",
     "next-auth": "^4.18.3",
@@ -45,6 +46,7 @@
     "superjson": "^1.12.2",
     "use-debounce": "^9.0.3",
     "zod": "^3.18.0",
+    "zod-formik-adapter": "^1.2.0",
     "zustand": "^4.3.7"
   },
   "devDependencies": {

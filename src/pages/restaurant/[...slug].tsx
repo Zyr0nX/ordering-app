@@ -36,13 +36,13 @@ export const getServerSideProps = async (
   }
 
   const session = await getServerAuthSession(context);
-  const ssg = createServerSideHelpers({
+  const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({ session: session }),
     transformer: superjson,
   });
   if (!session) {
-    const restaurant = await ssg.restaurant.get.fetch({
+    const restaurant = await helpers.restaurant.get.fetch({
       id: context.query.slug[1],
     });
     if (!restaurant) {
@@ -53,15 +53,15 @@ export const getServerSideProps = async (
 
     return {
       props: {
-        trpcState: ssg.dehydrate(),
+        trpcState: helpers.dehydrate(),
         id: context.query.slug[1],
       },
     };
   }
 
   const [restaurant] = await Promise.all([
-    ssg.restaurant.get.fetch({ id: context.query.slug[1] }),
-    ssg.user.getUser.prefetch(),
+    helpers.restaurant.get.fetch({ id: context.query.slug[1] }),
+    helpers.user.getUser.prefetch(),
   ]);
 
   if (!restaurant) {
@@ -72,7 +72,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      trpcState: ssg.dehydrate(),
+      trpcState: helpers.dehydrate(),
       id: context.query.slug[1],
     },
   };

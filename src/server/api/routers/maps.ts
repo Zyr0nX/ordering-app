@@ -1,24 +1,22 @@
-import {
-  type GeocodeResult,
-  type PlaceAutocompleteResult,
-} from "@googlemaps/google-maps-services-js";
+import { type GeocodeResult, type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { redis } from "~/server/cache";
 
+
 export const mapsRouter = createTRPCRouter({
   getAutocomplete: protectedProcedure
     .input(
       z.object({
-        query: z.string(),
+        query: z.string().nonempty(),
       })
     )
     .query(async ({ ctx, input }) => {
       const cached = await redis.get(`placeAutocomplete?query=${input.query}`);
 
       if (cached) {
-        return cached as PlaceAutocompleteResult[];
+        return cached as Pick<PlaceAutocompleteResult, "description" | "place_id">[];
       }
 
       const autocomplete = await ctx.maps.placeAutocomplete({
@@ -28,18 +26,21 @@ export const mapsRouter = createTRPCRouter({
         },
       });
 
-      await redis.set(
-        `placeAutocomplete?query=${input.query}`,
-        autocomplete.data.predictions,
-        { ex: 60 * 60 * 24 * 365 }
-      );
+      const data = autocomplete.data.predictions.map((prediction) => ({
+        description: prediction.description,
+        place_id: prediction.place_id,
+      }));
 
-      return autocomplete.data.predictions;
+      void redis.set(`placeAutocomplete?query=${input.query}`, data, {
+        ex: 60 * 60 * 24 * 365,
+      });
+
+      return data;
     }),
   getReverseGeocode: protectedProcedure
     .input(
       z.object({
-        query: z.string(),
+        query: z.string().nonempty(),
       })
     )
     .query(async ({ ctx, input }) => {

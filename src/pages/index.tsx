@@ -32,21 +32,21 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const ssg = createServerSideHelpers({
+  const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({ session: session }),
     transformer: superjson,
   });
 
   await Promise.all([
-    ssg.cuisine.getAll.prefetch(),
-    ssg.restaurant.getAllApproved.prefetch(),
-    ssg.user.getUser.prefetch(),
+    helpers.cuisine.getAll.prefetch(),
+    helpers.restaurant.getAllApproved.prefetch(),
+    helpers.user.getUser.prefetch(),
   ]);
 
   return {
     props: {
-      trpcState: ssg.dehydrate(),
+      trpcState: helpers.dehydrate(),
     },
   };
 };

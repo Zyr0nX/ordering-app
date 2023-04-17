@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest, event: NextFetchEvent) {
   }
 
   const { nextUrl: url, geo } = request;
-  const country = geo?.country || "";
+  const country = geo?.country || "US";
   url.searchParams.set("country", country);
   return NextResponse.rewrite(url);
 }

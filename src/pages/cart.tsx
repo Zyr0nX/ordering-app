@@ -27,7 +27,7 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const session = await getServerAuthSession(context);
-  const ssg = createServerSideHelpers({
+  const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({ session: session }),
     transformer: SuperJSON,
@@ -42,11 +42,11 @@ export const getServerSideProps = async (
     };
   }
 
-  await ssg.cart.getCart.prefetch();
+  await helpers.cart.getCart.prefetch();
 
   return {
     props: {
-      trpcState: ssg.dehydrate(),
+      trpcState: helpers.dehydrate(),
     },
   };
 };

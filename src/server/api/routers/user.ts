@@ -54,11 +54,11 @@ export const userRouter = createTRPCRouter({
   updateInfo: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
-        address: z.string(),
-        addressId: z.string(),
+        name: z.string().nonempty().min(2).max(191),
+        address: z.string().nonempty().min(2).max(191),
+        addressId: z.string().nonempty().min(2).max(191),
         additionalAddress: z.string().nullish(),
-        phoneNumber: z.string(),
+        phoneNumber: z.string().nonempty().min(2).max(191),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -111,29 +111,54 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      const cart = await ctx.prisma.user.findUnique({
+      return await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,
         },
-        include: {
+        select: {
           cartItem: {
             where: {
               food: {
                 restaurantId: input.restaurantId,
               },
             },
-            include: {
+            select: {
               food: {
-                include: {
-                  restaurant: true,
+                select: {
+                  restaurant: {
+                    select: {
+                      id: true,
+                      name: true,
+                      address: true,
+                      latitude: true,
+                      longitude: true,
+                    },
+                  },
+                  name: true,
+                  price: true,
+                  image: true,
                 },
               },
-              foodOption: true,
+              foodOption: {
+                select: {
+                  name: true,
+                  price: true,
+                }
+              },
+              id: true,
+              quantity: true,
+              foodId: true,
             },
           },
+          name: true,
+          address: true,
+          addressId: true,
+          additionalAddress: true,
+          phoneNumber: true,
+          latitude: true,
+          longitude: true,
         },
       });
-      return cart;
     }),
   getInfomation: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.prisma.user.findUnique({

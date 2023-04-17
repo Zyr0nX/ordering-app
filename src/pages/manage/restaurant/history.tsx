@@ -29,7 +29,7 @@ export const getServerSideProps = async (
       notFound: true,
     };
   }
-  const ssg = createServerSideHelpers({
+  const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: createInnerTRPCContext({
       session,
@@ -37,11 +37,11 @@ export const getServerSideProps = async (
     transformer: superjson,
   });
 
-  await ssg.order.getShipperOrderHistory.prefetch();
+  await helpers.order.getShipperOrderHistory.prefetch();
 
   return {
     props: {
-      trpcState: ssg.dehydrate(),
+      trpcState: helpers.dehydrate(),
     },
   };
 };
