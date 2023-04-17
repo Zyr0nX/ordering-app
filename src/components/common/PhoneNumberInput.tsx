@@ -1,8 +1,8 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { getCountries, getCountryCallingCode, type CountryCode, formatIncompletePhoneNumber } from "libphonenumber-js/min";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
 
@@ -21,11 +21,9 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const [field, meta, helper] = useField<string>(name);
   const router = useRouter();
   const country_code = router.query.country;
-
   const [selected, setSelected] = React.useState<CountryCode>(
     country_code as CountryCode
   );
-
   const prevSelectedRef = React.useRef<CountryCode>(selected);
   const helperRef = React.useRef(helper);
   useEffect(() => {
@@ -38,11 +36,11 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
 
   const format = (value: string) => {
     const phoneNumber = formatIncompletePhoneNumber(value, selected);
-    if (phoneNumber.startsWith(`+`)) {
-      helper.setValue(phoneNumber);
+    if (!phoneNumber.startsWith(`+${getCountryCallingCode(selected)} `)) {
+      helper.setValue(`+${getCountryCallingCode(selected)} `);
       return;
     }
-    helper.setValue(`+${getCountryCallingCode(selected)} ${phoneNumber}`);
+    helper.setValue(phoneNumber);
   };
 
   return (
@@ -52,7 +50,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
           {label}
         </label>
         {meta.error && meta.touched && (
-          <p className="text-virparyasRed text-xs">{meta.error}</p>
+          <p className="text-xs text-virparyasRed">{meta.error}</p>
         )}
       </div>
 
@@ -63,7 +61,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
               <div className="flex gap-2">
                 <Listbox.Button
                   className={`relative h-10 w-24 rounded-xl bg-white px-4 text-left ${
-                    open ? "ring-virparyasMainBlue ring-2" : ""
+                    open ? "ring-2 ring-virparyasMainBlue" : ""
                   }`}
                 >
                   <span className="truncate">{selected}</span>
@@ -75,9 +73,9 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
                   <input
                     type="text"
                     id={id}
-                    className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                    className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
                       meta.error && meta.touched
-                        ? "ring-virparyasRed ring-2"
+                        ? "ring-2 ring-virparyasRed"
                         : ""
                     }`}
                     {...field}
@@ -99,7 +97,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
                       <Listbox.Option
                         key={countryIdx}
                         className={({ active }) =>
-                          `text-viparyasDarkBlue relative cursor-default select-none ${
+                          `relative cursor-default select-none text-viparyasDarkBlue ${
                             active ? "bg-[#E9E9FF]" : "text-gray-900"
                           }`
                         }

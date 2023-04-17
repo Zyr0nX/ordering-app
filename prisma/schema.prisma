@@ -44,7 +44,7 @@ model User {
   emailVerified     DateTime?
   image             String?
   role              Role
-  address           String?
+  address           String?     @db.Text
   addressId         String?
   latitude          Float?      @db.Double
   longitude         Float?      @db.Double
@@ -74,7 +74,7 @@ model VerificationToken {
 model Restaurant {
   id                String     @id @default(cuid())
   name              String
-  address           String
+  address           String     @db.Text
   addressId         String
   latitude          Float      @db.Double
   longitude         Float      @db.Double
@@ -204,13 +204,13 @@ model Order {
   id                     Int         @id @default(autoincrement())
   userId                 String
   user                   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userAddress            String
+  userAddress            String      @db.Text
   userAddressId          String
   userLatitude           Float       @db.Double
   userLongitude          Float       @db.Double
   restaurantId           String
   restaurant             Restaurant  @relation(fields: [restaurantId], references: [id])
-  restaurantAddress      String
+  restaurantAddress      String      @db.Text
   restaurantAddressId    String
   restaurantLatitude     Float       @db.Double
   restaurantLongitude    Float       @db.Double

@@ -1,15 +1,18 @@
-import { Transition, Dialog, Listbox } from "@headlessui/react";
+import { Transition, Dialog } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
-import { Formik, Form, Field } from "formik";
-import { type InferGetServerSidePropsType, type GetServerSidePropsContext, type NextPage } from "next";
-import Image from "next/image";
+import { Formik, Form } from "formik";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
+import {
+  type InferGetServerSidePropsType,
+  type GetServerSidePropsContext,
+  type NextPage,
+} from "next";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import { z } from "zod";
-import { toFormikValidate } from "zod-formik-adapter";
 import { create } from "zustand";
 import CommonButton from "~/components/common/CommonButton";
 import Input from "~/components/common/CommonInput";
@@ -23,7 +26,6 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { type RouterOutputs, api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -55,15 +57,15 @@ export const getServerSideProps = async (
     };
   }
 
-  const user = await helpers.user.getCart.fetch({ restaurantId: id });
+  const cart = await helpers.user.getCart.fetch({ restaurantId: id });
 
-  if (!user || !user.cartItem[0]) {
+  if (!cart || !cart.cartItem[0]) {
     return {
       notFound: true,
     };
   }
 
-  if (!user.latitude || !user.longitude) {
+  if (!cart.latitude || !cart.longitude) {
     return {
       props: {
         trpcState: helpers.dehydrate(),
@@ -73,55 +75,52 @@ export const getServerSideProps = async (
     };
   }
 
-  const restaurant = user.cartItem[0].food.restaurant;
-  await helpers.maps.getDistanceMatrix.prefetch({
+  const restaurant = cart.cartItem[0].food.restaurant;
+  const distance = await helpers.maps.getDistanceMatrixQuery.fetch({
     origins: {
       lat: restaurant.latitude,
       lng: restaurant.longitude,
     },
     destinations: {
-      lat: user.latitude,
-      lng: user.longitude,
+      lat: cart.latitude,
+      lng: cart.longitude,
     },
   });
   return {
     props: {
       trpcState: helpers.dehydrate(),
-      country: country,
-      id: id,
+      cart: cart,
+      distance: distance,
     },
   };
 };
 
 interface CheckoutState {
   cart: RouterOutputs["user"]["getCart"];
-  shippingFee: number;
+  shippingFee: number | null;
 }
 
-const checkoutStore = create<CheckoutState>((set) => ({
+const useCheckoutStore = create<CheckoutState>(() => ({
   cart: null,
-  shippingFee: 0,
+  shippingFee: null,
 }));
 
 const Checkout: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ id }) => {
-  const { data: cartData } = api.user.getCart.useQuery(
-    {
-      restaurantId: id,
-    },
-    {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-    }
-  );
+> = ({ cart, distance }) => {
+  useEffect(() => {
+    useCheckoutStore.setState({
+      cart: cart,
+    });
+  }, [cart]);
 
   useEffect(() => {
-    checkoutStore.setState({
-      cart: cartData,
-    });
-  }, []);
+    if (distance) {
+      useCheckoutStore.setState({
+        shippingFee: Math.max(Math.round(distance / 500) / 2, 5),
+      });
+    }
+  }, [distance]);
 
   return (
     <Guest>
@@ -143,6 +142,7 @@ const CheckoutBody: React.FC = () => {
 };
 
 const ShippingAddress: React.FC = () => {
+  const cart = useCheckoutStore((state) => state.cart);
   const [isOpen, setIsOpen] = useState(false);
 
   const router = useRouter();
@@ -181,6 +181,9 @@ const ShippingAddress: React.FC = () => {
       void utils.user.getCart.invalidate();
     },
   });
+
+  const distanceMatrixMutation =
+    api.maps.getDistanceMatrixMutation.useMutation();
 
   if (!user) return null;
   return (
@@ -254,7 +257,7 @@ const ShippingAddress: React.FC = () => {
                         },
                         additionalAddress: user.additionalAddress,
                       }}
-                      onSubmit={(values) => {
+                      onSubmit={async (values) => {
                         if (updateUserMutation.isLoading) return;
                         if (
                           !values.name ||
@@ -263,25 +266,90 @@ const ShippingAddress: React.FC = () => {
                           !values.address.place_id
                         )
                           return;
-                        updateUserMutation.mutate({
-                          name: values.name,
-                          phoneNumber: values.phoneNumber,
-                          address: values.address.description,
-                          addressId: values.address.place_id,
-                          additionalAddress: values.additionalAddress,
-                        });
+                        await toast.promise(
+                          updateUserMutation.mutateAsync(
+                            {
+                              name: values.name,
+                              phoneNumber: values.phoneNumber,
+                              address: values.address.description,
+                              addressId: values.address.place_id,
+                              additionalAddress: values.additionalAddress,
+                            },
+                            {
+                              onSuccess: (data) => {
+                                if (
+                                  !cart ||
+                                  !cart.cartItem[0] ||
+                                  !data.latitude ||
+                                  !data.longitude
+                                ) {
+                                  return;
+                                }
+                                const restaurant =
+                                  cart.cartItem[0].food.restaurant;
+                                distanceMatrixMutation.mutate(
+                                  {
+                                    origins: {
+                                      lat: restaurant.latitude,
+                                      lng: restaurant.longitude,
+                                    },
+                                    destinations: {
+                                      lat: data.latitude,
+                                      lng: data.longitude,
+                                    },
+                                  },
+                                  {
+                                    onSuccess: (data) => {
+                                      if (!data) return;
+                                      useCheckoutStore.setState({
+                                        shippingFee: Math.max(
+                                          Math.round(data / 500) / 2,
+                                          5
+                                        ),
+                                      });
+                                    },
+                                  }
+                                );
+                              },
+                              onSettled: () => {
+                                setIsOpen(false);
+                              },
+                            }
+                          ),
+                          {
+                            loading: "Updating...",
+                            success: "Updated",
+                            error: "Failed to update",
+                          }
+                        );
                       }}
-                      validate={toFormikValidate(
-                        z.object({
-                          name: z.string().nonempty("Name is required"),
-                          phoneNumber: z.string().nonempty(),
-                          address: z.object({
-                            description: z.string().nonempty(),
-                            place_id: z.string().nonempty(),
-                          }),
-                          additionalAddress: z.string().nullish(),
-                        })
-                      )}
+                      validate={(values) => {
+                        const errors: {
+                          name?: string;
+                          phoneNumber?: string;
+                          address?: string;
+                        } = {};
+                        if (!z.string().min(1).safeParse(values.name).success) {
+                          errors.name = "Name is required";
+                        }
+                        if (
+                          !z.string().max(191).safeParse(values.name).success
+                        ) {
+                          errors.name = "Name is too long";
+                        }
+                        if (!isPossiblePhoneNumber(values.phoneNumber)) {
+                          errors.phoneNumber = "Invalid phone number";
+                        }
+                        if (
+                          !z
+                            .string()
+                            .min(1)
+                            .safeParse(values.address.description).success
+                        ) {
+                          errors.name = "Address is required";
+                        }
+                        return errors;
+                      }}
                     >
                       <Form className="grid grid-cols-1 gap-4">
                         <Input type="text" label="* Name:" name="name" />
@@ -338,9 +406,8 @@ const Receipt: React.FC = () => {
     },
   });
   const router = useRouter();
-  const cart = checkoutStore((state) => state.cart);
-  const shippingFee = checkoutStore((state) => state.shippingFee);
-
+  const cart = useCheckoutStore((state) => state.cart);
+  const shippingFee = useCheckoutStore((state) => state.shippingFee);
 
   if (!cart || !cart.cartItem[0]) return null;
 
@@ -355,7 +422,7 @@ const Receipt: React.FC = () => {
         item.quantity,
     0
   );
-  const total = itemTotal + shippingFee;
+  const total = itemTotal + (shippingFee || 0);
 
   const handleCheckout = async () => {
     await toast.promise(

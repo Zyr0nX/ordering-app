@@ -1,12 +1,11 @@
 import LocationIcon from "../icons/LocationIcon";
 import Loading from "./Loading";
-import { type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
 import { Combobox, Transition } from "@headlessui/react";
-import { useField, type FieldHookConfig } from "formik";
-import { Fragment, HtmlHTMLAttributes, useRef, useState } from "react";
+import { useField } from "formik";
+import { Fragment, type HtmlHTMLAttributes, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useDebounce } from "use-debounce";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 
 interface PlaceAutoCompleteComboboxProps
   extends HtmlHTMLAttributes<HTMLInputElement> {
@@ -62,35 +61,38 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
     setIsSearchLoading(true);
   };
 
+  function getPosition(): Promise<GeolocationPosition> {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  }
+
   const handleCurrentAddress = async () => {
     if (navigator.geolocation) {
       setIsReverseGeocodeLoading(true);
-      let lat: number;
-      let lng: number;
-      navigator.geolocation.getCurrentPosition((position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-      });
       await toast.promise(
-        reverseGeocodeMutation.mutateAsync(
-          {
-            lat: lat,
-            lng,
-          },
-          {
-            onSuccess: (data) => {
-              if (data) {
-                helper.setValue({
-                  description: data.formatted_address,
-                  place_id: data.place_id,
-                });
-              }
+        (async () => {
+          const { coords } = await getPosition();
+          await reverseGeocodeMutation.mutateAsync(
+            {
+              lat: coords.latitude,
+              lng: coords.longitude,
             },
-            onSettled: () => {
-              setIsReverseGeocodeLoading(false);
-            },
-          }
-        ),
+            {
+              onSuccess: (data) => {
+                if (data) {
+                  helper.setValue({
+                    description: data.formatted_address,
+                    place_id: data.place_id,
+                  });
+                }
+              },
+              onSettled: () => {
+                setIsReverseGeocodeLoading(false);
+              },
+            }
+          );
+        })(),
         {
           loading: "Getting your current address...",
           success: "Got your current address!",
@@ -109,7 +111,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
           {label}
         </label>
         {meta.error && meta.touched && (
-          <p className="text-virparyasRed text-xs">{meta.error}</p>
+          <p className="text-xs text-virparyasRed">{meta.error}</p>
         )}
       </div>
       <div className="flex gap-2">
@@ -130,8 +132,8 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
           >
             <div className="relative">
               <Combobox.Input
-                className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                  meta.error && meta.touched ? "ring-virparyasRed ring-2" : ""
+                className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                  meta.error && meta.touched ? "ring-2 ring-virparyasRed" : ""
                 }`}
                 displayValue={() => field.value.description || ""}
                 onChange={(e) => handleSearch(e.target.value)}
@@ -149,7 +151,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
                 <Combobox.Options className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                   {isSearchLoading ? (
                     <div className="relative flex h-32 items-center justify-center">
-                      <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
+                      <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
                     </div>
                   ) : places.length === 0 && query !== "" ? (
                     <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
@@ -160,7 +162,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
                       <Combobox.Option
                         key={place.place_id}
                         className={({ active }) =>
-                          `text-viparyasDarkBlue relative cursor-default select-none ${
+                          `relative cursor-default select-none text-viparyasDarkBlue ${
                             active ? "bg-[#E9E9FF]" : "text-gray-900"
                           }`
                         }
@@ -197,10 +199,10 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
         <button
           type="button"
           className="flex h-10 w-10 items-center justify-center rounded-xl bg-white"
-          onClick={handleCurrentAddress}
+          onClick={() => void handleCurrentAddress()}
         >
           {isReverseGeocodeLoading ? (
-            <Loading className="fill-virparyasMainBlue h-6 w-6 animate-spin text-gray-200" />
+            <Loading className="h-6 w-6 animate-spin fill-virparyasMainBlue text-gray-200" />
           ) : (
             <LocationIcon />
           )}
