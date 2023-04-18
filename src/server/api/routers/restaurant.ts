@@ -1,23 +1,20 @@
 import { type GeocodeResult } from "@googlemaps/google-maps-services-js";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure } from "~/server/api/trpc";
+
 
 export const restaurantRouter = createTRPCRouter({
   registration: protectedProcedure
     .input(
       z.object({
-        restaurantName: z.string(),
-        address: z.string(),
-        addressId: z.string(),
+        restaurantName: z.string().nonempty().max(191),
+        address: z.string().nonempty(),
+        addressId: z.string().nonempty(),
         additionalAddress: z.string().nullish(),
-        firstName: z.string(),
-        lastName: z.string(),
-        phoneNumber: z.string(),
+        firstName: z.string().nonempty().max(191),
+        lastName: z.string().nonempty().max(191),
+        phoneNumber: z.string().nonempty().max(191),
         cuisineId: z.string().cuid(),
       })
     )
@@ -165,8 +162,8 @@ export const restaurantRouter = createTRPCRouter({
                 },
               },
             },
-          }
-        }
+          },
+        },
       });
       return restaurant;
     }),

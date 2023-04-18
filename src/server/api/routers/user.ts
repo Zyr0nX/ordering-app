@@ -54,11 +54,11 @@ export const userRouter = createTRPCRouter({
   updateInfo: protectedProcedure
     .input(
       z.object({
-        name: z.string().nonempty().min(2).max(191),
-        address: z.string().nonempty().min(2).max(191),
-        addressId: z.string().nonempty().min(2).max(191),
+        name: z.string().nonempty().nonempty().max(191),
+        address: z.string().nonempty().nonempty(),
+        addressId: z.string().nonempty().nonempty().max(191),
         additionalAddress: z.string().nullish(),
-        phoneNumber: z.string().nonempty().min(2).max(191),
+        phoneNumber: z.string().nonempty().nonempty().max(191),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -143,7 +143,7 @@ export const userRouter = createTRPCRouter({
                 select: {
                   name: true,
                   price: true,
-                }
+                },
               },
               id: true,
               quantity: true,
@@ -164,6 +164,13 @@ export const userRouter = createTRPCRouter({
     const user = await ctx.prisma.user.findUnique({
       where: {
         id: ctx.session.user.id,
+      },
+      select: {
+        name: true,
+        address: true,
+        addressId: true,
+        additionalAddress: true,
+        phoneNumber: true,
       },
     });
     return user;

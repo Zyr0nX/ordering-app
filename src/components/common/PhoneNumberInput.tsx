@@ -1,7 +1,6 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
-import { isPossiblePhoneNumber } from "libphonenumber-js";
 import { getCountries, getCountryCallingCode, type CountryCode, formatIncompletePhoneNumber } from "libphonenumber-js/min";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
@@ -37,6 +36,10 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const format = (value: string) => {
     const phoneNumber = formatIncompletePhoneNumber(value, selected);
     if (!phoneNumber.startsWith(`+${getCountryCallingCode(selected)} `)) {
+      if (value.length <= 1) {
+        helper.setValue(`+${getCountryCallingCode(selected)} ${value}`);
+        return;
+      }
       helper.setValue(`+${getCountryCallingCode(selected)} `);
       return;
     }

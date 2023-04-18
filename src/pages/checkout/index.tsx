@@ -1,7 +1,7 @@
 import { Transition, Dialog } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Formik, Form } from "formik";
-import { isPossiblePhoneNumber } from "libphonenumber-js";
+import { isPossiblePhoneNumber } from "libphonenumber-js/min";
 import {
   type InferGetServerSidePropsType,
   type GetServerSidePropsContext,
@@ -18,7 +18,7 @@ import CommonButton from "~/components/common/CommonButton";
 import Input from "~/components/common/CommonInput";
 import Loading from "~/components/common/Loading";
 import PhoneNumberInput from "~/components/common/PhoneNumberInput";
-import PlaceAutoCompleteCombobox from "~/components/common/TestPlaceAutoComplete";
+import PlaceAutoCompleteCombobox from "~/components/common/PlaceAutoCompleteCombobox";
 import BluePencil from "~/components/icons/BluePencil";
 import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
@@ -329,7 +329,7 @@ const ShippingAddress: React.FC = () => {
                           phoneNumber?: string;
                           address?: string;
                         } = {};
-                        if (!z.string().min(1).safeParse(values.name).success) {
+                        if (!z.string().min(2).safeParse(values.name).success) {
                           errors.name = "Name is required";
                         }
                         if (
@@ -343,7 +343,7 @@ const ShippingAddress: React.FC = () => {
                         if (
                           !z
                             .string()
-                            .min(1)
+                            .min(2)
                             .safeParse(values.address.description).success
                         ) {
                           errors.name = "Address is required";
