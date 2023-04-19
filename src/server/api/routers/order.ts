@@ -2,15 +2,10 @@ import { TRPCError } from "@trpc/server";
 import { env } from "process";
 import { setIntervalAsync, clearIntervalAsync } from "set-interval-async";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-  restaurantProtectedProcedure,
-  shipperProtectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure, restaurantProtectedProcedure, shipperProtectedProcedure } from "~/server/api/trpc";
 import { transporter } from "~/server/email";
 import haversine from "~/utils/haversine";
+
 
 export const orderRouter = createTRPCRouter({
   getPlacedAndPreparingOrders: restaurantProtectedProcedure.query(
@@ -497,25 +492,55 @@ export const orderRouter = createTRPCRouter({
         },
       });
       return orders;
-    }),
-  getShipperOrderHistory: shipperProtectedProcedure.query(
-    async ({ ctx }) => {
-      const orders = await ctx.prisma.order.findMany({
-        where: {
-          shipper: {
-            userId: ctx.session.user.id,
-          },
-          status: {
-            in: ["DELIVERED"],
-          },
-        },
-        include: {
-          user: true,
-          orderFood: true,
-        },
-      });
-      return orders;
     }
   ),
-
+  getShipperOrderHistory: shipperProtectedProcedure.query(async ({ ctx }) => {
+    const orders = await ctx.prisma.order.findMany({
+      where: {
+        shipper: {
+          userId: ctx.session.user.id,
+        },
+        status: {
+          in: ["DELIVERED"],
+        },
+      },
+      include: {
+        user: true,
+        orderFood: true,
+      },
+    });
+    return orders;
+  }),
+  getOrderHistoryForUser: protectedProcedure.query(async ({ ctx }) => {
+    const orders = await ctx.prisma.order.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      select: {
+        orderFood: {
+          select: {
+            id: true,
+            foodName: true,
+            foodOption: true,
+            price: true,
+          },
+        },
+        restaurant: {
+          select: {
+            name: true,
+            address: true,
+            image: true,
+          },
+        },
+        id: true,
+        status: true,
+        shippingFee: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return orders;
+  }),
 });
