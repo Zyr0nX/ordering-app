@@ -38,5 +38,3 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-
-tailwind.config.ts

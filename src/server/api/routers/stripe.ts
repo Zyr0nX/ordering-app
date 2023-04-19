@@ -4,34 +4,20 @@ import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
 
-
 const baseUrl =
-  env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : env.SITE_URL;
+  env.NODE_ENV === "development" ? "http://localhost:3000" : env.SITE_URL;
 
 export const stripeRouter = createTRPCRouter({
   createCheckoutSession: protectedProcedure
     .input(
       z.object({
-        items: z.array(
-          z.object({
-            id: z.string().cuid(),
-            name: z.string(),
-            description: z.string(),
-            image: z.string().url(),
-            amount: z.number(),
-            quantity: z.number(),
-            price: z.number(),
-          })
-        ),
         restaurantId: z.string().cuid(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { stripe, session, prisma } = ctx;
 
-      const [customerId, user, restaurant, food] = await Promise.all([
+      const [customerId, user, restaurant, items] = await Promise.all([
         getOrCreateStripeCustomerIdForUser({
           prisma,
           stripe,
@@ -47,31 +33,29 @@ export const stripeRouter = createTRPCRouter({
             id: input.restaurantId,
           },
         }),
-        prisma.food.findMany({
+        prisma.cartItem.findMany({
           where: {
-            id: {
-              in: input.items.map((item) => item.id),
+            userId: session.user?.id,
+            food: {
+              restaurantId: input.restaurantId,
             },
+          },
+          include: {
+            food: true,
+            foodOption: true,
           },
         }),
       ]);
 
-      input.items.forEach((item) => {
-        const foodItem = food.find((food) => food.id === item.id);
-        if (!foodItem) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Food item does not exist",
-          });
-        }
-        if (foodItem.quantity < item.quantity) {
+      items.forEach((item) => {
+        if (item.food.quantity < item.quantity) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Food item quantity is not available",
           });
         }
       });
-      
+
       if (!customerId) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -107,7 +91,7 @@ export const stripeRouter = createTRPCRouter({
         });
       }
 
-      let distance;
+      let distance: number | undefined;
 
       const cached = await ctx.redis.get(
         `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`
@@ -146,8 +130,14 @@ export const stripeRouter = createTRPCRouter({
           { ex: 60 * 60 * 24 * 365 }
         );
 
-        distance = distanceMatrix.data.rows[0]?.elements[0]?.distance
-          .value as number;
+        distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
+      }
+
+      if (!distance) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not calculate distance",
+        });
       }
 
       const checkoutSession = await stripe.checkout.sessions.create({
@@ -159,15 +149,22 @@ export const stripeRouter = createTRPCRouter({
         client_reference_id: session.user?.id,
         payment_method_types: ["card"],
         mode: "payment",
-        line_items: input.items.map((item) => ({
+        line_items: items.map((item) => ({
           price_data: {
             currency: "usd",
             product_data: {
-              name: item.name,
-              description: item.description ? item.description : undefined,
-              images: item.image ? [item.image] : undefined,
+              name: item.food.name,
+              description: item.foodOption
+                .map((option) => option.name)
+                .join(", ")
+                ? item.foodOption.map((option) => option.name).join(", ")
+                : undefined,
+              images: item.food.image ? [item.food.image] : undefined,
+              metadata: {
+                foodId: item.foodId,
+              },
             },
-            unit_amount: parseInt((item.price * 100).toFixed(0)),
+            unit_amount: parseInt((item.food.price * 100).toFixed(0)),
           },
           quantity: item.quantity,
         })),
@@ -177,7 +174,7 @@ export const stripeRouter = createTRPCRouter({
               display_name: "Shipping fee",
               type: "fixed_amount",
               fixed_amount: {
-                amount: (Math.max(Math.round(distance / 500) / 2), 5) * 100,
+                amount: Math.max(Math.round(distance / 500) / 2, 5) * 100,
                 currency: "usd",
               },
             },
@@ -213,8 +210,8 @@ export const stripeRouter = createTRPCRouter({
       }
       return checkoutSession;
     }),
-  createRestaurantConnectedAccount: protectedProcedure
-    .mutation(async ({ ctx, input }) => {
+  createRestaurantConnectedAccount: protectedProcedure.mutation(
+    async ({ ctx, input }) => {
       const { stripe, prisma } = ctx;
 
       const restaurant = await prisma.restaurant.findUnique({

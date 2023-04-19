@@ -29,7 +29,7 @@ const ManageRestaurantRequestsBody = ({
     },
   });
   return (
-    <div className="text-virparyasMainBlue m-4">
+    <div className="m-4 text-virparyasMainBlue">
       <div className="relative mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {orderList.map((order) => (

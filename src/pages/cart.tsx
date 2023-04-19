@@ -173,7 +173,7 @@ const CartBody: React.FC = () => {
 
   if (cartData.length === 0) {
     return (
-      <div className="text-virparyasMainBlue m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 md:w-fit">
+      <div className="m-4 mx-auto flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-8 text-virparyasMainBlue md:w-fit">
         <NoCartIcon className="md:h-32 md:w-32" />
         <div className="flex flex-col items-center">
           <h2 className="text-xl font-semibold md:text-3xl">
@@ -229,7 +229,7 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
       </Link>
 
       <div>
-        <div className="text-virparyasMainBlue m-4 md:m-6">
+        <div className="m-4 text-virparyasMainBlue md:m-6">
           <div className="mx-4 my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
               {cart.items.map((cartItem) => (
@@ -242,14 +242,14 @@ const CartCard: React.FC<{ cart: Cart }> = ({ cart }) => {
             </ul>
             <div className="flex justify-center">
               {isLoading ? (
-                <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
+                <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
               ) : (
                 <Link
                   href={{
                     pathname: "/checkout",
                     query: { id: cart.restaurant.id },
                   }}
-                  className="bg-virparyasMainBlue flex max-w-xs grow items-center justify-center rounded-xl p-3 font-bold text-white"
+                  className="flex max-w-xs grow items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
                 >
                   Checkout -{" "}
                   {cart.total.toLocaleString("en-US", {
@@ -365,7 +365,7 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
         {cartItem.foodOption.map((option) => option.name).join(", ")}
       </p>
       <div className="flex items-center gap-4">
-        <div className="bg-virparyasBackground flex w-fit items-center rounded-lg text-sm font-medium">
+        <div className="flex w-fit items-center rounded-lg bg-virparyasBackground text-sm font-medium">
           <button
             type="button"
             className="px-2 py-1"

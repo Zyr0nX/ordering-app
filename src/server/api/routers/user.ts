@@ -3,7 +3,6 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-
 export const userRouter = createTRPCRouter({
   getUser: protectedProcedure.query(async ({ ctx }) => {
     return ctx.prisma.user.findUnique({

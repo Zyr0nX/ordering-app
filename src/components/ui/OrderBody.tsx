@@ -21,7 +21,7 @@ const OrderBody = ({
     0
   );
   return (
-    <div className="text-virparyasMainBlue m-4 grid grid-cols-1 gap-4 md:m-8 md:grid-cols-2 md:gap-8">
+    <div className="m-4 grid grid-cols-1 gap-4 text-virparyasMainBlue md:m-8 md:grid-cols-2 md:gap-8">
       <div className="h-fit rounded-2xl bg-white p-4 shadow-md md:col-start-2 md:row-start-1">
         <p className="text-xl font-bold md:text-3xl">Order Status</p>
         <div className="mt-4 grid grid-cols-4 grid-rows-1 gap-2">
@@ -39,7 +39,7 @@ const OrderBody = ({
                   : "bg-virparyasBackground"
               }`}
             />
-            <p className="text-virparyasGreen text-[0.625rem]">Order placed</p>
+            <p className="text-[0.625rem] text-virparyasGreen">Order placed</p>
           </div>
           <div className="flex flex-col gap-1">
             <div
@@ -134,7 +134,7 @@ const OrderBody = ({
             <p>{order.restaurant.name}</p>
             <p>{order.restaurantAddress}</p>
           </div>
-          <div className="bg-virparyasSeparator h-0.5" />
+          <div className="h-0.5 bg-virparyasSeparator" />
           <ul className="ml-4 flex list-decimal flex-col gap-2">
             {order.orderFood?.map((item) => (
               <li className="marker:font-bold md:marker:text-xl" key={item.id}>
@@ -151,7 +151,7 @@ const OrderBody = ({
               </li>
             ))}
           </ul>
-          <div className="bg-virparyasSeparator h-0.5" />
+          <div className="h-0.5 bg-virparyasSeparator" />
           <div className="text-sm md:text-base">
             <div className="flex justify-between">
               <p>Items:</p>
@@ -162,7 +162,7 @@ const OrderBody = ({
               <p>${order.shippingFee.toFixed(2)}</p>
             </div>
           </div>
-          <div className="bg-virparyasSeparator h-0.5" />
+          <div className="h-0.5 bg-virparyasSeparator" />
           <div>
             <div className="flex justify-between text-lg font-bold md:text-2xl">
               <p>Total:</p>
@@ -174,7 +174,7 @@ const OrderBody = ({
       <div className="relative top-32  md:col-start-2 md:row-start-1">
         <Link
           href="/"
-          className=" bg-virparyasMainBlue flex h-fit w-full items-center justify-center rounded-xl p-3 font-bold text-white"
+          className=" flex h-fit w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
         >
           Continue Shopping
         </Link>

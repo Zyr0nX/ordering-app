@@ -126,12 +126,12 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
               className="relative z-10"
               onClick={() => setIsInfoOpen(true)}
             >
-              <InfoIcon className="fill-virparyasMainBlue h-8 w-8 md:h-10 md:w-10" />
+              <InfoIcon className="h-8 w-8 fill-virparyasMainBlue md:h-10 md:w-10" />
             </button>
             <div className="w-2" />
             {order.status === "PLACED" &&
               (prepareOrderMutation.isLoading ? (
-                <Loading className="fill-virparyasMainBlue h-8 w-8 animate-spin text-gray-200 md:h-10 md:w-10" />
+                <Loading className="h-8 w-8 animate-spin fill-virparyasMainBlue text-gray-200 md:h-10 md:w-10" />
               ) : (
                 <>
                   <button
@@ -139,7 +139,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                     className="relative z-10"
                     onClick={handlePrepare}
                   >
-                    <GreenCheckmark className="fill-virparyasGreen h-8 w-8 md:h-10 md:w-10" />
+                    <GreenCheckmark className="h-8 w-8 fill-virparyasGreen md:h-10 md:w-10" />
                   </button>
                   <div className="w-2" />
                   <button
@@ -147,20 +147,20 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                     className="relative z-10"
                     onClick={() => setIsRejectOpen(true)}
                   >
-                    <RedCross className="fill-virparyasRed h-8 w-8 md:h-10 md:w-10" />
+                    <RedCross className="h-8 w-8 fill-virparyasRed md:h-10 md:w-10" />
                   </button>
                 </>
               ))}
             {order.status === "PREPARING" &&
               (readyOrderMutation.isLoading ? (
-                <Loading className="fill-virparyasMainBlue h-8 w-8 animate-spin text-gray-200 md:h-10 md:w-10" />
+                <Loading className="h-8 w-8 animate-spin fill-virparyasMainBlue text-gray-200 md:h-10 md:w-10" />
               ) : (
                 <button
                   type="button"
                   className="relative z-10"
                   onClick={handleReady}
                 >
-                  <TruckIcon className="fill-virparyasLightBlue h-8 w-8 md:h-10 md:w-10" />
+                  <TruckIcon className="h-8 w-8 fill-virparyasLightBlue md:h-10 md:w-10" />
                 </button>
               ))}
           </div>
@@ -195,7 +195,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Order VP-{order.id}
                   </Dialog.Title>
@@ -205,7 +205,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                       <p>{order.user.address}</p>
                       <p>{order.user.phoneNumber}</p>
                     </div>
-                    <div className="bg-virparyasSeparator h-0.5" />
+                    <div className="h-0.5 bg-virparyasSeparator" />
                     <ul className="ml-4 flex list-decimal flex-col gap-2">
                       {order.orderFood.map((food) => (
                         <li
@@ -234,7 +234,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                         </li>
                       ))}
                     </ul>
-                    <div className="bg-virparyasSeparator h-0.5" />
+                    <div className="h-0.5 bg-virparyasSeparator" />
                     <div className="flex justify-between">
                       <p>Total:</p>
                       <p>
@@ -281,7 +281,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Order VP-{order.id}
                   </Dialog.Title>
@@ -291,7 +291,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                       <p>{order.user.address}</p>
                       <p>{order.user.phoneNumber}</p>
                     </div>
-                    <div className="bg-virparyasSeparator h-0.5" />
+                    <div className="h-0.5 bg-virparyasSeparator" />
                     <div className="flex flex-col">
                       <div className="flex items-center justify-between">
                         <label
@@ -301,7 +301,7 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                           * Reason for cancelling:
                         </label>
                         {isInvalidReason && (
-                          <p className="text-virparyasRed text-xs">
+                          <p className="text-xs text-virparyasRed">
                             Reason is required
                           </p>
                         )}
@@ -309,15 +309,15 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
 
                       <textarea
                         id="phoneNumber"
-                        className={`focus-visible:ring-virparyasMainBlue h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                          isInvalidReason ? "ring-virparyasRed ring-2" : ""
+                        className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                          isInvalidReason ? "ring-2 ring-virparyasRed" : ""
                         }`}
                         placeholder="Reason for cancelling..."
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                       />
                     </div>
-                    <p className="text-virparyasRed text-center font-semibold">
+                    <p className="text-center font-semibold text-virparyasRed">
                       Cancelling order will affect your rating
                       <br />
                       Proceed with caution
@@ -325,11 +325,11 @@ const RestaurantPendingOrder: React.FC<RestaurantPendingOrderProps> = ({
                     <div className="flex justify-center">
                       {rejectOrderMutation.isLoading ? (
                         <div className="flex justify-center">
-                          <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                          <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                         </div>
                       ) : (
                         <button
-                          className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+                          className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
                           onClick={() => void handleReject()}
                         >
                           Cancel order

@@ -62,7 +62,7 @@ const OrderHistoryCard = ({
           </div>
         </div>
 
-        <div className="text-virparyasMainBlue p-4 md:p-6">
+        <div className="p-4 text-virparyasMainBlue md:p-6">
           <div className="my-2 flex flex-col gap-4 md:gap-8">
             <ul className="flex list-decimal flex-col gap-2">
               {order.orderFood.map((food) => (
@@ -81,7 +81,7 @@ const OrderHistoryCard = ({
                 </li>
               ))}
             </ul>
-            <div className="bg-virparyasSeparator h-0.5" />
+            <div className="h-0.5 bg-virparyasSeparator" />
             <div className="flex justify-between font-bold md:text-lg">
               <p>Total:</p>
               <p>${total.toFixed(2)}</p>

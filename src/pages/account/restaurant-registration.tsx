@@ -1,7 +1,11 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import { isPossiblePhoneNumber } from "libphonenumber-js/min";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import { useRouter } from "next/router";
 import React from "react";
 import { toast } from "react-hot-toast";
@@ -19,7 +23,6 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { RouterOutputs, api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -91,20 +94,23 @@ const RestaurantRegistrationForm: React.FC = () => {
           }}
           onSubmit={async (values) => {
             await toast.promise(
-              registrationMutation.mutateAsync({
-                firstName: values.firstName,
-                lastName: values.lastName,
-                phoneNumber: values.phoneNumber,
-                restaurantName: values.restaurantName,
-                address: values.address.description,
-                addressId: values.address.place_id,
-                additionalAddress: values.additionalAddress,
-                cuisineId: values.cuisine.id,
-              }, {
-                onSuccess: () => {
-                  void router.push("/account");
+              registrationMutation.mutateAsync(
+                {
+                  firstName: values.firstName,
+                  lastName: values.lastName,
+                  phoneNumber: values.phoneNumber,
+                  restaurantName: values.restaurantName,
+                  address: values.address.description,
+                  addressId: values.address.place_id,
+                  additionalAddress: values.additionalAddress,
+                  cuisineId: values.cuisine.id,
                 },
-              }),
+                {
+                  onSuccess: () => {
+                    void router.push("/account");
+                  },
+                }
+              ),
               {
                 loading: "Registering...",
                 success: "Registered successfully! Redirecting...",

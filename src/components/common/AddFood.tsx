@@ -99,7 +99,7 @@ const AddFood = () => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Add food
                   </Dialog.Title>
@@ -112,7 +112,7 @@ const AddFood = () => {
                         <input
                           type="text"
                           id="name"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Name..."
                           ref={nameRef}
                         />
@@ -124,7 +124,7 @@ const AddFood = () => {
                         <input
                           type="text"
                           id="price"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Price..."
                           ref={priceRef}
                         />
@@ -136,7 +136,7 @@ const AddFood = () => {
                         <input
                           type="text"
                           id="quantity"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Quantity..."
                           ref={quantityRef}
                         />
@@ -147,12 +147,12 @@ const AddFood = () => {
                         </label>
                         <textarea
                           id="description"
-                          className="focus-visible:ring-virparyasMainBlue h-20 w-full rounded-xl px-4 placeholder:leading-10 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-20 w-full rounded-xl px-4 placeholder:leading-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Description..."
                           ref={descriptionRef}
                         />
                       </div>
-                      <div className="bg-virparyasSeparator h-0.5" />
+                      <div className="h-0.5 bg-virparyasSeparator" />
                       <div className="flex flex-col gap-4" ref={parent}>
                         {foodCategories.map((foodCategory, index) => (
                           <FoodOptionInput
@@ -172,7 +172,7 @@ const AddFood = () => {
                   </div>
                   <button
                     type="button"
-                    className="bg-virparyasGreen w-36 rounded-xl py-2 font-medium text-white"
+                    className="w-36 rounded-xl bg-virparyasGreen py-2 font-medium text-white"
                     onClick={handleAddFood}
                   >
                     Confirm

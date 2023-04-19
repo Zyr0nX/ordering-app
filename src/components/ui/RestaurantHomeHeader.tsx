@@ -4,7 +4,7 @@ import React from "react";
 
 const RestaurantHomeHeader: React.FC = () => {
   return (
-    <div className="from-viparyasDarkBlue/80 to-virparyasPurple/80 relative flex items-center justify-center bg-gradient-to-r pb-24 pt-16 text-white md:pb-32 md:pt-8">
+    <div className="relative flex items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasPurple/80 pb-24 pt-16 text-white md:pb-32 md:pt-8">
       <button
         className="absolute right-0 top-0 p-5"
         onClick={() => void signOut()}

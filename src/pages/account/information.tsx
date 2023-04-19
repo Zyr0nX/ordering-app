@@ -1,7 +1,11 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import { isPossiblePhoneNumber } from "libphonenumber-js/min";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -19,7 +23,6 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

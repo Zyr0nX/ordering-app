@@ -1,13 +1,14 @@
 import React, { type HtmlHTMLAttributes } from "react";
 
-
 interface EmptyStarIconProps extends HtmlHTMLAttributes<HTMLOrSVGElement> {
   bgColor?: string;
   bgOpacity?: number;
 }
 
 const EmptyStarIcon: React.FC<EmptyStarIconProps> = ({
-  bgColor, bgOpacity, ...props
+  bgColor,
+  bgOpacity,
+  ...props
 }) => {
   return (
     <svg

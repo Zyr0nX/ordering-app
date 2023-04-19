@@ -30,7 +30,6 @@ import { prisma } from "~/server/db";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
 
-
 type CreateContextOptions = {
   session: Session | null;
 };

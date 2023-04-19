@@ -108,14 +108,19 @@ const RestaurantMainCard: React.FC<RestaurantMainCardProps> = ({
         </div>
         <div className="px-4 py-3">
           <p className="text-xl font-semibold">{restaurant.name}</p>
-          {distance && <p className="text-xs">${Math.max(Math.round(distance * 1.2), 5)} - ${Math.max(Math.round(distance * 1.5), 6)} Delivery Fee</p>}
+          {distance && (
+            <p className="text-xs">
+              ${Math.max(Math.round(distance * 1.2), 5)} - $
+              {Math.max(Math.round(distance * 1.5), 6)} Delivery Fee
+            </p>
+          )}
         </div>
       </Link>
       {displayFavorite && (
         <>
           {favoriteMutation.isLoading || unfavotiteMutation.isLoading ? (
             <div className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2">
-              <Loading className="fill-virparyasMainBlue h-5 w-5 animate-spin text-gray-200" />
+              <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
             </div>
           ) : restaurant.favorite.length > 0 ? (
             <button

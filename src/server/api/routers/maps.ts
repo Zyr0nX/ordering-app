@@ -1,9 +1,11 @@
-import { type GeocodeResult, type PlaceAutocompleteResult } from "@googlemaps/google-maps-services-js";
+import {
+  type GeocodeResult,
+  type PlaceAutocompleteResult,
+} from "@googlemaps/google-maps-services-js";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { redis } from "~/server/cache";
-
 
 export const mapsRouter = createTRPCRouter({
   getAutocomplete: protectedProcedure

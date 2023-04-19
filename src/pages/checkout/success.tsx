@@ -3,7 +3,6 @@ import type Stripe from "stripe";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { stripe } from "~/server/stripe";
-import haversine from "~/utils/haversine";
 
 const Success: NextPage = () => {
   return null;
@@ -24,7 +23,7 @@ export const getServerSideProps = async (
   const [session, checkoutSession] = await Promise.all([
     getServerAuthSession(context),
     stripe.checkout.sessions.retrieve(session_id, {
-      expand: ["payment_intent", "line_items.data.price.product"],
+      expand: ["line_items.data.price.product"],
     }),
   ]);
 
@@ -39,8 +38,24 @@ export const getServerSideProps = async (
     };
   }
 
+  const paymentIntent = await stripe.paymentIntents.retrieve(
+    checkoutSession.payment_intent as string,
+    {
+      expand: ["latest_charge"],
+    }
+  );
+
+  if ((paymentIntent.latest_charge as Stripe.Charge).refunded) {
+    return {
+      notFound: true,
+    };
+  }
+
   //Check if the user is the same as the client_reference_id
   if (session.user.id !== checkoutSession.client_reference_id) {
+    await stripe.refunds.create({
+      payment_intent: checkoutSession.payment_intent as string,
+    });
     context.res.statusCode = 403;
     return {
       notFound: true,
@@ -48,16 +63,14 @@ export const getServerSideProps = async (
   }
 
   //Check if the session has a restaurantId
-  if (!checkoutSession.metadata?.restaurantId) {
-    if (typeof checkoutSession.payment_intent === "string") {
-      await stripe.refunds.create({
-        payment_intent: checkoutSession.payment_intent,
-      });
-    } else {
-      await stripe.refunds.create({
-        payment_intent: checkoutSession.payment_intent.id,
-      });
-    }
+  if (
+    !checkoutSession.metadata?.restaurantId ||
+    !checkoutSession.line_items ||
+    !checkoutSession.shipping_cost
+  ) {
+    await stripe.refunds.create({
+      payment_intent: checkoutSession.payment_intent as string,
+    });
     context.res.statusCode = 500;
     return {
       notFound: true,
@@ -80,8 +93,6 @@ export const getServerSideProps = async (
 
   //If the restaurant doesn't exist, return 400
   if (
-    !checkoutSession.line_items ||
-    !checkoutSession.shipping_cost ||
     !restaurant ||
     !user ||
     !user.address ||
@@ -89,21 +100,14 @@ export const getServerSideProps = async (
     !user.latitude ||
     !user.longitude
   ) {
-    if (typeof checkoutSession.payment_intent === "string") {
-      await stripe.refunds.create({
-        payment_intent: checkoutSession.payment_intent,
-      });
-    } else {
-      await stripe.refunds.create({
-        payment_intent: checkoutSession.payment_intent.id,
-      });
-    }
+    await stripe.refunds.create({
+      payment_intent: checkoutSession.payment_intent as string,
+    });
     context.res.statusCode = 400;
     return {
       notFound: true,
     };
   }
-
   //Create the order
   const [order] = await Promise.all([
     prisma.order.create({
@@ -143,6 +147,18 @@ export const getServerSideProps = async (
           },
         },
       },
+    }),
+    checkoutSession.line_items.data.map(async (item) => {
+      await prisma.food.update({
+        where: {
+          id: (item.price?.product as Stripe.Product).metadata?.foodId,
+        },
+        data: {
+          quantity: {
+            decrement: item.quantity as number,
+          },
+        },
+      });
     }),
   ]);
 

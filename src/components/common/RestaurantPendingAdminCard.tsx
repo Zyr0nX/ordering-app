@@ -118,18 +118,18 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
               className="relative z-10"
               onClick={() => setIsOpen(true)}
             >
-              <InfoIcon className="fill-virparyasLightBlue h-8 w-8 md:h-10 md:w-10" />
+              <InfoIcon className="h-8 w-8 fill-virparyasLightBlue md:h-10 md:w-10" />
             </button>
             <div className="w-2" />
             {approveRestaurantMutation.isLoading ? (
-              <Loading className="fill-virparyasMainBlue h-8 w-8 animate-spin text-gray-200 md:h-10 md:w-10" />
+              <Loading className="h-8 w-8 animate-spin fill-virparyasMainBlue text-gray-200 md:h-10 md:w-10" />
             ) : (
               <button
                 type="button"
                 className="relative z-10"
                 onClick={() => void handleApprove()}
               >
-                <GreenCheckmark className="fill-virparyasGreen h-8 w-8 md:h-10 md:w-10" />
+                <GreenCheckmark className="h-8 w-8 fill-virparyasGreen md:h-10 md:w-10" />
               </button>
             )}
             <div className="w-2" />
@@ -138,7 +138,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
               className="relative z-10"
               onClick={() => void handleReject()}
             >
-              <RedCross className="fill-virparyasRed h-8 w-8 md:h-10 md:w-10" />
+              <RedCross className="h-8 w-8 fill-virparyasRed md:h-10 md:w-10" />
             </button>
           </div>
         </div>
@@ -172,7 +172,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit {restaurant.name}
                   </Dialog.Title>
@@ -185,7 +185,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="cuisine"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Cuisine..."
                           value={restaurant.cuisine.name}
                           disabled
@@ -199,7 +199,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="restaurantName"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Restaurant name..."
                           value={restaurant.name}
                           disabled
@@ -214,7 +214,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="address"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Address..."
                           value={restaurant.address}
                           disabled
@@ -232,7 +232,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="additionalAddress"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Additional address..."
                           value={restaurant.additionalAddress || ""}
                           disabled
@@ -251,7 +251,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                           <input
                             type="text"
                             id="firstName"
-                            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="First name..."
                             value={restaurant.firstName}
                             disabled
@@ -268,7 +268,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                           <input
                             type="text"
                             id="lastName"
-                            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                             placeholder="Last name..."
                             value={restaurant.lastName}
                             disabled
@@ -287,7 +287,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="phoneNumber"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Phone number..."
                           value={restaurant.phoneNumber}
                           disabled
@@ -305,7 +305,7 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         <input
                           type="text"
                           id="additionalAddress"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Additional address..."
                           value={restaurant.user.email || ""}
                           disabled
@@ -314,11 +314,11 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                       <div className="mt-4 grid grid-cols-2 gap-4">
                         {rejectRestaurantMutation.isLoading ? (
                           <div className="flex justify-center">
-                            <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                           </div>
                         ) : (
                           <button
-                            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
                             onClick={() => void handleReject()}
                           >
                             Reject
@@ -326,11 +326,11 @@ const RestaurantPendingAdminCard: React.FC<RestaurantPendingAdminCardProps> = ({
                         )}
                         {approveRestaurantMutation.isLoading ? (
                           <div className="flex justify-center">
-                            <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                           </div>
                         ) : (
                           <button
-                            className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
+                            className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
                             onClick={() => void handleApprove()}
                           >
                             Approve

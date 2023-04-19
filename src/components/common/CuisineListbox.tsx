@@ -4,7 +4,6 @@ import { useField } from "formik";
 import React, { Fragment } from "react";
 import { type RouterOutputs, api } from "~/utils/api";
 
-
 interface CuisineListboxProps {
   label: string;
   name: string;
@@ -22,7 +21,6 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
     refetchOnReconnect: false,
   });
 
-  
   const [field, meta] =
     useField<RouterOutputs["cuisine"]["getAll"][number]>(name);
   return (
@@ -58,7 +56,11 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
                   : ""
               }`}
             >
-              <span className={`truncate ${field.value.name ? "" : "text-gray-400"}`}>
+              <span
+                className={`truncate ${
+                  field.value.name ? "" : "text-gray-400"
+                }`}
+              >
                 {!field.value.name ? placeholder : field.value.name}
               </span>
               <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">

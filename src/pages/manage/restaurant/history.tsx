@@ -109,7 +109,7 @@ const ManageRestaurantOrderHistoryBody: React.FC = () => {
   }, [restaurantOrderHistoryData]);
 
   return (
-    <div className="text-virparyasMainBlue m-4">
+    <div className="m-4 text-virparyasMainBlue">
       <div className="flex flex-col gap-4">
         <Search />
         <OrderHistory />
@@ -134,7 +134,7 @@ const Search: React.FC = () => {
         onChange={(e) => search(e.target.value)}
       />
 
-      <div className="bg-virparyasMainBlue flex items-center px-4">
+      <div className="flex items-center bg-virparyasMainBlue px-4">
         <SearchIcon className="h-8 w-8 fill-white" />
       </div>
     </div>
@@ -204,7 +204,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
               className="relative z-10"
               onClick={() => setIsInfoOpen(true)}
             >
-              <InfoIcon className="fill-virparyasMainBlue h-8 w-8 md:h-10 md:w-10" />
+              <InfoIcon className="h-8 w-8 fill-virparyasMainBlue md:h-10 md:w-10" />
             </button>
           </div>
         </div>
@@ -238,7 +238,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Order VP-{order.id}
                   </Dialog.Title>
@@ -248,7 +248,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
                       <p>{order.user.address}</p>
                       <p>{order.user.phoneNumber}</p>
                     </div>
-                    <div className="bg-virparyasSeparator h-0.5" />
+                    <div className="h-0.5 bg-virparyasSeparator" />
                     <ul className="ml-4 flex list-decimal flex-col gap-2">
                       {order.orderFood.map((food) => (
                         <li
@@ -277,7 +277,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
                         </li>
                       ))}
                     </ul>
-                    <div className="bg-virparyasSeparator h-0.5" />
+                    <div className="h-0.5 bg-virparyasSeparator" />
                     <div className="flex justify-between">
                       <p>Total:</p>
                       <p>
@@ -290,7 +290,7 @@ const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
                     </div>
                     {order.status === "REJECTED_BY_RESTAURANT" && (
                       <>
-                        <div className="bg-virparyasSeparator h-0.5" />
+                        <div className="h-0.5 bg-virparyasSeparator" />
                         <p>
                           <span className="font-bold">
                             Reason for cancelling:

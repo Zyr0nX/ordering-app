@@ -1,10 +1,14 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
-import { getCountries, getCountryCallingCode, type CountryCode, formatIncompletePhoneNumber } from "libphonenumber-js/min";
+import {
+  getCountries,
+  getCountryCallingCode,
+  type CountryCode,
+  formatIncompletePhoneNumber,
+} from "libphonenumber-js/min";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
-
 
 interface PhoneNumberInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
   label: string;

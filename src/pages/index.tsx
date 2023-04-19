@@ -180,7 +180,7 @@ const HomeHeader: React.FC = () => {
     refetchOnWindowFocus: false,
   });
   return (
-    <div className="from-viparyasDarkBlue/80 to-virparyasLightBrown/80 bg-gradient-to-r p-4 text-white md:p-8">
+    <div className="bg-gradient-to-r from-viparyasDarkBlue/80 to-virparyasLightBrown/80 p-4 text-white md:p-8">
       <div className="flex w-full items-center justify-between">
         {user?.address ? (
           <Link
@@ -188,7 +188,7 @@ const HomeHeader: React.FC = () => {
             href="/account/information"
           >
             <HouseIcon className="md:h-6 md:w-6" />
-            <p className="text-virparyasMainBlue text-xs font-semibold md:text-base md:font-bold">
+            <p className="text-xs font-semibold text-virparyasMainBlue md:text-base md:font-bold">
               {user.address}
             </p>
           </Link>
@@ -264,7 +264,7 @@ const HomeBody: React.FC = () => {
 
   return (
     <>
-      <div className="bg-virparyasBackground text-virparyasMainBlue flex flex-col gap-4 px-4 py-6 md:flex-row md:gap-8">
+      <div className="flex flex-col gap-4 bg-virparyasBackground px-4 py-6 text-virparyasMainBlue md:flex-row md:gap-8">
         <div className="shrink-0">
           <CuisineCardsSection />
         </div>
@@ -466,7 +466,7 @@ const FavoriteRestaurantCard: React.FC<{
       </Link>
       {unfavotiteMutation.isLoading ? (
         <div className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2">
-          <Loading className="fill-virparyasMainBlue h-5 w-5 animate-spin text-gray-200" />
+          <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
         </div>
       ) : (
         <button
@@ -609,13 +609,33 @@ const RestaurantCard: React.FC<{
           )}
           <div className="mt-2 flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => {
-              const ratingDiff = i - Math.round((restaurant.rating || 5) * 2) / 2;
+              const ratingDiff =
+                i - Math.round((restaurant.rating || 5) * 2) / 2;
               if (ratingDiff <= -1) {
-                return <FullStarIcon key={i} className="md:h-4 md:w-4 fill-virparyasMainBlue" />;
+                return (
+                  <FullStarIcon
+                    key={i}
+                    className="fill-virparyasMainBlue md:h-4 md:w-4"
+                  />
+                );
               } else if (ratingDiff < 0) {
-                return <HalfStarIcon key={i} className="md:h-4 md:w-4 fill-virparyasMainBlue" bgColor="#D9D9D9" bgOpacity={1} />;
+                return (
+                  <HalfStarIcon
+                    key={i}
+                    className="fill-virparyasMainBlue md:h-4 md:w-4"
+                    bgColor="#D9D9D9"
+                    bgOpacity={1}
+                  />
+                );
               } else {
-                return <EmptyStarIcon key={i} className="md:h-4 md:w-4 fill-virparyasMainBlue" bgColor="#D9D9D9" bgOpacity={1}/>;
+                return (
+                  <EmptyStarIcon
+                    key={i}
+                    className="fill-virparyasMainBlue md:h-4 md:w-4"
+                    bgColor="#D9D9D9"
+                    bgOpacity={1}
+                  />
+                );
               }
             })}
           </div>
@@ -623,7 +643,7 @@ const RestaurantCard: React.FC<{
       </Link>
       {favoriteMutation.isLoading || unfavotiteMutation.isLoading ? (
         <div className="absolute right-0 top-0 z-10 m-2 rounded-full bg-white p-2">
-          <Loading className="fill-virparyasMainBlue h-5 w-5 animate-spin text-gray-200" />
+          <Loading className="h-5 w-5 animate-spin fill-virparyasMainBlue text-gray-200" />
         </div>
       ) : restaurant.favorite.length > 0 ? (
         <button

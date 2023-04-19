@@ -105,7 +105,7 @@ const ItemCart: React.FC<ItemCartProps> = ({
         {cardItem.foodOption.map((option) => option.name).join(", ")}
       </p>
       <div className="flex items-center gap-4">
-        <div className="bg-virparyasBackground flex w-fit items-center rounded-lg text-sm font-medium">
+        <div className="flex w-fit items-center rounded-lg bg-virparyasBackground text-sm font-medium">
           <button type="button" className="px-2 py-1" onClick={handleDecrement}>
             -
           </button>

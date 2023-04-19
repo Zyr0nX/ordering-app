@@ -114,19 +114,19 @@ const FoodOptionInput = ({
         <input
           type="text"
           id="restaurantName"
-          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
           placeholder="Email..."
           value={foodCategory.name}
           onChange={(e) => handleFoodCategoryNameChange(index, e.target.value)}
         />
-        <div className="bg-virparyasMainBlue absolute bottom-5 left-4 top-6 -z-10 w-1"></div>
+        <div className="absolute bottom-5 left-4 top-6 -z-10 w-1 bg-virparyasMainBlue"></div>
       </div>
       {foodCategory.options.map((foodOption, optionIndex) => (
         <div className="relative ml-8 flex gap-2" key={foodOption.id}>
           <input
             type="text"
             id="restaurantName"
-            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
             placeholder="Name..."
             value={foodOption.name}
             onChange={(e) =>
@@ -136,7 +136,7 @@ const FoodOptionInput = ({
           <input
             type="number"
             id="restaurantName"
-            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
             placeholder="Price..."
             value={Number(foodOption.price).toString()}
             onChange={(e) =>
@@ -148,7 +148,7 @@ const FoodOptionInput = ({
             }
           />
 
-          <div className="bg-virparyasMainBlue absolute -left-4 right-0 top-5 -z-10 h-1"></div>
+          <div className="absolute -left-4 right-0 top-5 -z-10 h-1 bg-virparyasMainBlue"></div>
         </div>
       ))}
     </div>

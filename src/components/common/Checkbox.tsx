@@ -19,7 +19,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ handleChange, label }) => {
         className={`${
           enabled
             ? "bg-viparyasDarkBlue"
-            : "border-virparyasMainBlue border-2 bg-transparent"
+            : "border-2 border-virparyasMainBlue bg-transparent"
         } flex h-5 w-5 items-center justify-center focus-within:outline-none`}
       >
         {enabled && <CheckmarkIcon />}

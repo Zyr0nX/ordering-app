@@ -225,7 +225,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Edit {user.name}
                   </Dialog.Title>
@@ -240,7 +240,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Name:
                           </label>
                           {isInvalidName && (
-                            <p className="text-virparyasRed text-xs">
+                            <p className="text-xs text-virparyasRed">
                               Name is required
                             </p>
                           )}
@@ -249,8 +249,8 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="name"
-                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                            isInvalidName ? "ring-virparyasRed ring-2" : ""
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            isInvalidName ? "ring-2 ring-virparyasRed" : ""
                           }`}
                           placeholder="Name..."
                           value={name || ""}
@@ -267,7 +267,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Address:
                           </label>
                           {isInvalidAddress && (
-                            <p className="text-virparyasRed text-xs">
+                            <p className="text-xs text-virparyasRed">
                               Identification number is required
                             </p>
                           )}
@@ -276,8 +276,8 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="address"
-                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                            isInvalidAddress ? "ring-virparyasRed ring-2" : ""
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                            isInvalidAddress ? "ring-2 ring-virparyasRed" : ""
                           }`}
                           placeholder="Address..."
                           value={address || ""}
@@ -298,7 +298,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="additionalAddress"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Additional address..."
                           value={additionalAddress || ""}
                           onChange={(e) => setAdditionalAddress(e.target.value)}
@@ -314,7 +314,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Phone number:
                           </label>
                           {isInvalidPhoneNumber && (
-                            <p className="text-virparyasRed text-xs">
+                            <p className="text-xs text-virparyasRed">
                               Phone number is required
                             </p>
                           )}
@@ -323,9 +323,9 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         <input
                           type="text"
                           id="phoneNumber"
-                          className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
                             isInvalidPhoneNumber
-                              ? "ring-virparyasRed ring-2"
+                              ? "ring-2 ring-virparyasRed"
                               : ""
                           }`}
                           placeholder="Phone number..."
@@ -343,7 +343,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                             * Image:
                           </label>
                           {isInvalidImage && (
-                            <p className="text-virparyasRed text-xs">
+                            <p className="text-xs text-virparyasRed">
                               Image is required
                             </p>
                           )}
@@ -351,7 +351,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
 
                         <div
                           className={`relative h-[125px] w-full overflow-hidden rounded-xl ${
-                            isInvalidImage ? "ring-virparyasRed ring-2" : ""
+                            isInvalidImage ? "ring-2 ring-virparyasRed" : ""
                           }`}
                         >
                           <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
@@ -387,7 +387,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         </div>
                         <div className="mt-4 grid grid-cols-2 gap-4">
                           <button
-                            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
                             onClick={handleDiscard}
                           >
                             Discard
@@ -395,11 +395,11 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                           {cloudinaryUploadMutation.isLoading ||
                           editUserMutation.isLoading ? (
                             <div className="flex justify-center">
-                              <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                              <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                             </div>
                           ) : (
                             <button
-                              className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
+                              className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
                               onClick={() => void handleEditUser()}
                             >
                               Confirm
@@ -444,7 +444,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Disable {user.name}
                   </Dialog.Title>
@@ -457,7 +457,7 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                         * Reason for disabling account:
                       </label>
                       {isInvalidReason && (
-                        <p className="text-virparyasRed text-xs">
+                        <p className="text-xs text-virparyasRed">
                           Reason is required
                         </p>
                       )}
@@ -465,8 +465,8 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
 
                     <textarea
                       id="phoneNumber"
-                      className={`focus-visible:ring-virparyasMainBlue h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                        isInvalidReason ? "ring-virparyasRed ring-2" : ""
+                      className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                        isInvalidReason ? "ring-2 ring-virparyasRed" : ""
                       }`}
                       placeholder="Reason for disabling account..."
                       value={reason}
@@ -476,11 +476,11 @@ const UserAdminCard: React.FC<ShipperAdminCardProps> = ({
                   <div className="mt-4 flex justify-center gap-4">
                     {disableUserMutation.isLoading ? (
                       <div className="flex justify-center">
-                        <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                       </div>
                     ) : (
                       <button
-                        className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+                        className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
                         onClick={() => void handleDisable()}
                       >
                         Disable account

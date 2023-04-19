@@ -41,7 +41,7 @@ const FoodOptionDialog: React.FC<CommonDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl transition-all md:w-[768px]">
+              <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground text-virparyasMainBlue transition-all md:w-[768px]">
                 {label && (
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     {label}

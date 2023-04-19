@@ -45,14 +45,14 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="bg-virparyasBackground text-virparyasMainBlue w-96 rounded-3xl p-5">
+    <div className="w-96 rounded-3xl bg-virparyasBackground p-5 text-virparyasMainBlue">
       <div className="flex items-center justify-between">
         <button type="button" onClick={handleBackButton}>
-          <BackArrowIcon className="fill-virparyasMainBlue h-5 w-5" />
+          <BackArrowIcon className="h-5 w-5 fill-virparyasMainBlue" />
         </button>
         <p className="text-center text-2xl font-bold">Sign In</p>
         <Link href="/">
-          <HomeIcon className="fill-virparyasMainBlue h-5 w-5" />
+          <HomeIcon className="h-5 w-5 fill-virparyasMainBlue" />
         </Link>
       </div>
 
@@ -89,15 +89,15 @@ const SignInForm = () => {
                   * Email:
                 </label>
                 {IsInvalidEmail && (
-                  <p className="text-virparyasRed text-xs">Email is invalid</p>
+                  <p className="text-xs text-virparyasRed">Email is invalid</p>
                 )}
               </div>
 
               <input
                 type="text"
                 id="address"
-                className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                  IsInvalidEmail ? "ring-virparyasRed ring-2" : ""
+                className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                  IsInvalidEmail ? "ring-2 ring-virparyasRed" : ""
                 }`}
                 placeholder="Email..."
                 value={email || ""}
@@ -107,15 +107,15 @@ const SignInForm = () => {
           </div>
           <button
             onClick={handleSignInWithEmail}
-            className="bg-virparyasMainBlue my-8 h-10 w-full rounded-xl font-bold text-white"
+            className="my-8 h-10 w-full rounded-xl bg-virparyasMainBlue font-bold text-white"
           >
             Sign In
           </button>
         </div>
       )}
 
-      <div className="bg-virparyasMainBlue relative h-px w-full">
-        <p className="bg-virparyasBackground ml-auto mr-auto w-fit -translate-y-1/2 px-2">
+      <div className="relative h-px w-full bg-virparyasMainBlue">
+        <p className="ml-auto mr-auto w-fit -translate-y-1/2 bg-virparyasBackground px-2">
           or sign in using
         </p>
       </div>

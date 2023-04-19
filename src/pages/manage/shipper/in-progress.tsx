@@ -1,11 +1,14 @@
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import React from "react";
 import Shipper from "~/components/layouts/Shipper";
 import ManageShipperHeader from "~/components/ui/ManageShipperHeader";
 import ManageShipperRequestsBody from "~/components/ui/ManageShipperRequestsBody";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
-
 
 const InProgress: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
@@ -45,7 +48,7 @@ export const getServerSideProps = async (
       },
       shipper: {
         userId: session?.user.id || "",
-      }
+      },
     },
     include: {
       user: true,

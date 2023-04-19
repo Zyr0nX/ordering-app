@@ -13,7 +13,7 @@ const CommonSearch = forwardRef<
         ref={ref}
         {...props}
       />
-      <div className="bg-virparyasMainBlue flex items-center px-4">
+      <div className="flex items-center bg-virparyasMainBlue px-4">
         <SearchIcon />
       </div>
     </div>

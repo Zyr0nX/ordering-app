@@ -7,12 +7,7 @@ interface CommonInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
   type?: "text" | "email" | "password" | "number";
 }
 
-const Input: React.FC<CommonInputProps> = ({
-  label,
-  name,
-  id,
-  ...props
-}) => {
+const Input: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => {
   const [field, meta] = useField<string>(name);
   return (
     <div className="flex flex-col">

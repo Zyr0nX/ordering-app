@@ -159,7 +159,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
   };
 
   return (
-    <div className="text-virparyasMainBlue mx-4 mt-6">
+    <div className="mx-4 mt-6 text-virparyasMainBlue">
       <div className="flex flex-col gap-2">
         <div className="flex gap-4">
           <div className="flex grow flex-col">
@@ -171,7 +171,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 * First name:
               </label>
               {isInvalidFirstName && (
-                <p className="text-virparyasRed text-xs">
+                <p className="text-xs text-virparyasRed">
                   First name is required
                 </p>
               )}
@@ -180,8 +180,8 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="firstName"
-              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                isInvalidFirstName ? "ring-virparyasRed ring-2" : ""
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidFirstName ? "ring-2 ring-virparyasRed" : ""
               }`}
               placeholder="First name..."
               value={firstName || ""}
@@ -197,7 +197,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                 * Last name:
               </label>
               {isInvalidLastName && (
-                <p className="text-virparyasRed text-xs">
+                <p className="text-xs text-virparyasRed">
                   Last name is required
                 </p>
               )}
@@ -206,8 +206,8 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="lastName"
-              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                isInvalidLastName ? "ring-virparyasRed ring-2" : ""
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidLastName ? "ring-2 ring-virparyasRed" : ""
               }`}
               placeholder="Last name..."
               value={lastName || ""}
@@ -222,12 +222,12 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Date of birth:
             </label>
             {isInvalidDateOfBirth && (
-              <p className="text-virparyasRed text-xs">
+              <p className="text-xs text-virparyasRed">
                 Date of birth is invalid
               </p>
             )}
             {isUnder18YearsOld && (
-              <p className="text-virparyasRed text-xs">
+              <p className="text-xs text-virparyasRed">
                 You have to be over 18 years old
               </p>
             )}
@@ -239,9 +239,9 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                   <Listbox.Button
                     className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                       open
-                        ? "ring-virparyasMainBlue ring-2"
+                        ? "ring-2 ring-virparyasMainBlue"
                         : isInvalidDateOfBirth
-                        ? "ring-virparyasRed ring-2"
+                        ? "ring-2 ring-virparyasRed"
                         : ""
                     }`}
                   >
@@ -262,7 +262,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                           <Listbox.Option
                             key={day.id}
                             className={({ active }) =>
-                              `text-viparyasDarkBlue relative cursor-default select-none ${
+                              `relative cursor-default select-none text-viparyasDarkBlue ${
                                 active ? "bg-[#E9E9FF]" : "text-gray-900"
                               }`
                             }
@@ -293,9 +293,9 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                   <Listbox.Button
                     className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                       open
-                        ? "ring-virparyasMainBlue ring-2"
+                        ? "ring-2 ring-virparyasMainBlue"
                         : isInvalidDateOfBirth
-                        ? "ring-virparyasRed ring-2"
+                        ? "ring-2 ring-virparyasRed"
                         : ""
                     }`}
                   >
@@ -316,7 +316,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                           <Listbox.Option
                             key={month.id}
                             className={({ active }) =>
-                              `text-viparyasDarkBlue relative cursor-default select-none ${
+                              `relative cursor-default select-none text-viparyasDarkBlue ${
                                 active ? "bg-[#E9E9FF]" : "text-gray-900"
                               }`
                             }
@@ -347,9 +347,9 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                   <Listbox.Button
                     className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
                       open
-                        ? "ring-virparyasMainBlue ring-2"
+                        ? "ring-2 ring-virparyasMainBlue"
                         : isInvalidDateOfBirth || isUnder18YearsOld
-                        ? "ring-virparyasRed ring-2"
+                        ? "ring-2 ring-virparyasRed"
                         : ""
                     }`}
                   >
@@ -370,7 +370,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                           <Listbox.Option
                             key={year.id}
                             className={({ active }) =>
-                              `text-viparyasDarkBlue relative cursor-default select-none ${
+                              `relative cursor-default select-none text-viparyasDarkBlue ${
                                 active ? "bg-[#E9E9FF]" : "text-gray-900"
                               }`
                             }
@@ -407,7 +407,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Identification number:
             </label>
             {isInvalidIdentificationNumber && (
-              <p className="text-virparyasRed text-xs">
+              <p className="text-xs text-virparyasRed">
                 Identification number is required
               </p>
             )}
@@ -416,8 +416,8 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="text"
             id="identificationNumber"
-            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-              isInvalidIdentificationNumber ? "ring-virparyasRed ring-2" : ""
+            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+              isInvalidIdentificationNumber ? "ring-2 ring-virparyasRed" : ""
             }`}
             placeholder="Identification number..."
             value={identificationNumber || ""}
@@ -434,7 +434,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * License plate:
             </label>
             {isInvalidLicensePlate && (
-              <p className="text-virparyasRed text-xs">
+              <p className="text-xs text-virparyasRed">
                 License plate is required
               </p>
             )}
@@ -443,8 +443,8 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="text"
             id="licensePlate"
-            className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-              isInvalidLicensePlate ? "ring-virparyasRed ring-2" : ""
+            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+              isInvalidLicensePlate ? "ring-2 ring-virparyasRed" : ""
             }`}
             placeholder="License plate..."
             value={licensePlate || ""}
@@ -461,7 +461,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
               * Phone number:
             </label>
             {isInvalidPhoneNumber && (
-              <p className="text-virparyasRed text-xs">
+              <p className="text-xs text-virparyasRed">
                 Phone number is required
               </p>
             )}
@@ -473,7 +473,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                   <div className="relative w-24 shrink-0">
                     <Listbox.Button
                       className={`relative h-10 w-full rounded-xl bg-white px-4 text-left ${
-                        open ? "ring-virparyasMainBlue ring-2" : ""
+                        open ? "ring-2 ring-virparyasMainBlue" : ""
                       }`}
                     >
                       <span className="truncate">{phonePrefix?.dialCode}</span>
@@ -493,7 +493,7 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
                             <Listbox.Option
                               key={country.name}
                               className={({ active }) =>
-                                `text-viparyasDarkBlue relative cursor-default select-none ${
+                                `relative cursor-default select-none text-viparyasDarkBlue ${
                                   active ? "bg-[#E9E9FF]" : "text-gray-900"
                                 }`
                               }
@@ -528,8 +528,8 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
             <input
               type="text"
               id="phoneNumber"
-              className={`focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
-                isInvalidPhoneNumber ? "ring-virparyasRed ring-2" : ""
+              className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+                isInvalidPhoneNumber ? "ring-2 ring-virparyasRed" : ""
               }`}
               placeholder="Phone number..."
               value={
@@ -549,20 +549,20 @@ const ShipperRegistrationForm: React.FC<RestaurantRegistrationFormProps> = ({
           <input
             type="email"
             id="email"
-            className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
             disabled
             value={session.data?.user.email || ""}
           />
         </div>
         <div className="mt-4 flex gap-4">
           <button
-            className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
             onClick={handleDiscard}
           >
             Discard
           </button>
           <button
-            className="bg-virparyasLightBlue h-10 w-full rounded-xl font-bold text-white"
+            className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
             onClick={handleSendShipperRequest}
           >
             Confirm

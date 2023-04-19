@@ -22,7 +22,7 @@ const ManageRestaurantMenuBody = ({
   });
 
   return (
-    <div className="text-virparyasMainBlue m-4">
+    <div className="m-4 text-virparyasMainBlue">
       <div className="flex justify-center">
         <AddFood />
       </div>

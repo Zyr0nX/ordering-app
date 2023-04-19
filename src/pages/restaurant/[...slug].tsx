@@ -1,6 +1,10 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { type inferProcedureOutput } from "@trpc/server";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
@@ -24,7 +28,6 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
 import haversine from "~/utils/haversine";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -199,11 +202,27 @@ const RestaurantDetailHeader: React.FC = () => {
               const ratingDiff =
                 i - Math.round((restaurant.rating || 5) * 2) / 2;
               if (ratingDiff <= -1) {
-                return <FullStarIcon key={i} className="md:h-8 md:w-8 fill-white" />;
+                return (
+                  <FullStarIcon key={i} className="fill-white md:h-8 md:w-8" />
+                );
               } else if (ratingDiff < 0) {
-                return <HalfStarIcon key={i} className="md:h-8 md:w-8 fill-white" bgColor="#000" bgOpacity={0.5} />;
+                return (
+                  <HalfStarIcon
+                    key={i}
+                    className="fill-white md:h-8 md:w-8"
+                    bgColor="#000"
+                    bgOpacity={0.5}
+                  />
+                );
               } else {
-                return <EmptyStarIcon key={i} className="md:h-8 md:w-8 fill-white" bgColor="#000" bgOpacity={0.5} />;
+                return (
+                  <EmptyStarIcon
+                    key={i}
+                    className="fill-white md:h-8 md:w-8"
+                    bgColor="#000"
+                    bgOpacity={0.5}
+                  />
+                );
               }
             })}
           </div>
@@ -276,10 +295,11 @@ const FoodCard: React.FC<{
         foodId: food.id,
         quantity: 1,
         foodOptionids: listFoodOptionItem.map((item) => item.id),
-      }), {
-        loading: 'Adding to cart...',
-        success: 'Added to cart!',
-        error: 'Failed to add to cart',
+      }),
+      {
+        loading: "Adding to cart...",
+        success: "Added to cart!",
+        error: "Failed to add to cart",
       }
     );
     resetState();
@@ -289,7 +309,7 @@ const FoodCard: React.FC<{
   return (
     <>
       <div
-        className="flex h-28 overflow-hidden rounded-2xl bg-white md:h-36"
+        className="flex h-28 cursor-pointer overflow-hidden rounded-2xl bg-white md:h-36"
         key={food.id}
         onClick={() => setIsOpen(true)}
       >
@@ -302,7 +322,7 @@ const FoodCard: React.FC<{
             priority
           />
         </div>
-        <div className="text-virparyasMainBlue p-4">
+        <div className="p-4 text-virparyasMainBlue">
           <div className="h-full">
             <h2 className="line-clamp-1 font-bold">{food.name}</h2>
             <p className="mt-1 text-sm">${food.price.toString()}</p>
@@ -343,7 +363,7 @@ const FoodCard: React.FC<{
                       />
                       <p>${item.price.toFixed(2)}</p>
                     </div>
-                    <div className="bg-virparyasBackground h-0.5 w-full last:hidden"></div>
+                    <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
                   </Fragment>
                 ))}
               </div>
@@ -352,11 +372,11 @@ const FoodCard: React.FC<{
         </div>
         <div className="flex justify-center bg-white px-8 pb-4">
           {addToCartMutation.isLoading ? (
-            <Loading className="fill-virparyasMainBlue h-12 w-12 animate-spin text-gray-200" />
+            <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
           ) : !user ? (
             <Link
               href="/signin"
-              className="bg-virparyasMainBlue flex w-full max-w-md items-center justify-center rounded-xl p-3 font-bold text-white"
+              className="flex w-full max-w-md items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
             >
               Login to Add to Cart
             </Link>

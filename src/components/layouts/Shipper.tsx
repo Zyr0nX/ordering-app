@@ -4,7 +4,6 @@ import React from "react";
 import { useThrottledCallback } from "use-debounce";
 import { api } from "~/utils/api";
 
-
 export default function Shipper({ children }: { children: ReactElement }) {
   const updateLocationMutatation = api.shipper.updateLocation.useMutation();
 

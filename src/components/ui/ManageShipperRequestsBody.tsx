@@ -86,13 +86,13 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
 
   return (
     <>
-      <div className="text-virparyasMainBlue m-4">
+      <div className="m-4 text-virparyasMainBlue">
         <div className="mt-4">
           {inProgressOrder ? (
             <>
               <div className="flex flex-col rounded-2xl bg-white p-4">
                 <p>Order: VP-{inProgressOrder.id}</p>
-                <div className="bg-virparyasSeparator h-0.5"></div>
+                <div className="h-0.5 bg-virparyasSeparator"></div>
                 <p>Restaurant Info</p>
                 <p>Name: {inProgressOrder.restaurant.name}</p>
                 <p>Address: {inProgressOrder.restaurant.address}</p>
@@ -103,7 +103,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                   </p>
                 )}
                 <p>Phone number: {inProgressOrder.restaurant.phoneNumber}</p>
-                <div className="bg-virparyasSeparator h-0.5"></div>
+                <div className="h-0.5 bg-virparyasSeparator"></div>
                 <p>Customer Info</p>
                 <p>Name: {inProgressOrder.user.name}</p>
                 <p>Address: {inProgressOrder.user.address}</p>
@@ -114,7 +114,9 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                 <button onClick={handleComplete} disabled={disabled}>
                   complete
                 </button>
-                <button onClick={() => void setIsRejectOpen(true)}>Reject</button>
+                <button onClick={() => void setIsRejectOpen(true)}>
+                  Reject
+                </button>
               </div>
               <Transition appear show={isRejectOpen} as={Fragment}>
                 <Dialog
@@ -145,7 +147,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                         leaveFrom="opacity-100 scale-100"
                         leaveTo="opacity-0 scale-95"
                       >
-                        <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                        <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                           <Dialog.Title as="h3" className="text-3xl font-bold">
                             Order VP-{inProgressOrder.id}
                           </Dialog.Title>
@@ -155,7 +157,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                               <p>{inProgressOrder.user.address}</p>
                               <p>{inProgressOrder.user.phoneNumber}</p>
                             </div>
-                            <div className="bg-virparyasSeparator h-0.5" />
+                            <div className="h-0.5 bg-virparyasSeparator" />
                             <div className="flex flex-col">
                               <div className="flex items-center justify-between">
                                 <label
@@ -165,7 +167,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                                   * Reason for cancelling:
                                 </label>
                                 {isInvalidReason && (
-                                  <p className="text-virparyasRed text-xs">
+                                  <p className="text-xs text-virparyasRed">
                                     Reason is required
                                   </p>
                                 )}
@@ -173,9 +175,9 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
 
                               <textarea
                                 id="phoneNumber"
-                                className={`focus-visible:ring-virparyasMainBlue h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 ${
+                                className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
                                   isInvalidReason
-                                    ? "ring-virparyasRed ring-2"
+                                    ? "ring-2 ring-virparyasRed"
                                     : ""
                                 }`}
                                 placeholder="Reason for cancelling..."
@@ -183,7 +185,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                                 onChange={(e) => setReason(e.target.value)}
                               />
                             </div>
-                            <p className="text-virparyasRed text-center font-semibold">
+                            <p className="text-center font-semibold text-virparyasRed">
                               Cancelling order will affect your rating
                               <br />
                               Proceed with caution
@@ -191,11 +193,11 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
                             <div className="flex justify-center">
                               {rejectOrderMutation.isLoading ? (
                                 <div className="flex justify-center">
-                                  <Loading className="fill-virparyasMainBlue h-10 w-10 animate-spin text-gray-200" />
+                                  <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                                 </div>
                               ) : (
                                 <button
-                                  className="bg-virparyasRed h-10 w-full rounded-xl font-bold text-white"
+                                  className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
                                   onClick={() => void handleReject()}
                                 >
                                   Cancel order

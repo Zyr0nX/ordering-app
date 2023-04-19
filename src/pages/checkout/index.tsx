@@ -427,17 +427,6 @@ const Receipt: React.FC = () => {
   const handleCheckout = async () => {
     await toast.promise(
       stripeMutation.mutateAsync({
-        items: cart.cartItem.map((item) => ({
-          id: item.foodId,
-          name: item.food.name,
-          description: item.foodOption.map((option) => option.name).join(", "),
-          image: item.food.image,
-          amount: item.quantity,
-          quantity: item.quantity,
-          price:
-            item.food.price +
-            item.foodOption.reduce((acc, item) => acc + item.price, 0),
-        })),
         restaurantId: restaurant.id,
       }),
       {

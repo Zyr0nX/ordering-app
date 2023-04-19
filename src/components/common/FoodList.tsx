@@ -94,7 +94,7 @@ const FoodList = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-virparyasBackground text-virparyasMainBlue w-11/12 transform overflow-hidden rounded-2xl p-6 transition-all">
+                <Dialog.Panel className="w-11/12 transform overflow-hidden rounded-2xl bg-virparyasBackground p-6 text-virparyasMainBlue transition-all">
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Add food
                   </Dialog.Title>
@@ -107,7 +107,7 @@ const FoodList = ({
                         <input
                           type="text"
                           id="firstName"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Item name..."
                         />
                       </div>
@@ -118,7 +118,7 @@ const FoodList = ({
                         <input
                           type="text"
                           id="lastName"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Email..."
                         />
                       </div>
@@ -129,7 +129,7 @@ const FoodList = ({
                         <input
                           type="text"
                           id="phone"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Email..."
                         />
                       </div>
@@ -140,7 +140,7 @@ const FoodList = ({
                         <input
                           type="email"
                           id="email"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Email..."
                         />
                       </div>
@@ -151,11 +151,11 @@ const FoodList = ({
                         <input
                           type="text"
                           id="restaurantName"
-                          className="focus-visible:ring-virparyasMainBlue h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2"
+                          className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                           placeholder="Email..."
                         />
                       </div>
-                      <div className="bg-virparyasSeparator h-0.5" />
+                      <div className="h-0.5 bg-virparyasSeparator" />
                       {foodCategories.map((foodCategory, index) => (
                         <FoodOptionInput
                           foodCategory={foodCategory}
