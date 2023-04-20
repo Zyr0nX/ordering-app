@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import SuperJSON from "superjson";
 import { useDebouncedCallback } from "use-debounce";
 import { create } from "zustand";
@@ -191,11 +192,16 @@ const CartBody: React.FC = () => {
     );
   }
   return (
-    <div className="mx-4 my-6 grid grid-cols-1 gap-4 md:mx-32 md:my-8 md:grid-cols-2 md:gap-8">
-      {cartData.map((cart) => (
-        <CartCard cart={cart} key={cart.restaurant.id} />
-      ))}
-    </div>
+    <ResponsiveMasonry
+      columnsCountBreakPoints={{ 639: 1, 767: 2 }}
+      className="mx-4 my-6 md:mx-32 md:my-8"
+    >
+      <Masonry gutter="16px">
+          {cartData.map((cart) => (
+            <CartCard cart={cart} key={cart.restaurant.id} />
+          ))}
+      </Masonry>
+    </ResponsiveMasonry>
   );
 };
 
