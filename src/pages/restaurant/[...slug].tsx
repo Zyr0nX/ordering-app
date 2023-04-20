@@ -375,7 +375,7 @@ const FoodCard: React.FC<{
             <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />
           ) : !user ? (
             <Link
-              href="/signin"
+              href="/login"
               className="flex w-full max-w-md items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
             >
               Login to Add to Cart
