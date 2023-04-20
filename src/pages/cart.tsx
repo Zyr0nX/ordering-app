@@ -197,9 +197,9 @@ const CartBody: React.FC = () => {
       className="mx-4 my-6 md:mx-32 md:my-8"
     >
       <Masonry gutter="16px">
-          {cartData.map((cart) => (
-            <CartCard cart={cart} key={cart.restaurant.id} />
-          ))}
+        {cartData.map((cart) => (
+          <CartCard cart={cart} key={cart.restaurant.id} />
+        ))}
       </Masonry>
     </ResponsiveMasonry>
   );

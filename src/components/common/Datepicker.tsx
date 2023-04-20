@@ -1,7 +1,11 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useField } from "formik";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
+
+dayjs.extend(customParseFormat);
 
 interface DatepickerProps {
   label: string;
@@ -15,6 +19,31 @@ const Datepicker: React.FC<DatepickerProps> = ({ label, name }) => {
     year: string;
   }>(name);
 
+  const fieldRef = useRef(field);
+
+  useEffect(() => {
+    if (
+      !dayjs(
+        `${field.value.year}-${field.value.month}-${field.value.date}`,
+        "YYYY-MMM-D",
+        true
+      ).isValid()
+    ) {
+      fieldRef.current.onChange({
+        target: {
+          name,
+          value: {
+            date: dayjs(
+              `${field.value.year}-${field.value.month}`,
+              "YYYY-MMM"
+            ).daysInMonth(),
+            month: field.value.month,
+            year: field.value.year,
+          },
+        },
+      });
+    }
+  }, [field.value.date, field.value.month, field.value.year, name]);
   return (
     <div className="flex flex-col">
       <div className="inline-flex items-center justify-between">
@@ -67,17 +96,16 @@ const Datepicker: React.FC<DatepickerProps> = ({ label, name }) => {
                   <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                     {Array.from(
                       {
-                        length:
-                          new Date(
-                            new Date(`${field.value.year}`).getFullYear(),
-                            new Date(`${field.value.month} 0`).getMonth() + 1,
-                            0
-                          ).getDate(),
+                        length: dayjs(
+                          `${field.value.year}-${field.value.month}`
+                        ).daysInMonth(),
                       },
                       (_, index) =>
-                        new Date(0, 0, index + 1).toLocaleString("en-US", {
-                          day: "numeric",
-                        })
+                        dayjs(
+                          `${field.value.year}-${field.value.month}-${
+                            index + 1
+                          }`
+                        ).format("D")
                     ).map((day) => (
                       <Listbox.Option
                         key={day}
@@ -147,9 +175,7 @@ const Datepicker: React.FC<DatepickerProps> = ({ label, name }) => {
                 >
                   <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                     {Array.from({ length: 12 }, (_, index) =>
-                      new Date(0, index).toLocaleString("en-US", {
-                        month: "short",
-                      })
+                      dayjs().month(index).format("MMM")
                     ).map((month) => (
                       <Listbox.Option
                         key={month}
@@ -218,13 +244,9 @@ const Datepicker: React.FC<DatepickerProps> = ({ label, name }) => {
                   leaveTo="opacity-0"
                 >
                   <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
-                    {Array.from({ length: 50 }, (_, index) => {
-                      const date = new Date();
-                      date.setFullYear(date.getFullYear() - index);
-                      return date.toLocaleString("en-US", {
-                        year: "numeric",
-                      });
-                    })
+                    {Array.from({ length: 50 }, (_, index) =>
+                      dayjs().subtract(index, "year").format("YYYY")
+                    )
                       .reverse()
                       .map((year) => (
                         <Listbox.Option

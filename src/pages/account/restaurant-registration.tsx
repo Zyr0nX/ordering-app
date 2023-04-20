@@ -22,7 +22,7 @@ import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { RouterOutputs, api } from "~/utils/api";
+import { api } from "~/utils/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -49,7 +49,10 @@ export const getServerSideProps = async (
     };
   }
 
-  await helpers.cuisine.getAll.prefetch();
+  await Promise.all([
+    helpers.cuisine.getAll.prefetch(),
+    helpers.user.getRestaurantRegistrationInformation.prefetch(),
+  ]);
 
   return {
     props: {
@@ -74,21 +77,27 @@ const RestaurantRegistration: NextPage<
 const RestaurantRegistrationForm: React.FC = () => {
   const router = useRouter();
   const registrationMutation = api.restaurant.registration.useMutation();
+  const { data: registrationData } =
+    api.user.getRestaurantRegistrationInformation.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+    });
   return (
     <div className="mx-4 mt-6 text-virparyasMainBlue">
       <Formik
         initialValues={{
-          firstName: "",
-          lastName: "",
-          phoneNumber: "",
-          restaurantName: "",
+          firstName: registrationData?.firstName || "",
+          lastName: registrationData?.lastName || "",
+          phoneNumber: registrationData?.phoneNumber || "",
+          restaurantName: registrationData?.name || "",
           address: {
-            description: "",
-            place_id: "",
+            description: registrationData?.address || "",
+            place_id: registrationData?.addressId || "",
           },
-          additionalAddress: "",
+          additionalAddress: registrationData?.additionalAddress || "",
           cuisine: {
-            id: "",
+            id: registrationData?.cuisineId || "",
           },
         }}
         onSubmit={async (values) => {

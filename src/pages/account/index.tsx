@@ -26,14 +26,14 @@ const GuestAccountHome: React.FC = () => {
       <MainButton
         text="Account Information"
         icon={
-          <AccountIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+          <AccountIcon className="h-16 w-16 fill-virparyasMainBlue md:h-24 md:w-24" />
         }
         href="/account/information"
       />
       <MainButton
         text="Cart"
         icon={
-          <CartIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+          <CartIcon className="h-16 w-16 fill-virparyasMainBlue md:h-24 md:w-24" />
         }
         href="/cart"
       />
@@ -47,9 +47,9 @@ const GuestAccountHome: React.FC = () => {
         onClick={() => void signOut()}
       >
         <div>
-          <LogoutIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+          <LogoutIcon className="h-16 w-16 fill-virparyasMainBlue md:h-24 md:w-24" />
         </div>
-        <p className="text-virparyasMainBlue text-center text-xl font-medium md:text-4xl">
+        <p className="text-center text-xl font-medium text-virparyasMainBlue md:text-4xl">
           Log out
         </p>
       </button>

@@ -69,7 +69,6 @@ const GuestAccountInformation = () => {
   const updateUserMutation = api.user.updateInfo.useMutation();
   const { data: user } = api.user.getInfomation.useQuery();
   if (!user) return null;
-  console.log(user.name);
   return (
     <div className="m-4 text-virparyasMainBlue md:m-8">
       <Formik

@@ -1,4 +1,5 @@
 import { GeocodeResult } from "@googlemaps/google-maps-services-js";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { protectedProcedure, createTRPCRouter } from "~/server/api/trpc";
@@ -174,4 +175,62 @@ export const userRouter = createTRPCRouter({
     });
     return user;
   }),
+  getRestaurantRegistrationInformation: protectedProcedure.query(
+    async ({ ctx }) => {
+      const registrationInformation = await ctx.prisma.restaurant.findUnique({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          address: true,
+          addressId: true,
+          additionalAddress: true,
+          name: true,
+          cuisineId: true,
+          approved: true,
+        },
+      });
+      if (!registrationInformation) {
+        return null;
+      }
+      if (registrationInformation.approved !== "PENDING") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are already a restaurant",
+        });
+      }
+      return registrationInformation;
+    }
+  ),
+  getShipperRegistrationInformation: protectedProcedure.query(
+    async ({ ctx }) => {
+      const registrationInformation = await ctx.prisma.shipper.findUnique({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        select: {
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          dateOfBirth: true,
+          identificationNumber: true,
+          licensePlate: true,
+          approved: true,
+        },
+      });
+      if (!registrationInformation) {
+        return null;
+      }
+      if (registrationInformation.approved !== "PENDING") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are already a shipper",
+        });
+      }
+      return registrationInformation;
+    }
+  ),
 });
