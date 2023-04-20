@@ -1,7 +1,12 @@
 import { type NextPage } from "next";
+import { signOut } from "next-auth/react";
 import React from "react";
+import MainButton from "~/components/common/MainButton";
+import AccountIcon from "~/components/icons/AccountIcon";
+import CartIcon from "~/components/icons/CartIcon";
+import LogoutIcon from "~/components/icons/LogoutIcon";
+import OrderIcon from "~/components/icons/OrderIcon";
 import Guest from "~/components/layouts/Guest";
-import GuestAccountHome from "~/components/ui/GuestAccountHome";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 
 const Index: NextPage = () => {
@@ -12,6 +17,43 @@ const Index: NextPage = () => {
         <GuestAccountHome />
       </>
     </Guest>
+  );
+};
+
+const GuestAccountHome: React.FC = () => {
+  return (
+    <div className="m-4 grid grid-cols-2 gap-4 md:m-8">
+      <MainButton
+        text="Account Information"
+        icon={
+          <AccountIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+        }
+        href="/account/information"
+      />
+      <MainButton
+        text="Cart"
+        icon={
+          <CartIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+        }
+        href="/cart"
+      />
+      <MainButton
+        text="Order History"
+        icon={<OrderIcon className="md:h-24 md:w-24" />}
+        href="/orders/history"
+      />
+      <button
+        className="flex h-40 flex-col items-center justify-center gap-2 rounded-2xl bg-white shadow-[0_4px_5px_0_rgba(0,0,0,0.1)] md:flex-row md:gap-8"
+        onClick={() => void signOut()}
+      >
+        <div>
+          <LogoutIcon className="fill-virparyasMainBlue h-16 w-16 md:h-24 md:w-24" />
+        </div>
+        <p className="text-virparyasMainBlue text-center text-xl font-medium md:text-4xl">
+          Log out
+        </p>
+      </button>
+    </div>
   );
 };
 

@@ -548,4 +548,105 @@ export const orderRouter = createTRPCRouter({
     });
     return orders;
   }),
+  getOrderByUser: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.number(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const order = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          orderFood: {
+            select: {
+              id: true,
+              foodName: true,
+              foodOption: true,
+              price: true,
+              quantity: true,
+            },
+          },
+          restaurant: {
+            select: {
+              name: true,
+            },
+          },
+          shipper: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+          userId: true,
+          restaurantAddress: true,
+          shippingFee: true,
+          status: true,
+          restaurantRating: true,
+          shipperRating: true,
+          createdAt: true,
+        },
+      });
+      if (!order) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order not found",
+        });
+      }
+      if (order.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to view this order",
+        });
+      }
+      return order;
+    }),
+  rateOrder: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.number(),
+        restaurantRating: z.number().min(1).max(5),
+        shipperRating: z.number().min(1).max(5),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const order = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
+        },
+        select: {
+          status: true,
+          userId: true,
+        },
+      });
+      if (!order) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Order not found",
+        });
+      }
+      if (order.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to rate this order",
+        });
+      }
+      if (order.status !== "DELIVERED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You can only rate an order after it has been delivered",
+        });
+      }
+      await ctx.prisma.order.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          restaurantRating: input.restaurantRating,
+          shipperRating: input.shipperRating,
+        },
+      });
+    }),
 });
