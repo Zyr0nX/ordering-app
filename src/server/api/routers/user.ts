@@ -196,12 +196,12 @@ export const userRouter = createTRPCRouter({
       if (!registrationInformation) {
         return null;
       }
-      if (registrationInformation.approved !== "PENDING") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "You are already a restaurant",
-        });
-      }
+      // if (registrationInformation.approved !== "PENDING") {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "You are already a restaurant",
+      //   });
+      // }
       return registrationInformation;
     }
   ),

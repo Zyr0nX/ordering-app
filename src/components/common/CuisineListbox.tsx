@@ -83,7 +83,7 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
                           active ? "bg-[#E9E9FF]" : "text-gray-900"
                         }`
                       }
-                      value={cuisine}
+                      value={cuisine.id}
                     >
                       {({ selected }) => (
                         <span

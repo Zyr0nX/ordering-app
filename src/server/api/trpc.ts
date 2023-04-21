@@ -29,6 +29,7 @@ import { redis } from "~/server/cache";
 import { prisma } from "~/server/db";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
+import { cloudinary } from "~/server/cloudinary";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -51,6 +52,7 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
     stripe,
     maps,
     redis,
+    cloudinary
   };
 };
 

@@ -1,14 +1,10 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
-import {
-  getCountries,
-  getCountryCallingCode,
-  type CountryCode,
-  formatIncompletePhoneNumber,
-} from "libphonenumber-js/min";
+import { getCountries, getCountryCallingCode, type CountryCode, formatIncompletePhoneNumber } from "libphonenumber-js/min";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
+
 
 interface PhoneNumberInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -32,14 +28,22 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   const prevSelectedRef = React.useRef<CountryCode>(selected);
   const helperRef = React.useRef(helper);
   useEffect(() => {
+    if (!enableCurrentLocation) {
+      return;
+    }
     if (prevSelectedRef.current === selected) {
       return; // selected hasn't changed, so return early
     }
     prevSelectedRef.current = selected; // update the reference
     helperRef.current.setValue(`+${getCountryCallingCode(selected)} `);
-  }, [selected]);
+  }, [enableCurrentLocation, selected]);
 
   const format = (value: string) => {
+    if (!enableCurrentLocation) {
+      const phoneNumber = formatIncompletePhoneNumber(value);
+      helper.setValue(phoneNumber);
+      return;
+    }
     const phoneNumber = formatIncompletePhoneNumber(value, selected);
     if (!phoneNumber.startsWith(`+${getCountryCallingCode(selected)} `)) {
       if (value.length <= 1) {
@@ -63,7 +67,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         )}
       </div>
 
-      {country_code || enableCurrentLocation && (
+      {enableCurrentLocation ? (
         <Listbox value={selected} onChange={setSelected}>
           {({ open }) => (
             <div className="relative w-full shrink-0">
@@ -131,6 +135,17 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
             </div>
           )}
         </Listbox>
+      ) : (
+        <input
+          type="text"
+          id={id}
+          className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+            meta.error && meta.touched ? "ring-2 ring-virparyasRed" : ""
+          }`}
+          {...field}
+          {...props}
+          onChange={(e) => format(e.target.value)}
+        />
       )}
     </div>
   );

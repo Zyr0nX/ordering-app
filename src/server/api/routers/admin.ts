@@ -124,9 +124,22 @@ export const adminRouter = createTRPCRouter({
       where: {
         approved: "APPROVED",
       },
-      include: {
-        user: true,
-        cuisine: true,
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        addressId: true,
+        additionalAddress: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        image: true,
+        cuisineId: true,
+        user: {
+          select: {
+            email: true,
+          }
+        }
       },
     });
   }),
@@ -136,6 +149,7 @@ export const adminRouter = createTRPCRouter({
         restaurantId: z.string().cuid(),
         restaurantName: z.string(),
         address: z.string(),
+        addressId: z.string(),
         additionalAddress: z.string().nullish(),
         firstName: z.string(),
         lastName: z.string(),

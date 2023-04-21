@@ -2,17 +2,18 @@ import { Dialog, Transition } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import fuzzysort from "fuzzysort";
-import {
-  type GetServerSidePropsContext,
-  type NextPage,
-  type InferGetServerSidePropsType,
-} from "next";
+import { type GetServerSidePropsContext, type NextPage, type InferGetServerSidePropsType } from "next";
 import React, { Fragment, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import { create } from "zustand";
 import Input from "~/components/common/CommonInput";
 import CuisineListbox from "~/components/common/CuisineListbox";
+import ImageUpload from "~/components/common/ImageUpload";
+import Loading from "~/components/common/Loading";
+import PhoneNumberInput from "~/components/common/PhoneNumberInput";
 import PlaceAutoCompleteCombobox from "~/components/common/PlaceAutoCompleteCombobox";
+import TextArea from "~/components/common/TextArea";
 import BluePencil from "~/components/icons/BluePencil";
 import RedCross from "~/components/icons/RedCross";
 import SearchIcon from "~/components/icons/SearchIcon";
@@ -22,7 +23,8 @@ import AdminCommonHeader from "~/components/ui/AdminCommonHeader";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { RouterOutputs, api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
+
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -56,7 +58,7 @@ interface AdminRestaurantState {
   restaurantList: RouterOutputs["admin"]["getApprovedRestaurants"];
 }
 
-const useAdminRestaurantStore = create<AdminRestaurantState>((set) => ({
+const useAdminRestaurantStore = create<AdminRestaurantState>(() => ({
   restaurantList: [],
 }));
 
@@ -83,12 +85,10 @@ const AdminRestaurantsBody: React.FC = () => {
     undefined,
     {
       refetchInterval: 5000,
-      enabled: !searchRef.current?.value,
       onSuccess: (data) => {
-        if (!searchRef.current?.value)
-          useAdminRestaurantStore.setState({
-            restaurantList: data,
-          });
+        useAdminRestaurantStore.setState({
+          restaurantList: data,
+        });
       },
     }
   );
@@ -151,8 +151,42 @@ const AdminRestaurantsBody: React.FC = () => {
 const RestaurantAdminCard: React.FC<{
   restaurant: RouterOutputs["admin"]["getApprovedRestaurants"][number];
 }> = ({ restaurant }) => {
+  const restaurantList = useAdminRestaurantStore(
+    (state) => state.restaurantList
+  );
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
+  const utils = api.useContext();
+  const cloudinaryUploadMutation = api.cloudinary.upload.useMutation();
+  const editRestaurantMutation = api.admin.editRestaurant.useMutation({
+    onSuccess: (data) => {
+      const newRestaurantList = restaurantList.map((restaurant) => {
+        if (restaurant.id === data.id) {
+          return {
+            ...restaurant,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phoneNumber: data.phoneNumber,
+            name: data.name,
+            address: data.address,
+            addressId: data.addressId,
+            additionalAddress: data.additionalAddress,
+            cuisineId: data.cuisineId,
+            image: data.image,
+          };
+        } else {
+          return restaurant;
+        }
+      });
+      useAdminRestaurantStore.setState({
+        restaurantList: newRestaurantList,
+      });
+    },
+    onSettled: () => {
+      void utils.admin.getApprovedRestaurants.invalidate();
+    },
+  });
+
   return (
     <>
       <div className="flex flex-auto rounded-2xl bg-white p-4 pt-3 shadow-md">
@@ -217,7 +251,68 @@ const RestaurantAdminCard: React.FC<{
                     Edit {restaurant.name}
                   </Dialog.Title>
                   <div className="mt-2">
-                    <Formik>
+                    <Formik
+                      initialValues={{
+                        cuisine: {
+                          id: restaurant.cuisineId
+                        },
+                        restaurantName: restaurant.name,
+                        address: {
+                          description: restaurant.address,
+                          place_id: restaurant.addressId,
+                        },
+                        additionalAddress: restaurant.additionalAddress,
+                        phoneNumber: restaurant.phoneNumber,
+                        firstName: restaurant.firstName,
+                        lastName: restaurant.lastName,
+                        email: restaurant.user.email,
+                        image: restaurant.image,
+                      }}
+                      onSubmit={async (values) => {
+                        if (values.image === restaurant.image || !values.image) {
+                          await toast.promise(
+                            editRestaurantMutation.mutateAsync({
+                              restaurantId: restaurant.id,
+                              restaurantName: values.restaurantName,
+                              address: values.address.description,
+                              addressId: values.address.place_id,
+                              additionalAddress: values.additionalAddress,
+                              phoneNumber: values.phoneNumber,
+                              cuisineId: values.cuisine.id,
+                              firstName: values.firstName,
+                              lastName: values.lastName,
+                            }),
+                            {
+                              loading: "Editing restaurant...",
+                              success: "Restaurant edited!",
+                              error: "Failed to edit restaurant",
+                            }
+                          );
+                          return;
+                        }
+                        await toast.promise(
+                          editRestaurantMutation.mutateAsync({
+                            restaurantId: restaurant.id,
+                            restaurantName: values.restaurantName,
+                            address: values.address.description,
+                            addressId: values.address.place_id,
+                            additionalAddress: values.additionalAddress,
+                            phoneNumber: values.phoneNumber,
+                            cuisineId: values.cuisine.id,
+                            firstName: values.firstName,
+                            lastName: values.lastName,
+                            image: await cloudinaryUploadMutation.mutateAsync({
+                              file: values.image,
+                            }),
+                          }),
+                          {
+                            loading: "Editing restaurant...",
+                            success: "Restaurant edited!",
+                            error: "Failed to edit restaurant",
+                          }
+                        );
+                      }}
+                    >
                       <Form className="grid grid-cols-1 gap-4">
                         <CuisineListbox
                           label="* Cuisine:"
@@ -244,139 +339,63 @@ const RestaurantAdminCard: React.FC<{
                           name="additionalAddress"
                           placeholder="Additional address..."
                         />
+                        <PhoneNumberInput
+                          label="* Phone number:"
+                          name="phoneNumber"
+                          placeholder="Phone number..."
+                          enableCurrentLocation={false}
+                        />
 
                         <div className="flex gap-4">
-            <div className="grow">
-              <Input
-                type="text"
-                label="* First name:"
-                name="firstName"
-                placeholder="First name..."
-              />
-            </div>
-            <div className="grow">
-              <Input
-                type="text"
-                label="* Last name:"
-                name="lastName"
-                placeholder="Last name..."
-              />
-            </div>
-          </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="phoneNumber"
-                              className="whitespace-nowrap font-medium"
-                            >
-                              * Phone number:
-                            </label>
-                            {isInvalidPhoneNumber && (
-                              <p className="text-xs text-virparyasRed">
-                                Address is required
-                              </p>
-                            )}
-                          </div>
-
-                          <input
-                            type="text"
-                            id="phoneNumber"
-                            className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                              isInvalidPhoneNumber
-                                ? "ring-2 ring-virparyasRed"
-                                : ""
-                            }`}
-                            placeholder="Address..."
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="email"
-                            className="whitespace-nowrap font-medium"
-                          >
-                            Email:
-                          </label>
-
-                          <input
-                            type="email"
-                            id="email"
-                            className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                            disabled
-                            value={restaurant.user.email || ""}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center justify-between">
-                            <label
-                              htmlFor="brandImage"
-                              className="truncate font-medium"
-                            >
-                              * Image:
-                            </label>
-                            {isInvalidImage && (
-                              <p className="text-xs text-virparyasRed">
-                                Image is required
-                              </p>
-                            )}
-                          </div>
-
-                          <div
-                            className={`relative h-[125px] w-full overflow-hidden rounded-xl ${
-                              isInvalidImage ? "ring-2 ring-virparyasRed" : ""
-                            }`}
-                          >
-                            <div className="absolute top-0 z-10 flex h-full w-full flex-col items-center justify-center gap-2 bg-black/60">
-                              <CloudIcon />
-                              <p className="font-medium text-white">
-                                Upload a new image
-                              </p>
-                            </div>
-                            <input
-                              type="file"
-                              id="brandImage"
-                              className="absolute top-0 z-10 h-full w-full cursor-pointer opacity-0"
-                              accept="image/*"
-                              onChange={(e) => void handleSelectImage(e)}
+                          <div className="grow">
+                            <Input
+                              type="text"
+                              label="* First name:"
+                              name="firstName"
+                              placeholder="First name..."
                             />
-                            {base64Image ? (
-                              <Image
-                                src={base64Image}
-                                alt="Image"
-                                fill
-                                className="object-cover"
-                              ></Image>
-                            ) : (
-                              <Image
-                                src={restaurant.image || ""}
-                                alt="Image"
-                                fill
-                                className="object-cover"
-                              ></Image>
-                            )}
                           </div>
-                          <div className="mt-4 grid grid-cols-2 gap-4">
-                            <button
-                              className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
-                              onClick={handleDiscard}
-                            >
-                              Discard
-                            </button>
-                            {cloudinaryUploadMutation.isLoading ||
-                            editRestaurantMutation.isLoading ? (
-                              <div className="flex justify-center">
-                                <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
-                              </div>
-                            ) : (
+                          <div className="grow">
+                            <Input
+                              type="text"
+                              label="* Last name:"
+                              name="lastName"
+                              placeholder="Last name..."
+                            />
+                          </div>
+                        </div>
+
+                        <Input
+                          type="email"
+                          label="Email: "
+                          name="email"
+                          placeholder="Email..."
+                          disabled
+                        />
+                        <ImageUpload
+                          label="* Image:"
+                          name="image"
+                          placeholder="Choose an image"
+                        />
+                        <div className="px-auto mt-4 flex w-full justify-center gap-4">
+                          {editRestaurantMutation.isLoading ? (
+                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                          ) : (
+                            <>
                               <button
-                                className="h-10 w-full rounded-xl bg-virparyasLightBlue font-bold text-white"
-                                onClick={() => void handleEditRestaurant()}
+                                type="button"
+                                className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
+                              >
+                                Discard
+                              </button>
+                              <button
+                                type="submit"
+                                className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white"
                               >
                                 Confirm
                               </button>
-                            )}
-                          </div>
+                            </>
+                          )}
                         </div>
                       </Form>
                     </Formik>
@@ -420,45 +439,22 @@ const RestaurantAdminCard: React.FC<{
                   <Dialog.Title as="h3" className="text-3xl font-bold">
                     Disable {restaurant.name}
                   </Dialog.Title>
-                  <div className="flex flex-col">
-                    <div className="flex items-center justify-between">
-                      <label
-                        htmlFor="phoneNumber"
-                        className="whitespace-nowrap font-medium"
-                      >
-                        * Reason for disabling account:
-                      </label>
-                      {isInvalidReason && (
-                        <p className="text-xs text-virparyasRed">
-                          Reason is required
-                        </p>
-                      )}
-                    </div>
-
-                    <textarea
-                      id="phoneNumber"
-                      className={`h-40 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
-                        isInvalidReason ? "ring-2 ring-virparyasRed" : ""
-                      }`}
-                      placeholder="Reason for disabling account..."
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                    />
-                  </div>
-                  <div className="mt-4 flex justify-center gap-4">
-                    {disableRestaurantMutation.isLoading ? (
-                      <div className="flex justify-center">
-                        <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
-                      </div>
-                    ) : (
-                      <button
-                        className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
-                        onClick={() => void handleDisable()}
-                      >
-                        Disable account
-                      </button>
-                    )}
-                  </div>
+                  <Formik
+                    initialValues={{
+                      reason: "",
+                    }}
+                    onSubmit={(values) => {
+                      console.log(values);
+                    }}
+                  >
+                    <Form className="grid grid-cols-1 gap-4">
+                      <TextArea
+                        label="* Reason for disable account:"
+                        name="reason"
+                        placeholder="Reason for disable account..."
+                      />
+                    </Form>
+                  </Formik>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
