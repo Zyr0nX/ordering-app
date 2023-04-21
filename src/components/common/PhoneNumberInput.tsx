@@ -13,12 +13,14 @@ import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
 interface PhoneNumberInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
   label: string;
   name: string;
+  enableCurrentLocation?: boolean;
 }
 
 const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   label,
   name,
   id,
+  enableCurrentLocation = true,
   ...props
 }) => {
   const [field, meta, helper] = useField<string>(name);
@@ -61,7 +63,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         )}
       </div>
 
-      {country_code && (
+      {country_code || enableCurrentLocation && (
         <Listbox value={selected} onChange={setSelected}>
           {({ open }) => (
             <div className="relative w-full shrink-0">

@@ -11,12 +11,14 @@ interface PlaceAutoCompleteComboboxProps
   extends HtmlHTMLAttributes<HTMLInputElement> {
   label: string;
   name: string;
+  enableCurrentAddress?: boolean;
 }
 
 const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
   label,
   name,
   id,
+  enableCurrentAddress = true,
   ...props
 }) => {
   const [field, meta, helper] =
@@ -141,17 +143,19 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
                   id={id}
                   {...props}
                 />
-                <button
-                  type="button"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white"
-                  onClick={() => void handleCurrentAddress()}
-                >
-                  {isReverseGeocodeLoading ? (
-                    <Loading className="h-6 w-6 animate-spin fill-virparyasMainBlue text-gray-200" />
-                  ) : (
-                    <LocationIcon />
-                  )}
-                </button>
+                {enableCurrentAddress && (
+                  <button
+                    type="button"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white"
+                    onClick={() => void handleCurrentAddress()}
+                  >
+                    {isReverseGeocodeLoading ? (
+                      <Loading className="h-6 w-6 animate-spin fill-virparyasMainBlue text-gray-200" />
+                    ) : (
+                      <LocationIcon />
+                    )}
+                  </button>
+                )}
               </div>
 
               <Transition
