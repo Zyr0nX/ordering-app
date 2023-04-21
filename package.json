@@ -48,6 +48,7 @@
     "superjson": "^1.12.2",
     "use-debounce": "^9.0.3",
     "zod": "^3.18.0",
+    "zod-formik-adapter": "^1.2.0",
     "zustand": "^4.3.7"
   },
   "devDependencies": {

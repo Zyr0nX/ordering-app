@@ -26,10 +26,11 @@ import { type Session } from "next-auth";
 import superjson from "superjson";
 import { getServerAuthSession } from "~/server/auth";
 import { redis } from "~/server/cache";
+import { cloudinary } from "~/server/cloudinary";
 import { prisma } from "~/server/db";
+import { nodemailer } from "~/server/email";
 import { maps } from "~/server/maps";
 import { stripe } from "~/server/stripe";
-import { cloudinary } from "~/server/cloudinary";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -52,7 +53,8 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
     stripe,
     maps,
     redis,
-    cloudinary
+    cloudinary,
+    nodemailer,
   };
 };
 

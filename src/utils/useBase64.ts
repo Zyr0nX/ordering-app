@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
 
-const useBase64 = (file: Blob | null) => {
+const useBase64 = (file: File | null) => {
   const [result, setResult] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [isError, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    setResult(null);
     const reader = new FileReader();
 
     reader.onloadstart = () => {
       setLoading(true);
-      setError(false);
-      setResult(null);
     };
 
     reader.onload = () => {

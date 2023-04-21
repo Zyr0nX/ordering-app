@@ -211,7 +211,7 @@ export const stripeRouter = createTRPCRouter({
       return checkoutSession;
     }),
   createRestaurantConnectedAccount: protectedProcedure.mutation(
-    async ({ ctx, input }) => {
+    async ({ ctx }) => {
       const { stripe, prisma } = ctx;
 
       const restaurant = await prisma.restaurant.findUnique({

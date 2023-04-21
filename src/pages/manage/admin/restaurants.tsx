@@ -2,10 +2,17 @@ import { Dialog, Transition } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import fuzzysort from "fuzzysort";
-import { type GetServerSidePropsContext, type NextPage, type InferGetServerSidePropsType } from "next";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
+import {
+  type GetServerSidePropsContext,
+  type NextPage,
+  type InferGetServerSidePropsType,
+} from "next";
 import React, { Fragment, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
+import { z } from "zod";
+import { toFormikValidationSchema } from "zod-formik-adapter";
 import { create } from "zustand";
 import Input from "~/components/common/CommonInput";
 import CuisineListbox from "~/components/common/CuisineListbox";
@@ -24,7 +31,6 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { type RouterOutputs, api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -157,7 +163,6 @@ const RestaurantAdminCard: React.FC<{
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
-  const cloudinaryUploadMutation = api.cloudinary.upload.useMutation();
   const editRestaurantMutation = api.admin.editRestaurant.useMutation({
     onSuccess: (data) => {
       const newRestaurantList = restaurantList.map((restaurant) => {
@@ -186,6 +191,8 @@ const RestaurantAdminCard: React.FC<{
       void utils.admin.getApprovedRestaurants.invalidate();
     },
   });
+
+  const disableRestaurantMutation = api.admin.disableRestaurant.useMutation();
 
   return (
     <>
@@ -253,9 +260,7 @@ const RestaurantAdminCard: React.FC<{
                   <div className="mt-2">
                     <Formik
                       initialValues={{
-                        cuisine: {
-                          id: restaurant.cuisineId
-                        },
+                        cuisine: restaurant.cuisineId,
                         restaurantName: restaurant.name,
                         address: {
                           description: restaurant.address,
@@ -269,7 +274,10 @@ const RestaurantAdminCard: React.FC<{
                         image: restaurant.image,
                       }}
                       onSubmit={async (values) => {
-                        if (values.image === restaurant.image || !values.image) {
+                        if (
+                          values.image === restaurant.image ||
+                          !values.image
+                        ) {
                           await toast.promise(
                             editRestaurantMutation.mutateAsync({
                               restaurantId: restaurant.id,
@@ -278,14 +286,16 @@ const RestaurantAdminCard: React.FC<{
                               addressId: values.address.place_id,
                               additionalAddress: values.additionalAddress,
                               phoneNumber: values.phoneNumber,
-                              cuisineId: values.cuisine.id,
+                              cuisineId: values.cuisine,
                               firstName: values.firstName,
                               lastName: values.lastName,
                             }),
                             {
                               loading: "Editing restaurant...",
                               success: "Restaurant edited!",
-                              error: "Failed to edit restaurant",
+                              error:
+                                editRestaurantMutation.error?.message ||
+                                "Failed to edit restaurant",
                             }
                           );
                           return;
@@ -298,20 +308,104 @@ const RestaurantAdminCard: React.FC<{
                             addressId: values.address.place_id,
                             additionalAddress: values.additionalAddress,
                             phoneNumber: values.phoneNumber,
-                            cuisineId: values.cuisine.id,
+                            cuisineId: values.cuisine,
                             firstName: values.firstName,
                             lastName: values.lastName,
-                            image: await cloudinaryUploadMutation.mutateAsync({
-                              file: values.image,
-                            }),
+                            image: values.image,
                           }),
                           {
                             loading: "Editing restaurant...",
                             success: "Restaurant edited!",
-                            error: "Failed to edit restaurant",
+                            error:
+                              editRestaurantMutation.error?.message ||
+                              "Failed to edit restaurant",
                           }
                         );
                       }}
+                      validationSchema={toFormikValidationSchema(
+                        z.object({
+                          restaurantName: z
+                            .string({
+                              required_error: "Restaurant name is required",
+                              invalid_type_error:
+                                "Restaurant name must be a string",
+                            })
+                            .nonempty({
+                              message: "Restaurant name is required",
+                            })
+                            .max(191, {
+                              message: "Restaurant name is too long",
+                            }),
+                          address: z.object({
+                            description: z
+                              .string({
+                                required_error: "Address is required",
+                                invalid_type_error: "Address must be a string",
+                              })
+                              .nonempty({
+                                message: "Address is required",
+                              })
+                              .max(191, {
+                                message: "Address is too long",
+                              }),
+                            place_id: z
+                              .string({
+                                required_error: "Address is required",
+                                invalid_type_error: "Address must be a string",
+                              })
+                              .nonempty({
+                                message: "Address is required",
+                              })
+                              .max(191, {
+                                message: "Address is too long",
+                              }),
+                          }),
+                          phoneNumber: z
+                            .string({
+                              required_error: "Phone number is required",
+                              invalid_type_error:
+                                "Phone number must be a string",
+                            })
+                            .refine((value) => isValidPhoneNumber(value), {
+                              message: "Phone number is invalid",
+                            }),
+                          firstName: z
+                            .string({
+                              required_error: "First name is required",
+                              invalid_type_error: "First name must be a string",
+                            })
+                            .nonempty({
+                              message: "First name is required",
+                            })
+                            .max(191, {
+                              message: "First name is too long",
+                            }),
+                          lastName: z
+                            .string({
+                              required_error: "Last name is required",
+                              invalid_type_error: "Last name must be a string",
+                            })
+                            .nonempty({
+                              message: "Last name is required",
+                            })
+                            .max(191, {
+                              message: "Last name is too long",
+                            }),
+                          image: z
+                            .string()
+                            .url({
+                              message: "Image is invalid",
+                            })
+                            .refine(
+                              (value) =>
+                                new TextEncoder().encode(value).length <=
+                                4 * 1024 * 1024,
+                              {
+                                message: "Image is too large",
+                              }
+                            ),
+                        })
+                      )}
                     >
                       <Form className="grid grid-cols-1 gap-4">
                         <CuisineListbox
@@ -367,7 +461,7 @@ const RestaurantAdminCard: React.FC<{
 
                         <Input
                           type="email"
-                          label="Email: "
+                          label="Email:"
                           name="email"
                           placeholder="Email..."
                           disabled
@@ -443,9 +537,38 @@ const RestaurantAdminCard: React.FC<{
                     initialValues={{
                       reason: "",
                     }}
-                    onSubmit={(values) => {
-                      console.log(values);
+                    onSubmit={async (values) => {
+                      await toast.promise(
+                        disableRestaurantMutation.mutateAsync({
+                          restaurantId: restaurant.id,
+                          reason: values.reason,
+                        }),
+                        {
+                          loading: "Disabling restaurant...",
+                          success: "Restaurant disabled",
+                          error:
+                            disableRestaurantMutation.error?.message ||
+                            "Failed to disable restaurant",
+                        }
+                      );
                     }}
+                    validationSchema={toFormikValidationSchema(
+                      z
+                        .object({
+                          reason: z
+                            .string({
+                              required_error: "Reason is required",
+                              invalid_type_error: "Reason must be a string",
+                            })
+                            .nonempty({
+                              message: "Reason is required",
+                            })
+                            .max(191, {
+                              message: "Reason is too long",
+                            }),
+                        })
+                        .nonstrict()
+                    )}
                   >
                     <Form className="grid grid-cols-1 gap-4">
                       <TextArea
@@ -453,6 +576,20 @@ const RestaurantAdminCard: React.FC<{
                         name="reason"
                         placeholder="Reason for disable account..."
                       />
+                      <div className="mt-4 flex justify-center gap-4">
+                        {disableRestaurantMutation.isLoading ? (
+                          <div className="flex justify-center">
+                            <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                          </div>
+                        ) : (
+                          <button
+                            type="submit"
+                            className="h-10 w-full rounded-xl bg-virparyasRed font-bold text-white"
+                          >
+                            Disable account
+                          </button>
+                        )}
+                      </div>
                     </Form>
                   </Formik>
                 </Dialog.Panel>

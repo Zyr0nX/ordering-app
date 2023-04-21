@@ -1,10 +1,14 @@
 import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
-import { getCountries, getCountryCallingCode, type CountryCode, formatIncompletePhoneNumber } from "libphonenumber-js/min";
+import {
+  getCountries,
+  getCountryCallingCode,
+  type CountryCode,
+  formatIncompletePhoneNumber,
+} from "libphonenumber-js/min";
 import { useRouter } from "next/router";
 import React, { Fragment, useEffect, type HtmlHTMLAttributes } from "react";
-
 
 interface PhoneNumberInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -26,7 +30,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
     country_code as CountryCode
   );
   const prevSelectedRef = React.useRef<CountryCode>(selected);
-  const helperRef = React.useRef(helper);
+  const helpersRef = React.useRef(helper);
   useEffect(() => {
     if (!enableCurrentLocation) {
       return;
@@ -35,7 +39,7 @@ const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
       return; // selected hasn't changed, so return early
     }
     prevSelectedRef.current = selected; // update the reference
-    helperRef.current.setValue(`+${getCountryCallingCode(selected)} `);
+    helpersRef.current.setValue(`+${getCountryCallingCode(selected)} `);
   }, [enableCurrentLocation, selected]);
 
   const format = (value: string) => {

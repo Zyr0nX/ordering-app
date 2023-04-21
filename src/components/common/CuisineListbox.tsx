@@ -2,7 +2,7 @@ import DropDownIcon from "../icons/DropDownIcon";
 import { Listbox, Transition } from "@headlessui/react";
 import { useField } from "formik";
 import React, { Fragment } from "react";
-import { type RouterOutputs, api } from "~/utils/api";
+import { api } from "~/utils/api";
 
 interface CuisineListboxProps {
   label: string;
@@ -21,8 +21,8 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
     refetchOnReconnect: false,
   });
 
-  const [field, meta] =
-    useField<RouterOutputs["cuisine"]["getAll"][number]>(name);
+  const [field, meta] = useField<string>(name);
+  if (!cuisines) return null;
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between">
@@ -36,14 +36,14 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
 
       <Listbox
         value={field.value}
-        onChange={(value) =>
+        onChange={(value) => {
           field.onChange({
             target: {
               value: value,
               name,
             },
-          })
-        }
+          });
+        }}
       >
         {({ open }) => (
           <div className="relative">
@@ -57,11 +57,12 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
               }`}
             >
               <span
-                className={`truncate ${
-                  field.value.name ? "" : "text-gray-400"
-                }`}
+                className={`truncate ${field.value ? "" : "text-gray-400"}`}
               >
-                {!field.value.name ? placeholder : field.value.name}
+                {!field.value
+                  ? placeholder
+                  : cuisines.find((cuisine) => cuisine.id === field.value)
+                      ?.name}
               </span>
               <span className="pointer-events-none absolute right-0 top-1/2 mr-4 flex -translate-y-1/2 items-center">
                 <DropDownIcon />

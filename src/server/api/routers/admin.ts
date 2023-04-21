@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -83,15 +84,18 @@ export const adminRouter = createTRPCRouter({
         data: {
           approved: "REJECTED",
         },
-        include: {
-          user: true,
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
         },
       });
-      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
       if (!restaurant.user.email) {
         return;
       }
-      await transporter.sendMail({
+      await ctx.nodemailer.sendMail({
         from: env.EMAIL_FROM,
         to: restaurant.user.email,
         subject: "Your restaurant has been disabled",
@@ -138,8 +142,8 @@ export const adminRouter = createTRPCRouter({
         user: {
           select: {
             email: true,
-          }
-        }
+          },
+        },
       },
     });
   }),
@@ -159,7 +163,32 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const restaurant = await ctx.prisma.restaurant.update({
+      if (new TextEncoder().encode(input.image).length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Image size is too large",
+        });
+      }
+      if (input.image) {
+        return await ctx.prisma.restaurant.update({
+          where: {
+            id: input.restaurantId,
+          },
+          data: {
+            name: input.restaurantName,
+            address: input.address,
+            additionalAddress: input.additionalAddress,
+            firstName: input.firstName,
+            lastName: input.lastName,
+            phoneNumber: input.phoneNumber,
+            cuisineId: input.cuisineId,
+            image: (
+              await ctx.cloudinary.uploader.upload(input.image)
+            ).secure_url,
+          },
+        });
+      }
+      return await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
         },
@@ -171,10 +200,8 @@ export const adminRouter = createTRPCRouter({
           lastName: input.lastName,
           phoneNumber: input.phoneNumber,
           cuisineId: input.cuisineId,
-          image: input.image,
         },
       });
-      return restaurant;
     }),
   getApprovedShippers: adminProtectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.shipper.findMany({
@@ -235,11 +262,10 @@ export const adminRouter = createTRPCRouter({
           user: true,
         },
       });
-      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
       if (!shipper.user.email) {
         return;
       }
-      await transporter.sendMail({
+      await ctx.nodemailer.sendMail({
         from: env.EMAIL_FROM,
         to: shipper.user.email,
         subject: "Your shipper account has been disabled",
@@ -290,11 +316,10 @@ export const adminRouter = createTRPCRouter({
           status: "DISABLED",
         },
       });
-      const transporter = nodemailer.createTransport(env.EMAIL_SERVER);
       if (!user.email) {
         return;
       }
-      await transporter.sendMail({
+      await ctx.nodemailer.sendMail({
         from: env.EMAIL_FROM,
         to: user.email,
         subject: "Your account has been disabled",

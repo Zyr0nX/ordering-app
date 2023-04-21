@@ -9,7 +9,6 @@ import {
   restaurantProtectedProcedure,
   shipperProtectedProcedure,
 } from "~/server/api/trpc";
-import { transporter } from "~/server/email";
 import haversine from "~/utils/haversine";
 
 export const orderRouter = createTRPCRouter({
@@ -123,7 +122,7 @@ export const orderRouter = createTRPCRouter({
               status: "REJECTED_BY_RESTAURANT",
             },
           }),
-          transporter.sendMail({
+          ctx.nodemailer.sendMail({
             from: env.EMAIL_FROM,
             to: query.user.email,
             subject: "Your order has been rejected",
@@ -271,7 +270,7 @@ export const orderRouter = createTRPCRouter({
           }
 
           if (query.user.email) {
-            await transporter.sendMail({
+            await ctx.nodemailer.sendMail({
               from: env.EMAIL_FROM,
               to: query.user.email,
               subject: "Your order has been rejected",
@@ -459,7 +458,7 @@ export const orderRouter = createTRPCRouter({
               status: "READY_FOR_PICKUP",
             },
           }),
-          transporter.sendMail({
+          ctx.nodemailer.sendMail({
             from: env.EMAIL_FROM,
             to: query.user.email,
             subject: "Your order has been rejected",

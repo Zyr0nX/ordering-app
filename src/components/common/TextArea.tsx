@@ -1,7 +1,6 @@
 import { useField } from "formik";
 import React, { type HtmlHTMLAttributes } from "react";
 
-
 interface CommonInputProps extends HtmlHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   name: string;
@@ -9,7 +8,12 @@ interface CommonInputProps extends HtmlHTMLAttributes<HTMLTextAreaElement> {
   disabled?: boolean;
 }
 
-const TextArea: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => {
+const TextArea: React.FC<CommonInputProps> = ({
+  label,
+  name,
+  id,
+  ...props
+}) => {
   const [field, meta] = useField<string>(name);
   return (
     <div className="flex flex-col">
@@ -23,7 +27,7 @@ const TextArea: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => 
       </div>
 
       <textarea
-        className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
+        className={`h-40 w-full rounded-xl p-2 px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
           meta.touched && meta.error ? "ring-2 ring-virparyasRed" : ""
         }`}
         {...field}

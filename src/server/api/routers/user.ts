@@ -1,4 +1,4 @@
-import { GeocodeResult } from "@googlemaps/google-maps-services-js";
+import { type GeocodeResult } from "@googlemaps/google-maps-services-js";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -196,12 +196,12 @@ export const userRouter = createTRPCRouter({
       if (!registrationInformation) {
         return null;
       }
-      // if (registrationInformation.approved !== "PENDING") {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "You are already a restaurant",
-      //   });
-      // }
+      if (registrationInformation.approved !== "PENDING") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are already a restaurant",
+        });
+      }
       return registrationInformation;
     }
   ),
