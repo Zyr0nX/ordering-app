@@ -11,13 +11,29 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.restaurant.update({
+      const restaurant = await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
         },
         data: {
           approved: "APPROVED",
         },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!restaurant.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: restaurant.user.email,
+        subject: "Your restaurant has been approved",
+        text: "Your restaurant has been approved",
       });
     }),
   approveShipper: adminProtectedProcedure
@@ -27,45 +43,95 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.shipper.update({
+      const shipper = await ctx.prisma.shipper.update({
         where: {
           id: input.shipperId,
         },
         data: {
           approved: "APPROVED",
         },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!shipper.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: shipper.user.email,
+        subject: "Your shipper account has been approved",
+        text: "Your shipper account has been approved",
       });
     }),
   rejectRestaurant: adminProtectedProcedure
     .input(
       z.object({
         restaurantId: z.string().cuid(),
+        reason: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.restaurant.update({
+      const restaurant = await ctx.prisma.restaurant.update({
         where: {
           id: input.restaurantId,
         },
         data: {
           approved: "REJECTED",
         },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!restaurant.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: restaurant.user.email,
+        subject: "Your restaurant has been rejected",
+        text: `Your restaurant has been rejected for the following reason: ${input.reason}`,
       });
     }),
   rejectShipper: adminProtectedProcedure
     .input(
       z.object({
         shipperId: z.string().cuid(),
+        reason: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.shipper.update({
+      const shipper = await ctx.prisma.shipper.update({
         where: {
           id: input.shipperId,
         },
         data: {
           approved: "REJECTED",
         },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!shipper.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: shipper.user.email,
+        subject: "Your shipper account has been rejected",
+        text: `Your shipper account has been rejected for the following reason: ${input.reason}`,
       });
     }),
   disableRestaurant: adminProtectedProcedure
