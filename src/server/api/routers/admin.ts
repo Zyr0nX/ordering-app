@@ -1,9 +1,8 @@
-import { GeocodeResult } from "@googlemaps/google-maps-services-js";
+import { type GeocodeResult } from "@googlemaps/google-maps-services-js";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
-
 
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure

@@ -1,7 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
@@ -17,9 +21,7 @@ import ManageRestaurantHeader from "~/components/ui/ManageRestaurantHeader";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
-import { RouterOutputs, api } from "~/utils/api";
-
+import { type RouterOutputs, api } from "~/utils/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -103,11 +105,14 @@ const RestaurantPendingOrder: React.FC<{
   });
 
   const handlePrepare = async () => {
-    await toast.promise(prepareOrderMutation.mutateAsync({ orderId: order.id }), {
-      loading: "Accepting order...",
-      success: "Order accepted!",
-      error: prepareOrderMutation.error?.message || "Failed to accept order",
-    });
+    await toast.promise(
+      prepareOrderMutation.mutateAsync({ orderId: order.id }),
+      {
+        loading: "Accepting order...",
+        success: "Order accepted!",
+        error: prepareOrderMutation.error?.message || "Failed to accept order",
+      }
+    );
   };
 
   const rejectOrderMutation = api.order.restaurantRejectOrder.useMutation({

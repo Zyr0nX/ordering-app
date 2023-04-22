@@ -7,9 +7,8 @@ import {
   type GetServerSidePropsContext,
   type InferGetServerSidePropsType,
 } from "next";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import superjson from "superjson";
-import { create } from "zustand";
 import InfoIcon from "~/components/icons/InfoIcon";
 import SearchIcon from "~/components/icons/SearchIcon";
 import SleepIcon from "~/components/icons/SleepIcon";
@@ -37,7 +36,7 @@ export const getServerSideProps = async (
     transformer: superjson,
   });
 
-  await helpers.order.getShipperOrderHistory.prefetch();
+  await helpers.order.getRestaurantOrderHistory.prefetch();
 
   return {
     props: {
@@ -46,34 +45,6 @@ export const getServerSideProps = async (
   };
 };
 
-interface ManageRestaurantOrderHistoryState {
-  searchQuery: string;
-  orderHistory: inferProcedureOutput<
-    AppRouter["order"]["getShipperOrderHistory"]
-  >;
-  orderHistoryData: inferProcedureOutput<
-    AppRouter["order"]["getShipperOrderHistory"]
-  >;
-  search: (searchQuery: string) => void;
-}
-
-const useManageRestaurantOrderHistoryStore =
-  create<ManageRestaurantOrderHistoryState>((set) => ({
-    searchQuery: "",
-    orderHistory: [],
-    orderHistoryData: [],
-    search: (searchQuery) => {
-      set({ searchQuery: searchQuery });
-      set((state) => ({
-        orderHistory: fuzzysort
-          .go(searchQuery, state.orderHistoryData, {
-            keys: ["id", "user.name", "user.email", "user.phone"],
-            all: true,
-          })
-          .map((result) => result.obj),
-      }));
-    },
-  }));
 const History: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = () => {
@@ -88,89 +59,88 @@ const History: NextPage<
 };
 
 const ManageRestaurantOrderHistoryBody: React.FC = () => {
+  const [search, setSearch] = useState("");
   const { data: restaurantOrderHistoryData } =
-    api.order.getShipperOrderHistory.useQuery(undefined, {
+    api.order.getRestaurantOrderHistory.useQuery(undefined, {
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchInterval: 5000,
     });
-  useEffect(() => {
-    if (useManageRestaurantOrderHistoryStore.getState().searchQuery) {
-      useManageRestaurantOrderHistoryStore.setState({
-        orderHistoryData: restaurantOrderHistoryData,
-      });
-      return;
-    }
-    useManageRestaurantOrderHistoryStore.setState({
-      orderHistoryData: restaurantOrderHistoryData,
-      orderHistory: restaurantOrderHistoryData,
-    });
-  }, [restaurantOrderHistoryData]);
 
+  if (!restaurantOrderHistoryData) {
+    return null;
+  }
   return (
     <div className="m-4 text-virparyasMainBlue">
       <div className="flex flex-col gap-4">
-        <Search />
-        <OrderHistory />
+        <div className="flex h-12 w-full overflow-hidden rounded-2xl bg-white">
+          <input
+            type="text"
+            className="grow rounded-l-2xl px-4 text-xl placeholder:text-lg placeholder:font-light focus-within:outline-none"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <div className="flex items-center bg-virparyasMainBlue px-4">
+            <SearchIcon className="h-8 w-8 fill-white" />
+          </div>
+        </div>
+        {fuzzysort.go(
+          search,
+          restaurantOrderHistoryData.map((order) => {
+            return {
+              ...order,
+              id: `VP-${order.id}`,
+            };
+          }),
+          {
+            keys: ["id", "user.email", "user.name"],
+            all: true,
+          }
+        ).length === 0 ? (
+          <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
+            <p className="text-xl font-semibold">No orders found</p>
+            <SleepIcon />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {fuzzysort
+              .go(
+                search,
+                restaurantOrderHistoryData.map((order) => {
+                  return {
+                    ...order,
+                    id: `VP-${order.id}`,
+                  };
+                }),
+                {
+                  keys: ["id", "user.email", "user.name"],
+                  all: true,
+                }
+              )
+              .map((order) => {
+                return {
+                  ...order.obj,
+                  id: Number(order.obj.id.replace("VP-", "")),
+                };
+              })
+              .map((order) => (
+                <OrderHistoryCard order={order} key={order.id} />
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-const Search: React.FC = () => {
-  const search = useManageRestaurantOrderHistoryStore((state) => state.search);
-  const searchQuery = useManageRestaurantOrderHistoryStore(
-    (state) => state.searchQuery
-  );
-
-  return (
-    <div className="flex h-12 w-full overflow-hidden rounded-2xl bg-white">
-      <input
-        type="text"
-        className="grow rounded-l-2xl px-4 text-xl placeholder:text-lg placeholder:font-light focus-within:outline-none"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={(e) => search(e.target.value)}
-      />
-
-      <div className="flex items-center bg-virparyasMainBlue px-4">
-        <SearchIcon className="h-8 w-8 fill-white" />
-      </div>
-    </div>
-  );
-};
-
-const OrderHistory: React.FC = () => {
-  const orderHistory = useManageRestaurantOrderHistoryStore(
-    (state) => state.orderHistory
-  );
-
-  return (
-    <>
-      {orderHistory.length === 0 ? (
-        <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
-          <p className="text-xl font-semibold">No order found</p>
-          <SleepIcon />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {orderHistory.map((order) => (
-            <OrderHistoryCard order={order} key={order.id} />
-          ))}
-        </div>
-      )}
-    </>
-  );
-};
-
-interface OrderHistoryCardProps {
+const OrderHistoryCard: React.FC<{
   order: inferProcedureOutput<
     AppRouter["order"]["getShipperOrderHistory"]
   >[number];
-}
-
-const OrderHistoryCard: React.FC<OrderHistoryCardProps> = ({ order }) => {
+}> = ({ order }) => {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const total = order.orderFood.reduce(

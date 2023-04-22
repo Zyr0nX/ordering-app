@@ -3,9 +3,7 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import dayjs from "dayjs";
 import { Form, Formik } from "formik";
 import fuzzysort from "fuzzysort";
-import {
-  isValidPhoneNumber,
-} from "libphonenumber-js/min";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 import {
   type GetServerSidePropsContext,
   type NextPage,

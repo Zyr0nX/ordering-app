@@ -2,9 +2,14 @@ import { TRPCError } from "@trpc/server";
 import { env } from "process";
 import { setIntervalAsync, clearIntervalAsync } from "set-interval-async";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure, restaurantProtectedProcedure, shipperProtectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+  restaurantProtectedProcedure,
+  shipperProtectedProcedure,
+} from "~/server/api/trpc";
 import haversine from "~/utils/haversine";
-
 
 export const orderRouter = createTRPCRouter({
   getPlacedAndPreparingOrders: restaurantProtectedProcedure.query(
@@ -168,7 +173,7 @@ export const orderRouter = createTRPCRouter({
                 latitude: true,
                 longitude: true,
               },
-            }
+            },
           },
         });
 
@@ -265,6 +270,7 @@ export const orderRouter = createTRPCRouter({
             },
             data: {
               status: "REJECTED_BY_RESTAURANT",
+              restaurantCancelReason: input.reason,
             },
           }),
           ctx.nodemailer.sendMail({
@@ -286,6 +292,7 @@ export const orderRouter = createTRPCRouter({
           },
           data: {
             status: "REJECTED_BY_RESTAURANT",
+            restaurantCancelReason: input.reason,
           },
         }),
         ctx.stripe.refunds.create({
