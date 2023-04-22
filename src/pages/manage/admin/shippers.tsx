@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import { Form, Formik } from "formik";
 import fuzzysort from "fuzzysort";
 import {
-  isPossiblePhoneNumber,
   isValidPhoneNumber,
 } from "libphonenumber-js/min";
 import {
@@ -12,19 +11,16 @@ import {
   type NextPage,
   type InferGetServerSidePropsType,
 } from "next";
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
-import { object, z } from "zod";
+import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { create } from "zustand";
 import Input from "~/components/common/CommonInput";
-import CuisineListbox from "~/components/common/CuisineListbox";
 import Datepicker from "~/components/common/Datepicker";
 import ImageUpload from "~/components/common/ImageUpload";
 import Loading from "~/components/common/Loading";
 import PhoneNumberInput from "~/components/common/PhoneNumberInput";
-import PlaceAutoCompleteCombobox from "~/components/common/PlaceAutoCompleteCombobox";
 import TextArea from "~/components/common/TextArea";
 import BluePencil from "~/components/icons/BluePencil";
 import RedCross from "~/components/icons/RedCross";
@@ -368,7 +364,7 @@ const ShipperAdminCard: React.FC<{
                         ) {
                           errors.licensePlate = "License plate is too long";
                         }
-                        if (!isPossiblePhoneNumber(values.phoneNumber)) {
+                        if (!isValidPhoneNumber(values.phoneNumber)) {
                           errors.phoneNumber = "Invalid phone number";
                         }
                         if (!z.string().url().safeParse(values.image).success) {

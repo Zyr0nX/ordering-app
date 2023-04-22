@@ -1,6 +1,6 @@
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
-import { isPossiblePhoneNumber } from "libphonenumber-js/min";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 import {
   type GetServerSidePropsContext,
   type InferGetServerSidePropsType,
@@ -120,7 +120,7 @@ const GuestAccountInformation = () => {
           ) {
             errors.address = "Address is required";
           }
-          if (!isPossiblePhoneNumber(values.phoneNumber)) {
+          if (!isValidPhoneNumber(values.phoneNumber)) {
             errors.phoneNumber = "Invalid phone number";
           }
           return errors;

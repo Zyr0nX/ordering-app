@@ -1,5 +1,4 @@
 import { TRPCError } from "@trpc/server";
-import nodemailer from "nodemailer";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";

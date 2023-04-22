@@ -2,7 +2,7 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { Form, Formik } from "formik";
-import { isPossiblePhoneNumber } from "libphonenumber-js";
+import { isValidPhoneNumber } from "libphonenumber-js";
 import {
   type GetServerSidePropsContext,
   type InferGetServerSidePropsType,
@@ -189,7 +189,7 @@ const ShipperRegistrationForm: React.FC = () => {
           if (!z.string().max(20).safeParse(values.licensePlate).success) {
             errors.licensePlate = "License plate is too long";
           }
-          if (!isPossiblePhoneNumber(values.phoneNumber)) {
+          if (!isValidPhoneNumber(values.phoneNumber)) {
             errors.phoneNumber = "Invalid phone number";
           }
           return errors;

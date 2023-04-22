@@ -1,7 +1,7 @@
 import { Transition, Dialog } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Formik, Form } from "formik";
-import { isPossiblePhoneNumber } from "libphonenumber-js/min";
+import { isValidPhoneNumber } from "libphonenumber-js/min";
 import {
   type InferGetServerSidePropsType,
   type GetServerSidePropsContext,
@@ -337,7 +337,7 @@ const ShippingAddress: React.FC = () => {
                         ) {
                           errors.name = "Name is too long";
                         }
-                        if (!isPossiblePhoneNumber(values.phoneNumber)) {
+                        if (!isValidPhoneNumber(values.phoneNumber)) {
                           errors.phoneNumber = "Invalid phone number";
                         }
                         if (
