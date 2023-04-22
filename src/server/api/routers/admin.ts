@@ -238,7 +238,31 @@ export const adminRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const shipper = await ctx.prisma.shipper.update({
+      if (new TextEncoder().encode(input.image).length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Image size is too large",
+        });
+      }
+      if (input.image) {
+        return await ctx.prisma.shipper.update({
+          where: {
+            id: input.shipperId,
+          },
+          data: {
+            firstName: input.firstName,
+            lastName: input.lastName,
+            identificationNumber: input.identificationNumber,
+            licensePlate: input.licensePlate,
+            phoneNumber: input.phoneNumber,
+            image: (
+              await ctx.cloudinary.uploader.upload(input.image)
+            ).secure_url,
+            dateOfBirth: input.dateOfBirth,
+          },
+        });
+      }
+      return await ctx.prisma.shipper.update({
         where: {
           id: input.shipperId,
         },
@@ -248,11 +272,9 @@ export const adminRouter = createTRPCRouter({
           identificationNumber: input.identificationNumber,
           licensePlate: input.licensePlate,
           phoneNumber: input.phoneNumber,
-          image: input.image,
           dateOfBirth: input.dateOfBirth,
         },
       });
-      return shipper;
     }),
   disableShipper: adminProtectedProcedure
     .input(
@@ -290,14 +312,37 @@ export const adminRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string().cuid(),
-        name: z.string().nullish(),
-        address: z.string().nullish(),
-        additionalAddress: z.string().nullish(),
-        phoneNumber: z.string().nullish(),
+        name: z.string(),
+        address: z.string(),
+        addressId: z.string(),
+        additionalAddress: z.string(),
+        phoneNumber: z.string(),
         image: z.string().url().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (new TextEncoder().encode(input.image).length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Image size is too large",
+        });
+      }
+      if (input.image) {
+        return await ctx.prisma.user.update({
+          where: {
+            id: input.userId,
+          },
+          data: {
+            name: input.name,
+            address: input.address,
+            additionalAddress: input.additionalAddress,
+            phoneNumber: input.phoneNumber,
+            image: (
+              await ctx.cloudinary.uploader.upload(input.image)
+            ).secure_url,
+          },
+        });
+      }
       return await ctx.prisma.user.update({
         where: {
           id: input.userId,
@@ -307,7 +352,6 @@ export const adminRouter = createTRPCRouter({
           address: input.address,
           additionalAddress: input.additionalAddress,
           phoneNumber: input.phoneNumber,
-          image: input.image,
         },
       });
     }),

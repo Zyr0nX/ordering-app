@@ -3,11 +3,7 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import fuzzysort from "fuzzysort";
 import { isValidPhoneNumber } from "libphonenumber-js/min";
-import {
-  type GetServerSidePropsContext,
-  type NextPage,
-  type InferGetServerSidePropsType,
-} from "next";
+import { type GetServerSidePropsContext, type NextPage, type InferGetServerSidePropsType } from "next";
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
@@ -30,6 +26,7 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { type RouterOutputs, api } from "~/utils/api";
+
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -137,6 +134,9 @@ const RestaurantAdminCard: React.FC<{
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
   const editRestaurantMutation = api.admin.editRestaurant.useMutation({
+    onMutate: async () => {
+      await utils.admin.getApprovedRestaurants.cancel();
+    },
     onSettled: async () => {
       await utils.admin.getApprovedRestaurants.invalidate();
       setIsEditOpen(false);

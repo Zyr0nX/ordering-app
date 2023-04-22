@@ -136,6 +136,9 @@ const ShipperAdminCard: React.FC<{
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
   const editShipperMutation = api.admin.editShipper.useMutation({
+    onMutate: async () => {
+      await utils.admin.getApprovedShippers.cancel();
+    },
     onSettled: async () => {
       await utils.admin.getApprovedShippers.invalidate();
       setIsEditOpen(false);
