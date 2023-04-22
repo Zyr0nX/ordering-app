@@ -8,7 +8,7 @@ import {
   type NextPage,
   type InferGetServerSidePropsType,
 } from "next";
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import { z } from "zod";
@@ -60,14 +60,6 @@ export const getServerSideProps = async (
   };
 };
 
-interface AdminRestaurantState {
-  restaurantList: RouterOutputs["admin"]["getApprovedRestaurants"];
-}
-
-const useAdminRestaurantStore = create<AdminRestaurantState>(() => ({
-  restaurantList: [],
-}));
-
 const Restaurants: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = () => {
@@ -82,41 +74,17 @@ const Restaurants: NextPage<
 };
 
 const AdminRestaurantsBody: React.FC = () => {
-  const restaurantList = useAdminRestaurantStore(
-    (state) => state.restaurantList
-  );
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [search, setSearch] = useState("");
 
   const { data: restaurantsData } = api.admin.getApprovedRestaurants.useQuery(
     undefined,
     {
       refetchInterval: 5000,
-      onSuccess: (data) => {
-        useAdminRestaurantStore.setState({
-          restaurantList: data,
-        });
-      },
+      enabled: !search,
     }
   );
 
   if (!restaurantsData) return null;
-
-  const handleSearch = (query: string) => {
-    if (query === "") {
-      useAdminRestaurantStore.setState({
-        restaurantList: restaurantsData,
-      });
-      return;
-    }
-    useAdminRestaurantStore.setState({
-      restaurantList: fuzzysort
-        .go(query, restaurantsData, {
-          keys: ["name"],
-          all: true,
-        })
-        .map((restaurant) => restaurant.obj),
-    });
-  };
 
   return (
     <div className="m-4 text-virparyasMainBlue">
@@ -125,8 +93,8 @@ const AdminRestaurantsBody: React.FC = () => {
           type="text"
           className="grow rounded-l-2xl px-4 text-xl placeholder:text-lg placeholder:font-light focus-within:outline-none"
           placeholder="Search..."
-          ref={searchRef}
-          onChange={(e) => handleSearch(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
 
         <div className="flex items-center bg-virparyasMainBlue px-4">
@@ -134,19 +102,28 @@ const AdminRestaurantsBody: React.FC = () => {
         </div>
       </div>
       <div className="mt-4">
-        {restaurantList.length === 0 ? (
+        {fuzzysort.go(search, restaurantsData, {
+          keys: ["name"],
+          all: true,
+        }).length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center gap-1 rounded-2xl bg-white">
             <p className="text-xl font-semibold">No restaurants found</p>
             <SleepIcon />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {restaurantList.map((restaurant) => (
-              <RestaurantAdminCard
-                restaurant={restaurant}
-                key={restaurant.id}
-              />
-            ))}
+            {fuzzysort
+              .go(search, restaurantsData, {
+                keys: ["name"],
+                all: true,
+              })
+              .map((restaurant) => restaurant.obj)
+              .map((restaurant) => (
+                <RestaurantAdminCard
+                  restaurant={restaurant}
+                  key={restaurant.id}
+                />
+              ))}
           </div>
         )}
       </div>
@@ -157,38 +134,13 @@ const AdminRestaurantsBody: React.FC = () => {
 const RestaurantAdminCard: React.FC<{
   restaurant: RouterOutputs["admin"]["getApprovedRestaurants"][number];
 }> = ({ restaurant }) => {
-  const restaurantList = useAdminRestaurantStore(
-    (state) => state.restaurantList
-  );
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
   const editRestaurantMutation = api.admin.editRestaurant.useMutation({
-    onSuccess: (data) => {
-      const newRestaurantList = restaurantList.map((restaurant) => {
-        if (restaurant.id === data.id) {
-          return {
-            ...restaurant,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            phoneNumber: data.phoneNumber,
-            name: data.name,
-            address: data.address,
-            addressId: data.addressId,
-            additionalAddress: data.additionalAddress,
-            cuisineId: data.cuisineId,
-            image: data.image,
-          };
-        } else {
-          return restaurant;
-        }
-      });
-      useAdminRestaurantStore.setState({
-        restaurantList: newRestaurantList,
-      });
-    },
-    onSettled: () => {
-      void utils.admin.getApprovedRestaurants.invalidate();
+    onSettled: async () => {
+      await utils.admin.getApprovedRestaurants.invalidate();
+      setIsEditOpen(false);
     },
   });
 
@@ -348,17 +300,17 @@ const RestaurantAdminCard: React.FC<{
                               .max(191, {
                                 message: "Address is too long",
                               }),
-                            place_id: z
-                              .string({
-                                required_error: "Address is required",
-                                invalid_type_error: "Address must be a string",
-                              })
-                              .nonempty({
-                                message: "Address is required",
-                              })
-                              .max(191, {
-                                message: "Address is too long",
-                              }),
+                            // place_id: z
+                            //   .string({
+                            //     required_error: "Address is required",
+                            //     invalid_type_error: "Address must be a string",
+                            //   })
+                            //   .nonempty({
+                            //     message: "Address is required",
+                            //   })
+                            //   .max(191, {
+                            //     message: "Address is too long",
+                            //   }),
                           }),
                           phoneNumber: z
                             .string({

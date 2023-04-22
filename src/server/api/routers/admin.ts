@@ -208,8 +208,20 @@ export const adminRouter = createTRPCRouter({
       where: {
         approved: "APPROVED",
       },
-      include: {
-        user: true,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        identificationNumber: true,
+        licensePlate: true,
+        phoneNumber: true,
+        image: true,
+        dateOfBirth: true,
+        user: {
+          select: {
+            email: true,
+          },
+        },
       },
     });
   }),

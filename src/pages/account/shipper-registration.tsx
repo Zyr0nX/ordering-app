@@ -161,7 +161,14 @@ const ShipperRegistrationForm: React.FC = () => {
             errors.dateOfBirth = "Date of birth is invalid";
           }
           if (
-            dayjs().diff(dayjs("2000-Jan-1", "YYYY-MMM-D", true), "year") < 18
+            dayjs().diff(
+              dayjs(
+                `${values.dateOfBirth.year}-${values.dateOfBirth.month}-${values.dateOfBirth.date}`,
+                "YYYY-MMM-D",
+                true
+              ),
+              "year"
+            ) < 18
           ) {
             errors.dateOfBirth = "You must be at least 18 years old";
           }
