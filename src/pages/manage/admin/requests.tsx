@@ -69,7 +69,6 @@ const AdminRequestsBody: React.FC = () => {
   const { data: pendingData } =
     api.admin.getPendingRestauranntAndShipperRequests.useQuery(undefined, {
       refetchInterval: 5000,
-      enabled: !search,
     });
 
   if (!pendingData) return null;

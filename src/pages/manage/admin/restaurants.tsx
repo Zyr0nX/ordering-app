@@ -76,7 +76,6 @@ const AdminRestaurantsBody: React.FC = () => {
     undefined,
     {
       refetchInterval: 5000,
-      enabled: !search,
     }
   );
 

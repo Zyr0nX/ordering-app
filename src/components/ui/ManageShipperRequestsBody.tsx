@@ -65,7 +65,7 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
     },
   });
 
-  const findShipperMutation = api.order.findShipper.useMutation();
+  //const findShipperMutation = api.order.findShipper.useMutation();
 
   const handleReject = async () => {
     if (!z.string().nonempty().safeParse(reason).success) {
@@ -77,9 +77,9 @@ const ManageShipperRequestsBody: React.FC<ManageShipperRequestsBodyProps> = ({
         orderId: inProgressOrder.id,
         reason,
       });
-      findShipperMutation.mutate({
-        orderId: inProgressOrder.id,
-      });
+      // findShipperMutation.mutate({
+      //   orderId: inProgressOrder.id,
+      // });
     }
     setIsRejectOpen(false);
   };

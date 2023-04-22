@@ -1,7 +1,9 @@
+import { GeocodeResult } from "@googlemaps/google-maps-services-js";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
+
 
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
@@ -234,6 +236,32 @@ export const adminRouter = createTRPCRouter({
           message: "Image size is too large",
         });
       }
+      let geocodeResult;
+
+      const cached = await ctx.redis.get(`geocode?query=${input.addressId}`);
+
+      if (cached) {
+        geocodeResult = cached as GeocodeResult;
+      } else {
+        const geocode = await ctx.maps.geocode({
+          params: {
+            place_id: input.addressId,
+            key: env.GOOGLE_MAPS_API_KEY,
+          },
+        });
+
+        await ctx.redis.set(
+          `geocode?query=${input.addressId}`,
+          geocode.data.results[0],
+          { ex: 60 * 60 * 24 * 365 }
+        );
+
+        if (!geocode.data.results[0]) {
+          throw new Error("Invalid address");
+        }
+
+        geocodeResult = geocode.data.results[0];
+      }
       if (input.image) {
         return await ctx.prisma.restaurant.update({
           where: {
@@ -242,7 +270,10 @@ export const adminRouter = createTRPCRouter({
           data: {
             name: input.restaurantName,
             address: input.address,
+            addressId: input.addressId,
             additionalAddress: input.additionalAddress,
+            latitude: geocodeResult.geometry.location.lat,
+            longitude: geocodeResult.geometry.location.lng,
             firstName: input.firstName,
             lastName: input.lastName,
             phoneNumber: input.phoneNumber,
