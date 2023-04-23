@@ -221,7 +221,7 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
           ))}
         </div>
       ))}
-      <button className="font-medium" onClick={addFoodCategory}>
+      <button type="button" className="font-medium" onClick={addFoodCategory}>
         Add customization +
       </button>
     </>
