@@ -2,7 +2,11 @@ import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
@@ -17,7 +21,6 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { type RouterOutputs, api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -155,19 +158,29 @@ const AddFood: React.FC = () => {
                             quantity: Number(values.quantity),
                             description: values.description,
                             image: values.image,
-                            foodOptions: values.foodOptions.map(
-                              (foodOption) => ({
+                            foodOptions: values.foodOptions
+                              .filter((foodOption) => {
+                                if (foodOption.name) {
+                                  return true;
+                                }
+                                return false;
+                              })
+                              .map((foodOption) => ({
                                 id: foodOption.id,
                                 name: foodOption.name,
-                                options: foodOption.options.map(
-                                  (foodOptionItem) => ({
+                                options: foodOption.options
+                                  .filter((foodOptionItem) => {
+                                    if (foodOptionItem.name) {
+                                      return true;
+                                    }
+                                    return false;
+                                  })
+                                  .map((foodOptionItem) => ({
                                     id: foodOptionItem.id,
                                     name: foodOptionItem.name,
-                                    price: Number(foodOptionItem.price),
-                                  })
-                                ),
-                              })
-                            ),
+                                    price: foodOptionItem.price,
+                                  })),
+                              })),
                           }),
                           {
                             loading: "Adding food...",

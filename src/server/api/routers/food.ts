@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-
+import {
+  createTRPCRouter,
+  publicProcedure,
+  restaurantProtectedProcedure,
+} from "~/server/api/trpc";
 
 export const foodRouter = createTRPCRouter({
   getByRestaurantId: publicProcedure
@@ -13,11 +16,11 @@ export const foodRouter = createTRPCRouter({
       });
       return food;
     }),
-  getMenu: publicProcedure.query(async ({ ctx }) => {
+  getMenu: restaurantProtectedProcedure.query(async ({ ctx }) => {
     const food = await ctx.prisma.food.findMany({
       where: {
         restaurant: {
-          userId: ctx.session?.user.id || "",
+          userId: ctx.session.user.id || "",
         },
       },
       include: {
@@ -30,7 +33,7 @@ export const foodRouter = createTRPCRouter({
     });
     return food;
   }),
-  update: publicProcedure
+  update: restaurantProtectedProcedure
     .input(
       z.object({
         id: z.string().cuid(),
@@ -53,6 +56,58 @@ export const foodRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const food = await ctx.prisma.food.findUnique({
+        where: {
+          id: input.id,
+        },
+        select: {
+          restaurant: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+      if (!food) {
+        throw new Error("Food not found");
+      }
+      if (food.restaurant.userId !== ctx.session.user.id) {
+        throw new Error("You are not the owner of this food");
+      }
+      if (input.image) {
+        await ctx.prisma.food.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            name: input.name,
+            price: input.price,
+            description: input.description,
+            image: (
+              await ctx.cloudinary.uploader.upload(input.image)
+            ).secure_url,
+            quantity: input.quantity,
+            restaurant: {
+              connect: {
+                userId: ctx.session?.user.id || "",
+              },
+            },
+            foodOption: {
+              create: input.foodOptions.map((category) => ({
+                name: category.name,
+                maxOption: 1,
+                foodOptionItem: {
+                  create: category.options.map((option) => ({
+                    name: option.name,
+                    price: option.price,
+                  })),
+                },
+              })),
+            },
+          },
+        });
+        return;
+      }
       await ctx.prisma.food.update({
         where: {
           id: input.id,
@@ -61,10 +116,13 @@ export const foodRouter = createTRPCRouter({
           name: input.name,
           price: input.price,
           description: input.description,
-          image: input.image,
           quantity: input.quantity,
+          restaurant: {
+            connect: {
+              userId: ctx.session?.user.id || "",
+            },
+          },
           foodOption: {
-            deleteMany: {},
             create: input.foodOptions.map((category) => ({
               name: category.name,
               maxOption: 1,
@@ -79,7 +137,7 @@ export const foodRouter = createTRPCRouter({
         },
       });
     }),
-  create: publicProcedure
+  create: restaurantProtectedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -106,7 +164,7 @@ export const foodRouter = createTRPCRouter({
           name: input.name,
           price: input.price,
           description: input.description,
-          image: input.image,
+          image: (await ctx.cloudinary.uploader.upload(input.image)).secure_url,
           quantity: input.quantity,
           restaurant: {
             connect: {
