@@ -2,11 +2,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { createId } from "@paralleldrive/cuid2";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
-import {
-  type GetServerSidePropsContext,
-  type InferGetServerSidePropsType,
-  type NextPage,
-} from "next";
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
@@ -21,6 +17,7 @@ import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { type RouterOutputs, api } from "~/utils/api";
+
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -154,8 +151,8 @@ const AddFood: React.FC = () => {
                         await toast.promise(
                           addFoodMutation.mutateAsync({
                             name: values.name,
-                            price: values.price,
-                            quantity: values.quantity,
+                            price: Number(values.price),
+                            quantity: Number(values.quantity),
                             description: values.description,
                             image: values.image,
                             foodOptions: values.foodOptions.map(
@@ -166,7 +163,7 @@ const AddFood: React.FC = () => {
                                   (foodOptionItem) => ({
                                     id: foodOptionItem.id,
                                     name: foodOptionItem.name,
-                                    price: foodOptionItem.price,
+                                    price: Number(foodOptionItem.price),
                                   })
                                 ),
                               })
@@ -310,8 +307,8 @@ const FoodList: React.FC<{
                     <Formik
                       initialValues={{
                         name: food.name,
-                        price: food.price,
-                        quantity: food.quantity,
+                        price: Number(food.price),
+                        quantity: Number(food.quantity),
                         description: food.description,
                         image: food.image,
                         foodOptions: food.foodOption.map((foodOption) => ({
@@ -369,12 +366,14 @@ const FoodList: React.FC<{
                           label="* Price:"
                           name="price"
                           placeholder="Price..."
+                          type="number"
                         />
 
                         <Input
                           label="* Quantity:"
                           name="quantity"
                           placeholder="Quantity..."
+                          type="number"
                         />
                         <Input
                           label="Description:"
