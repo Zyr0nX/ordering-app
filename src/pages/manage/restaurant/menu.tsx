@@ -332,19 +332,29 @@ const FoodList: React.FC<{
                             quantity: values.quantity,
                             description: values.description,
                             image: values.image,
-                            foodOptions: values.foodOptions.map(
-                              (foodOption) => ({
+                            foodOptions: values.foodOptions
+                              .filter((foodOption) => {
+                                if (foodOption.name) {
+                                  return true;
+                                }
+                                return false;
+                              })
+                              .map((foodOption) => ({
                                 id: foodOption.id,
                                 name: foodOption.name,
-                                options: foodOption.options.map(
-                                  (foodOptionItem) => ({
+                                options: foodOption.options
+                                  .filter((foodOptionItem) => {
+                                    if (foodOptionItem.name) {
+                                      return true;
+                                    }
+                                    return false;
+                                  })
+                                  .map((foodOptionItem) => ({
                                     id: foodOptionItem.id,
                                     name: foodOptionItem.name,
                                     price: foodOptionItem.price,
-                                  })
-                                ),
-                              })
-                            ),
+                                  })),
+                              })),
                           }),
                           {
                             loading: "Updating food...",
