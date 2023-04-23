@@ -1,7 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType, type NextPage } from "next";
+import {
+  type GetServerSidePropsContext,
+  type InferGetServerSidePropsType,
+  type NextPage,
+} from "next";
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
@@ -15,7 +19,6 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
-
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -58,7 +61,7 @@ const InProgress: NextPage<
 const ManageShipperRequestsBody: React.FC = () => {
   const { data: inProgressOrder } =
     api.order.getShipperInProgressOrders.useQuery(undefined, {
-      refetchInterval: 5000
+      refetchInterval: 5000,
     });
   const utils = api.useContext();
   const [isRejectOpen, setIsRejectOpen] = useState(false);
@@ -72,40 +75,87 @@ const ManageShipperRequestsBody: React.FC = () => {
 
   return (
     <>
-      <div className="m-4 text-virparyasMainBlue">
+      <div className="m-4 mx-auto max-w-lg text-virparyasMainBlue">
         <div className="mt-4">
           {inProgressOrder ? (
             <>
-              <div className="flex flex-col rounded-2xl bg-white p-4">
-                <p>Order: VP-{inProgressOrder.id}</p>
-                <div className="h-0.5 bg-virparyasSeparator"></div>
-                <p>Restaurant Info</p>
-                <p>Name: {inProgressOrder.restaurant.name}</p>
-                <p>Address: {inProgressOrder.restaurant.address}</p>
-                {inProgressOrder.restaurant.additionalAddress && (
-                  <p>
-                    Additional address:{" "}
-                    {inProgressOrder.restaurant.additionalAddress}
-                  </p>
-                )}
-                <p>Phone number: {inProgressOrder.restaurant.phoneNumber}</p>
-                <div className="h-0.5 bg-virparyasSeparator"></div>
-                <p>Customer Info</p>
-                <p>Name: {inProgressOrder.user.name}</p>
-                <p>Address: {inProgressOrder.user.address}</p>
-                <p>
-                  Additional address: {inProgressOrder.user.additionalAddress}
+              <div className="flex flex-col gap-4 rounded-2xl bg-white p-6">
+                <p className="text-2xl font-bold">
+                  Order: VP-{inProgressOrder.id}
                 </p>
-                <p>Phone number: {inProgressOrder.user.phoneNumber}</p>
-                <button
-                  onClick={handleComplete}
-                  disabled={inProgressOrder.status !== "DELIVERING"}
-                >
-                  Complete
-                </button>
-                <button onClick={() => void setIsRejectOpen(true)}>
-                  Reject
-                </button>
+                <div className="h-0.5 bg-virparyasSeparator"></div>
+                <div>
+                  <p className="text-xl font-semibold">Restaurant Info</p>
+                  <p>
+                    <span className="font-semibold">Name: </span>
+                    {inProgressOrder.restaurant.name}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Address: </span>
+                    {inProgressOrder.restaurant.address}
+                  </p>
+                  {inProgressOrder.restaurant.additionalAddress && (
+                    <p>
+                      <span className="font-semibold">
+                        Additional address:{" "}
+                      </span>
+                      {inProgressOrder.restaurant.additionalAddress}
+                    </p>
+                  )}
+                  <p>
+                    <span className="font-semibold">Phone number: </span>
+                    {inProgressOrder.restaurant.phoneNumber}
+                  </p>
+                </div>
+
+                <div className="h-0.5 bg-virparyasSeparator"></div>
+
+                <div>
+                  <p className="text-xl font-semibold">Customer Info</p>
+                  <p>
+                    <span className="font-semibold">Name: </span>
+                    {inProgressOrder.restaurant.name}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Address: </span>
+                    {inProgressOrder.restaurant.address}
+                  </p>
+                  {inProgressOrder.restaurant.additionalAddress && (
+                    <p>
+                      <span className="font-semibold">
+                        Additional address:{" "}
+                      </span>
+                      {inProgressOrder.restaurant.additionalAddress}
+                    </p>
+                  )}
+                  <p>
+                    <span className="font-semibold">Phone number: </span>
+                    {inProgressOrder.restaurant.phoneNumber}
+                  </p>
+                </div>
+
+                <div className="px-auto mt-4 flex w-full justify-center gap-4">
+                  {completeOrderMutation.isLoading ? (
+                    <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
+                        onClick={() => void setIsRejectOpen(true)}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        type="button"
+                        className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white disabled:bg-gray-300"
+                        disabled={inProgressOrder.status !== "DELIVERING"}
+                      >
+                        Complete
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <Transition appear show={isRejectOpen} as={Fragment}>
                 <Dialog

@@ -1,5 +1,6 @@
 import { type NextPage } from "next";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
 import MainButton from "~/components/common/MainButton";
 import AccountIcon from "~/components/icons/AccountIcon";
@@ -21,6 +22,7 @@ const Index: NextPage = () => {
 };
 
 const GuestAccountHome: React.FC = () => {
+  const router = useRouter();
   return (
     <div className="m-4 grid grid-cols-2 gap-4 md:m-8">
       <MainButton
@@ -44,7 +46,10 @@ const GuestAccountHome: React.FC = () => {
       />
       <button
         className="flex h-40 flex-col items-center justify-center gap-2 rounded-2xl bg-white shadow-[0_4px_5px_0_rgba(0,0,0,0.1)] md:flex-row md:gap-8"
-        onClick={() => void signOut()}
+        onClick={() => async () => {
+          await signOut();
+          void router.push("/");
+        }}
       >
         <div>
           <LogoutIcon className="h-16 w-16 fill-virparyasMainBlue md:h-24 md:w-24" />
