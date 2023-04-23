@@ -338,31 +338,6 @@ const FoodList: React.FC<{
                         })),
                       }}
                       onSubmit={async (values) => {
-                        console.log(
-                          values.foodOptions
-                            .filter((foodOption) => {
-                              if (foodOption.name) {
-                                return true;
-                              }
-                              return false;
-                            })
-                            .map((foodOption) => ({
-                              id: foodOption.id,
-                              name: foodOption.name,
-                              options: foodOption.options
-                                .filter((foodOptionItem) => {
-                                  if (foodOptionItem.name) {
-                                    return true;
-                                  }
-                                  return false;
-                                })
-                                .map((foodOptionItem) => ({
-                                  id: foodOptionItem.id,
-                                  name: foodOptionItem.name,
-                                  price: foodOptionItem.price,
-                                })),
-                            }))
-                        );
                         await toast.promise(
                           updateFoodMutation.mutateAsync({
                             id: food.id,

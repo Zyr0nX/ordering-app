@@ -30,7 +30,7 @@ export const getServerSideProps = async (
   if (session?.user.role === "USER") {
     return {
       redirect: {
-        destination: "/manage/user",
+        destination: "/",
         permanent: false,
       },
     };

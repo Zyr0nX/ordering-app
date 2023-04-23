@@ -1,8 +1,13 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
+import { clearIntervalAsync, setIntervalAsync } from "set-interval-async";
 import type Stripe from "stripe";
+import { env } from "~/env.mjs";
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import { nodemailer } from "~/server/email";
 import { stripe } from "~/server/stripe";
+import haversine from "~/utils/haversine";
+
 
 const Success: NextPage = () => {
   return null;
@@ -137,6 +142,21 @@ export const getServerSideProps = async (
             ? checkoutSession.payment_intent
             : checkoutSession.payment_intent.id,
       },
+      select: {
+        id: true,
+        user: {
+          select: {
+            email: true,
+          },
+        },
+        restaurant: {
+          select: {
+            latitude: true,
+            longitude: true,
+          },
+        },
+        paymentIntentId: true,
+      },
     }),
     prisma.cartItem.deleteMany({
       where: {
@@ -161,6 +181,125 @@ export const getServerSideProps = async (
       });
     }),
   ]);
+
+  let timesRun = 0;
+  const intervalId = setIntervalAsync(async () => {
+    timesRun += 1;
+    // stop after 360 times (1 hour)
+    if (timesRun >= 360) {
+      if (order.user.email) {
+        await Promise.all([
+          prisma.order.update({
+            where: {
+              id: order.id,
+            },
+            data: {
+              status: "REJECTED_BY_SHIPPER",
+            },
+          }),
+          stripe.refunds.create({
+            payment_intent: order.paymentIntentId,
+          }),
+          nodemailer.sendMail({
+            from: env.EMAIL_FROM,
+            to: order.user.email,
+            subject: "Your order has been rejected",
+            text: `Your order has been rejected because we can not find a shipper`,
+          }),
+        ]);
+        await clearIntervalAsync(intervalId);
+      }
+      await Promise.all([
+        prisma.order.update({
+          where: {
+            id: order.id,
+          },
+          data: {
+            status: "REJECTED_BY_SHIPPER",
+          },
+        }),
+        stripe.refunds.create({
+          payment_intent: order.paymentIntentId,
+        }),
+      ]);
+      await clearIntervalAsync(intervalId);
+    }
+
+    const onlineShippers = await prisma.shipper.findMany({
+      where: {
+        shipperLocation: {
+          updatedAt: {
+            gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+          },
+        },
+        order: {
+          every: {
+            status: {
+              in: ["DELIVERED"],
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        shipperLocation: {
+          select: {
+            latitude: true,
+            longitude: true,
+          },
+        },
+      },
+    });
+
+    if (!onlineShippers.length) {
+      return;
+    }
+
+    const nearestShipper = onlineShippers.reduce((prev, curr) => {
+      if (!prev.shipperLocation) return curr;
+      if (!curr.shipperLocation) return prev;
+
+      if (
+        haversine(
+          order.restaurant.latitude,
+          order.restaurant.longitude,
+          prev.shipperLocation.latitude,
+          prev.shipperLocation.longitude
+        ) >
+        haversine(
+          order.restaurant.latitude,
+          order.restaurant.longitude,
+          curr.shipperLocation.latitude,
+          curr.shipperLocation.longitude
+        )
+      )
+        return curr;
+      return prev;
+    });
+
+    const orderPresent = await prisma.order.findUnique({
+      where: {
+        id: order.id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    await prisma.order.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          shipperId: nearestShipper.id,
+          status:
+            orderPresent?.status === "READY_FOR_PICKUP"
+              ? "DELIVERING"
+              : undefined,
+        },
+      });
+      await clearIntervalAsync(intervalId);
+  }, 10000);
 
   return {
     redirect: {
