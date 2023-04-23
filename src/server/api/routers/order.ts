@@ -102,6 +102,7 @@ export const orderRouter = createTRPCRouter({
               longitude: true,
             },
           },
+          status: true,
         },
       });
       if (!order) {
@@ -220,6 +221,22 @@ export const orderRouter = createTRPCRouter({
           return prev;
         });
 
+        const orderPresent = await ctx.prisma.order.findUnique({
+          where: {
+            id: input.orderId,
+          },
+          select: {
+            status: true,
+          },
+        });
+
+        if (!orderPresent) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Order not found",
+          });
+        }
+
         await Promise.all([
           ctx.prisma.order.update({
             where: {
@@ -227,7 +244,10 @@ export const orderRouter = createTRPCRouter({
             },
             data: {
               shipperId: nearestShipper.id,
-              status: "DELIVERING",
+              status:
+                orderPresent.status === "READY_FOR_PICKUP"
+                  ? "DELIVERING"
+                  : undefined,
             },
           }),
           await clearIntervalAsync(intervalId),
@@ -349,7 +369,7 @@ export const orderRouter = createTRPCRouter({
           id: input.orderId,
         },
         data: {
-          status: "READY_FOR_PICKUP",
+          status: query.shipperId ? "DELIVERING" : "READY_FOR_PICKUP",
         },
       });
 
@@ -395,7 +415,6 @@ export const orderRouter = createTRPCRouter({
         where: {
           status: {
             notIn: [
-              "PLACED",
               "REJECTED_BY_RESTAURANT",
               "REJECTED_BY_SHIPPER",
               "DELIVERED",
@@ -436,7 +455,7 @@ export const orderRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const query = await ctx.prisma.order.findUnique({
+      const order = await ctx.prisma.order.findUnique({
         where: {
           id: input.orderId,
         },
@@ -452,23 +471,169 @@ export const orderRouter = createTRPCRouter({
               email: true,
             },
           },
+          restaurant: {
+            select: {
+              latitude: true,
+              longitude: true,
+            },
+          },
         },
       });
-      if (!query) {
+      if (!order) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Order not found",
         });
       }
-      if (ctx.session?.user.id !== query.shipper?.userId) {
+      if (ctx.session?.user.id !== order.shipper?.userId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "You are not authorized to reject this order",
         });
       }
 
-      if (query.user.email) {
-        const [order] = await Promise.all([
+      let timesRun = 0;
+      const intervalId = setIntervalAsync(async () => {
+        timesRun += 1;
+        console.log(timesRun, "timesRun");
+        // stop after 360 times (1 hour)
+        if (timesRun >= 360) {
+          if (order.user.email) {
+            await Promise.all([
+              ctx.prisma.order.update({
+                where: {
+                  id: input.orderId,
+                },
+                data: {
+                  status: "REJECTED_BY_SHIPPER",
+                },
+              }),
+              ctx.stripe.refunds.create({
+                payment_intent: order.paymentIntentId,
+              }),
+              ctx.nodemailer.sendMail({
+                from: env.EMAIL_FROM,
+                to: order.user.email,
+                subject: "Your order has been rejected",
+                text: `Your order has been rejected because we can not find a shipper`,
+              }),
+            ]);
+            await clearIntervalAsync(intervalId);
+          }
+          await Promise.all([
+            ctx.prisma.order.update({
+              where: {
+                id: input.orderId,
+              },
+              data: {
+                status: "REJECTED_BY_SHIPPER",
+              },
+            }),
+            ctx.stripe.refunds.create({
+              payment_intent: order.paymentIntentId,
+            }),
+          ]);
+          await clearIntervalAsync(intervalId);
+        }
+
+        const onlineShippers = await ctx.prisma.shipper.findMany({
+          where: {
+            shipperLocation: {
+              updatedAt: {
+                gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+              },
+            },
+            user: {
+              id: {
+                not: ctx.session.user.id,
+              },
+            },
+            order: {
+              every: {
+                status: {
+                  in: ["DELIVERED"],
+                },
+              },
+            },
+          },
+          select: {
+            id: true,
+            shipperLocation: {
+              select: {
+                latitude: true,
+                longitude: true,
+              },
+            },
+          },
+        });
+
+        if (!order) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Order not found",
+          });
+        }
+        if (!onlineShippers.length) {
+          return;
+        }
+
+        const nearestShipper = onlineShippers.reduce((prev, curr) => {
+          if (!prev.shipperLocation) return curr;
+          if (!curr.shipperLocation) return prev;
+
+          if (
+            haversine(
+              order.restaurant.latitude,
+              order.restaurant.longitude,
+              prev.shipperLocation.latitude,
+              prev.shipperLocation.longitude
+            ) >
+            haversine(
+              order.restaurant.latitude,
+              order.restaurant.longitude,
+              curr.shipperLocation.latitude,
+              curr.shipperLocation.longitude
+            )
+          )
+            return curr;
+          return prev;
+        });
+
+        const orderPresent = await ctx.prisma.order.findUnique({
+          where: {
+            id: input.orderId,
+          },
+          select: {
+            status: true,
+          },
+        });
+
+        if (!orderPresent) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Order not found",
+          });
+        }
+
+        await Promise.all([
+          ctx.prisma.order.update({
+            where: {
+              id: input.orderId,
+            },
+            data: {
+              shipperId: nearestShipper.id,
+              status:
+                orderPresent.status === "READY_FOR_PICKUP"
+                  ? "DELIVERING"
+                  : undefined,
+            },
+          }),
+          await clearIntervalAsync(intervalId),
+        ]);
+      }, 10000);
+
+      if (order.user.email) {
+        await Promise.all([
           ctx.prisma.order.update({
             where: {
               id: input.orderId,
@@ -480,14 +645,14 @@ export const orderRouter = createTRPCRouter({
           }),
           ctx.nodemailer.sendMail({
             from: env.EMAIL_FROM,
-            to: query.user.email,
+            to: order.user.email,
             subject: "Your order has been rejected",
             text: `Your order has been rejected by the shipper for the following reason: ${input.reason}, we will find you another shipper soon`,
           }),
         ]);
-        return order;
+        return;
       }
-      const [order] = await Promise.all([
+      await Promise.all([
         ctx.prisma.order.update({
           where: {
             id: input.orderId,
@@ -497,7 +662,7 @@ export const orderRouter = createTRPCRouter({
           },
         }),
       ]);
-      return order;
+      return;
     }),
   getRestaurantOrderHistory: restaurantProtectedProcedure.query(
     async ({ ctx }) => {

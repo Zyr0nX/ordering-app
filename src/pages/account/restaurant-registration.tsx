@@ -95,9 +95,7 @@ const RestaurantRegistrationForm: React.FC = () => {
             place_id: registrationData?.addressId || "",
           },
           additionalAddress: registrationData?.additionalAddress || "",
-          cuisine: {
-            id: registrationData?.cuisineId || "",
-          },
+          cuisine: registrationData?.cuisineId || "",
         }}
         onSubmit={async (values) => {
           await toast.promise(
@@ -110,7 +108,7 @@ const RestaurantRegistrationForm: React.FC = () => {
                 address: values.address.description,
                 addressId: values.address.place_id,
                 additionalAddress: values.additionalAddress,
-                cuisineId: values.cuisine.id,
+                cuisineId: values.cuisine,
               },
               {
                 onSuccess: () => {
@@ -157,7 +155,7 @@ const RestaurantRegistrationForm: React.FC = () => {
           ) {
             errors.address = "Address is required";
           }
-          if (!z.string().cuid().safeParse(values.cuisine.id).success) {
+          if (!z.string().cuid().safeParse(values.cuisine).success) {
             errors.cuisine = "Cuisine is required";
           }
           if (!isValidPhoneNumber(values.phoneNumber)) {
