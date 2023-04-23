@@ -21,7 +21,7 @@ interface FoodOptionInputProps {
 }
 
 const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
-  const [field, helpers] = useField<FoodCategory[]>(name);
+  const [field,, helpers] = useField<FoodCategory[]>(name);
   const handleFoodOptionNameChange = (
     index: number,
     optionIndex: number,
