@@ -1,9 +1,6 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  restaurantProtectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
+
 
 export const foodRouter = createTRPCRouter({
   getByRestaurantId: publicProcedure
@@ -93,6 +90,7 @@ export const foodRouter = createTRPCRouter({
               },
             },
             foodOption: {
+              deleteMany: {},
               create: input.foodOptions.map((category) => ({
                 name: category.name,
                 maxOption: 1,
@@ -123,6 +121,7 @@ export const foodRouter = createTRPCRouter({
             },
           },
           foodOption: {
+            deleteMany: {},
             create: input.foodOptions.map((category) => ({
               name: category.name,
               maxOption: 1,
