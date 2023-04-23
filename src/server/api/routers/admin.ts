@@ -4,6 +4,7 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
+
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -18,6 +19,11 @@ export const adminRouter = createTRPCRouter({
         },
         data: {
           approved: "APPROVED",
+          user: {
+            update: {
+              role: "RESTAURANT",
+            },
+          },
         },
         select: {
           user: {
@@ -30,7 +36,7 @@ export const adminRouter = createTRPCRouter({
       if (!restaurant.user.email) {
         return;
       }
-      await ctx.nodemailer.sendMail({
+      void ctx.nodemailer.sendMail({
         from: env.EMAIL_FROM,
         to: restaurant.user.email,
         subject: "Your restaurant has been approved",
@@ -50,6 +56,11 @@ export const adminRouter = createTRPCRouter({
         },
         data: {
           approved: "APPROVED",
+          user: {
+            update: {
+              role: "SHIPPER",
+            },
+          },
         },
         select: {
           user: {
@@ -62,7 +73,7 @@ export const adminRouter = createTRPCRouter({
       if (!shipper.user.email) {
         return;
       }
-      await ctx.nodemailer.sendMail({
+      void ctx.nodemailer.sendMail({
         from: env.EMAIL_FROM,
         to: shipper.user.email,
         subject: "Your shipper account has been approved",
