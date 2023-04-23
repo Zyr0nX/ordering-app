@@ -117,7 +117,6 @@ export const orderRouter = createTRPCRouter({
       let timesRun = 0;
       const intervalId = setIntervalAsync(async () => {
         timesRun += 1;
-        console.log(timesRun, "timesRun");
         // stop after 360 times (1 hour)
         if (timesRun >= 360) {
           if (order.user.email) {
@@ -495,7 +494,6 @@ export const orderRouter = createTRPCRouter({
       let timesRun = 0;
       const intervalId = setIntervalAsync(async () => {
         timesRun += 1;
-        console.log(timesRun, "timesRun");
         // stop after 360 times (1 hour)
         if (timesRun >= 360) {
           if (order.user.email) {

@@ -21,7 +21,7 @@ interface FoodOptionInputProps {
 }
 
 const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
-  const [field, meta, helpers] = useField<FoodCategory[]>(name);
+  const [field, helpers] = useField<FoodCategory[]>(name);
   const handleFoodOptionNameChange = (
     index: number,
     optionIndex: number,
@@ -173,7 +173,7 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
                   type="text"
                   id="restaurantName"
                   className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
-                  placeholder="Email..."
+                  placeholder="Category..."
                   value={foodCategory.name}
                   onChange={(e) =>
                     handleFoodCategoryNameChange(index, e.target.value)
@@ -203,7 +203,6 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
               />
               <input
                 type="number"
-                id="restaurantName"
                 className="h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
                 placeholder="Price..."
                 value={Number(foodOption.price).toString()}

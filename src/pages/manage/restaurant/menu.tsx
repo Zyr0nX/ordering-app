@@ -10,6 +10,7 @@ import {
 import React, { Fragment, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
+import { z } from "zod";
 import Input from "~/components/common/CommonInput";
 import FoodOptionInput from "~/components/common/FoodOptionInput";
 import ImageUpload from "~/components/common/ImageUpload";
@@ -337,6 +338,31 @@ const FoodList: React.FC<{
                         })),
                       }}
                       onSubmit={async (values) => {
+                        console.log(
+                          values.foodOptions
+                            .filter((foodOption) => {
+                              if (foodOption.name) {
+                                return true;
+                              }
+                              return false;
+                            })
+                            .map((foodOption) => ({
+                              id: foodOption.id,
+                              name: foodOption.name,
+                              options: foodOption.options
+                                .filter((foodOptionItem) => {
+                                  if (foodOptionItem.name) {
+                                    return true;
+                                  }
+                                  return false;
+                                })
+                                .map((foodOptionItem) => ({
+                                  id: foodOptionItem.id,
+                                  name: foodOptionItem.name,
+                                  price: foodOptionItem.price,
+                                })),
+                            }))
+                        );
                         await toast.promise(
                           updateFoodMutation.mutateAsync({
                             id: food.id,
@@ -377,6 +403,42 @@ const FoodList: React.FC<{
                               "Failed to update food",
                           }
                         );
+                      }}
+                      validate={(values) => {
+                        const errors: {
+                          name?: string;
+                          price?: string;
+                          quantity?: string;
+                          image?: string;
+                        } = {};
+                        if (
+                          !z.string().nonempty().safeParse(values.name).success
+                        ) {
+                          errors.name = "Name is required";
+                        }
+                        if (
+                          !z.string().max(191).safeParse(values.name).success
+                        ) {
+                          errors.name = "Name is too long";
+                        }
+                        if (Number(values.price) <= 0) {
+                          errors.price = "Price must be a positive number";
+                        }
+                        if (Number(values.quantity) <= 0) {
+                          errors.quantity =
+                            "Quantity must be a positive number";
+                        }
+                        if (!z.string().url().safeParse(values.image).success) {
+                          errors.image = "Invalid image url";
+                        }
+                        if (
+                          new TextEncoder().encode(values.image || undefined)
+                            .length >=
+                          4 * 1024 * 1024
+                        ) {
+                          errors.image = "Image size is too large";
+                        }
+                        return errors;
                       }}
                     >
                       <Form className="grid grid-cols-1 gap-4">
