@@ -10,6 +10,7 @@ interface CommonInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
 
 const Input: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => {
   const [field, meta] = useField<string>(name);
+  const { onChange: _onChange, ...rest } = field;
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between">
@@ -25,8 +26,22 @@ const Input: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => {
         className={`h-10 w-full rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue ${
           meta.touched && meta.error ? "ring-2 ring-virparyasRed" : ""
         }`}
+        onChange={(e) => {
+          if (props.type === "number") {
+            if (e.target.value === "") {
+              field.onChange(e);
+            } else {
+              const parsed = Number(e.target.value);
+              if (!isNaN(parsed)) {
+                field.onChange(e);
+              }
+            }
+          } else {
+            field.onChange(e);
+          }
+        }}
         {...props}
-        {...field}
+        {...rest}
       />
     </div>
   );
