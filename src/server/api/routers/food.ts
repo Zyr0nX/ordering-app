@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
+
 export const foodRouter = createTRPCRouter({
   getByRestaurantId: publicProcedure
     .input(z.object({ restaurantId: z.string().cuid() }))
@@ -35,10 +36,10 @@ export const foodRouter = createTRPCRouter({
         id: z.string().cuid(),
         name: z.string(),
         price: z.number(),
-        description: z.string(),
+        description: z.string().nullable(),
         image: z.string(),
         quantity: z.number(),
-        categories: z.array(
+        foodOptions: z.array(
           z.object({
             name: z.string(),
             options: z.array(
@@ -64,7 +65,7 @@ export const foodRouter = createTRPCRouter({
           quantity: input.quantity,
           foodOption: {
             deleteMany: {},
-            create: input.categories.map((category) => ({
+            create: input.foodOptions.map((category) => ({
               name: category.name,
               maxOption: 1,
               foodOptionItem: {
@@ -86,7 +87,7 @@ export const foodRouter = createTRPCRouter({
         description: z.string().optional(),
         image: z.string(),
         quantity: z.number(),
-        categories: z.array(
+        foodOptions: z.array(
           z.object({
             name: z.string(),
             options: z.array(
@@ -113,7 +114,7 @@ export const foodRouter = createTRPCRouter({
             },
           },
           foodOption: {
-            create: input.categories.map((category) => ({
+            create: input.foodOptions.map((category) => ({
               name: category.name,
               maxOption: 1,
               foodOptionItem: {

@@ -2,14 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { env } from "process";
 import { setIntervalAsync, clearIntervalAsync } from "set-interval-async";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-  restaurantProtectedProcedure,
-  shipperProtectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure, restaurantProtectedProcedure, shipperProtectedProcedure } from "~/server/api/trpc";
 import haversine from "~/utils/haversine";
+
 
 export const orderRouter = createTRPCRouter({
   getPlacedAndPreparingOrders: restaurantProtectedProcedure.query(
@@ -23,9 +18,25 @@ export const orderRouter = createTRPCRouter({
             in: ["PLACED", "PREPARING"],
           },
         },
-        include: {
-          user: true,
-          orderFood: true,
+        select: {
+          id: true,
+          status: true,
+          orderFood: {
+            select: {
+              id: true,
+              quantity: true,
+              price: true,
+              foodName: true,
+              foodOption: true,
+            },
+          },
+          user: {
+            select: {
+              name: true,
+              address: true,
+              phoneNumber: true,
+            },
+          },
         },
       });
       return orders;
