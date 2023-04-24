@@ -4,7 +4,6 @@ import { z } from "zod";
 import { env } from "~/env.mjs";
 import { adminProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
-
 export const adminRouter = createTRPCRouter({
   approveRestaurant: adminProtectedProcedure
     .input(
@@ -521,4 +520,177 @@ export const adminRouter = createTRPCRouter({
       ].sort((a, b) => b.data.updatedAt.getTime() - a.data.updatedAt.getTime());
     }
   ),
+  updateCuisine: adminProtectedProcedure
+    .input(
+      z.object({
+        cuisineId: z.string().cuid(),
+        name: z.string(),
+        image: z.string().url().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (new TextEncoder().encode(input.image).length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Image size is too large",
+        });
+      }
+      if (input.image) {
+        return await ctx.prisma.cuisine.update({
+          where: {
+            id: input.cuisineId,
+          },
+          data: {
+            name: input.name,
+            image: (
+              await ctx.cloudinary.uploader.upload(input.image)
+            ).secure_url,
+          },
+        });
+      }
+      return await ctx.prisma.cuisine.update({
+        where: {
+          id: input.cuisineId,
+        },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
+  deleteCuisine: adminProtectedProcedure
+    .input(
+      z.object({
+        cuisineId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const cuisine = await ctx.prisma.cuisine.findUnique({
+        where: {
+          id: input.cuisineId,
+        },
+        select: {
+          _count: {
+            select: {
+              restaurant: true,
+            },
+          },
+        },
+      });
+      if (!cuisine) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cuisine not found",
+        });
+      }
+      if (cuisine._count.restaurant > 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cannot delete cuisine with restaurants",
+        });
+      }
+      return await ctx.prisma.cuisine.delete({
+        where: {
+          id: input.cuisineId,
+        },
+      });
+    }),
+  getStats: adminProtectedProcedure.query(async ({ ctx }) => {
+    const [
+      totalUsers,
+      totalRestaurants,
+      totalShippers,
+      totalRestaurantRequests,
+      totalShipperRequests,
+      totalRevenue,
+      totalOrdersThisMonth,
+      totalRevenueThisMonth,
+    ] = await Promise.all([
+      ctx.prisma.user.count(), // total users
+      ctx.prisma.restaurant.count({
+        where: {
+          approved: "APPROVED",
+        },
+      }), // total restaurants
+      ctx.prisma.shipper.count({
+        where: {
+          approved: "APPROVED",
+        },
+      }), // total shippers
+      ctx.prisma.restaurant.count({
+        where: {
+          approved: "PENDING",
+        },
+      }), // total restaurant requests
+      ctx.prisma.shipper.count({
+        where: {
+          approved: "PENDING",
+        },
+      }), // total shipper requests
+      ctx.prisma.order.findMany({
+        where: {
+          status: "DELIVERED",
+        },
+        select: {
+          shippingFee: true,
+          orderFood: {
+            select: {
+              price: true,
+              quantity: true,
+            },
+          },
+        },
+      }), // total revenue
+      ctx.prisma.order.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setDate(1)),
+          },
+        },
+      }), // total orders this month
+      ctx.prisma.order.findMany({
+        where: {
+          status: "DELIVERED",
+          createdAt: {
+            gte: new Date(new Date().setDate(1)),
+          },
+        },
+        select: {
+          shippingFee: true,
+          orderFood: {
+            select: {
+              price: true,
+              quantity: true,
+            },
+          },
+        },
+      }), // total revenue this month
+    ]);
+    return {
+      totalUsers,
+      totalRestaurants,
+      totalShippers,
+      totalRequests: totalRestaurantRequests + totalShipperRequests,
+      totalRevenue: totalRevenue.reduce(
+        (acc, order) =>
+          acc +
+          order.shippingFee +
+          order.orderFood.reduce(
+            (acc, orderFood) => acc + orderFood.price * orderFood.quantity,
+            0
+          ),
+        0
+      ),
+      totalOrdersThisMonth,
+      totalRevenueThisMonth: totalRevenueThisMonth.reduce(
+        (acc, order) =>
+          acc +
+          order.shippingFee +
+          order.orderFood.reduce(
+            (acc, orderFood) => acc + orderFood.price * orderFood.quantity,
+            0
+          ),
+        0
+      ),
+    };
+  }),
 });

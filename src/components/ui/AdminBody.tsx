@@ -30,9 +30,9 @@ const AdminBody = () => {
         href="/manage/admin/requests"
       />
       <MainButton
-        text="Categories"
+        text="Cuisines"
         icon={<CategoryIcon className="md:h-24 md:w-24" />}
-        href="/manage/admin/categories"
+        href="/manage/admin/cuisines"
       />
     </div>
   );
