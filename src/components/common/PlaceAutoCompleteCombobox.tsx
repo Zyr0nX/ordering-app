@@ -2,7 +2,7 @@ import LocationIcon from "../icons/LocationIcon";
 import Loading from "./Loading";
 import { Combobox, Transition } from "@headlessui/react";
 import { useField } from "formik";
-import { Fragment, type HtmlHTMLAttributes, useState } from "react";
+import { Fragment, type HtmlHTMLAttributes, useState, useId } from "react";
 import { toast } from "react-hot-toast";
 import { useDebounce } from "use-debounce";
 import { type RouterOutputs, api } from "~/utils/api";
@@ -21,6 +21,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
   enableCurrentAddress = true,
   ...props
 }) => {
+  const mapsAutoCompleteSession = useId();
   const [field, meta, helper] =
     useField<RouterOutputs["maps"]["getAutocomplete"][number]>(name);
 
@@ -36,7 +37,7 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
   const [isReverseGeocodeLoading, setIsReverseGeocodeLoading] = useState(false);
 
   api.maps.getAutocomplete.useQuery(
-    { query: debouncedQuery },
+    { query: debouncedQuery, sessionToken: mapsAutoCompleteSession },
     {
       onSuccess: (data) => {
         setPlaces(data);

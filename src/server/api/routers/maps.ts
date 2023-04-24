@@ -12,6 +12,7 @@ export const mapsRouter = createTRPCRouter({
     .input(
       z.object({
         query: z.string().nonempty(),
+        sessionToken: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -28,6 +29,7 @@ export const mapsRouter = createTRPCRouter({
         params: {
           input: input.query,
           key: env.GOOGLE_MAPS_API_KEY,
+          sessiontoken: input.sessionToken,
         },
       });
 
