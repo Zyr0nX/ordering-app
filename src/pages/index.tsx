@@ -4,6 +4,7 @@ import { type inferProcedureOutput } from "@trpc/server";
 import fuzzysort from "fuzzysort";
 import { type GetServerSidePropsContext, type NextPage } from "next";
 import { type InferGetServerSidePropsType } from "next";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -38,6 +39,17 @@ export const getServerSideProps = async (
     transformer: superjson,
   });
 
+  if (!session) {
+    await Promise.all([
+      helpers.cuisine.getAll.prefetch(),
+      helpers.restaurant.getAllApproved.prefetch(),
+    ]);
+    return {
+      props: {
+        trpcState: helpers.dehydrate(),
+      },
+    };
+  }
   await Promise.all([
     helpers.cuisine.getAll.prefetch(),
     helpers.restaurant.getAllApproved.prefetch(),
@@ -174,7 +186,9 @@ const Home: NextPage<
 const HomeHeader: React.FC = () => {
   const searchQuery = useHomeStore((state) => state.searchQuery);
   const search = useHomeStore((state) => state.search);
+  const session = useSession();
   const { data: user } = api.user.getUser.useQuery(undefined, {
+    enabled: session.status === "authenticated",
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
@@ -384,8 +398,9 @@ const FavoriteRestaurantCard: React.FC<{
   const unfavoriteARestaurant = useHomeStore(
     (state) => state.unfavoriteARestaurant
   );
-
+  const session = useSession();
   const { data: user } = api.user.getUser.useQuery(undefined, {
+    enabled: session.status === "authenticated",
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
@@ -511,7 +526,10 @@ const RestaurantCard: React.FC<{
     (state) => state.unfavoriteARestaurant
   );
 
+  const session = useSession();
+
   const { data: user } = api.user.getUser.useQuery(undefined, {
+    enabled: session.status === "authenticated",
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,

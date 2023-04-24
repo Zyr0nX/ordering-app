@@ -1,11 +1,9 @@
 import { type GeocodeResult } from "@googlemaps/google-maps-services-js";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
+
 
 export const restaurantRouter = createTRPCRouter({
   registration: protectedProcedure
@@ -78,43 +76,70 @@ export const restaurantRouter = createTRPCRouter({
         },
       });
     }),
-  update: publicProcedure
+  update: restaurantProtectedProcedure
     .input(
       z.object({
-        id: z.string().cuid(),
-        name: z.string(),
-        address: z.string(),
-        additionaladdress: z.string().nullish(),
-        firstname: z.string(),
-        lastname: z.string(),
-        phonenumber: z.string(),
+        restaurantName: z.string().nonempty().max(191),
+        address: z.string().nonempty(),
+        addressId: z.string().nonempty(),
+        additionalAddress: z.string().nullish(),
+        firstName: z.string().nonempty().max(191),
+        lastName: z.string().nonempty().max(191),
+        phoneNumber: z.string().nonempty().max(191),
+        cuisineId: z.string().cuid(),
+        image: z.string().optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ ctx, input }) => {
+      if (new TextEncoder().encode(input.image).length > 4 * 1024 * 1024) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Image size is too large",
+        });
+      }
+      let geocodeResult: GeocodeResult;
+
+      const cached = await ctx.redis.get(`geocode?query=${input.addressId}`);
+
+      if (cached) {
+        geocodeResult = cached as GeocodeResult;
+      } else {
+        const geocode = await ctx.maps.geocode({
+          params: {
+            place_id: input.addressId,
+            key: env.GOOGLE_MAPS_API_KEY,
+          },
+        });
+
+        await ctx.redis.set(
+          `geocode?query=${input.addressId}`,
+          geocode.data.results[0],
+          { ex: 60 * 60 * 24 * 365 }
+        );
+
+        if (!geocode.data.results[0]) {
+          throw new Error("Invalid address");
+        }
+
+        geocodeResult = geocode.data.results[0];
+      }
+
       await ctx.prisma.restaurant.update({
         where: {
-          id: input.id,
+          userId: ctx.session.user.id,
         },
         data: {
-          name: input.name,
+          name: input.restaurantName,
           address: input.address,
-          additionalAddress: input.additionaladdress,
-          firstName: input.firstname,
-          lastName: input.lastname,
-          phoneNumber: input.phonenumber,
-        },
-      });
-    }),
-  delete: publicProcedure
-    .input(
-      z.object({
-        id: z.string().cuid(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.restaurant.delete({
-        where: {
-          id: input.id,
+          addressId: input.addressId,
+          latitude: geocodeResult.geometry.location.lat,
+          longitude: geocodeResult.geometry.location.lng,
+          additionalAddress: input.additionalAddress,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phoneNumber: input.phoneNumber,
+          cuisineId: input.cuisineId,
+          image: input.image,
         },
       });
     }),
@@ -207,5 +232,25 @@ export const restaurantRouter = createTRPCRouter({
       },
     });
     return restaurants;
+  }),
+  getInfomation: restaurantProtectedProcedure.query(async ({ ctx }) => {
+    const restaurant = await ctx.prisma.restaurant.findUnique({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        addressId: true,
+        additionalAddress: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
+        image: true,
+        cuisineId: true,
+      },
+    });
+    return restaurant;
   }),
 });
