@@ -164,7 +164,16 @@ export const stripeRouter = createTRPCRouter({
                 foodId: item.foodId,
               },
             },
-            unit_amount: parseInt((item.food.price * 100).toFixed(0)),
+            unit_amount: parseInt(
+              (
+                (item.food.price +
+                  item.foodOption.reduce(
+                    (acc, option) => acc + option.price,
+                    0
+                  )) *
+                100
+              ).toFixed(0)
+            ),
           },
           quantity: item.quantity,
         })),

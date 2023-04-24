@@ -352,19 +352,22 @@ const ShippingAddress: React.FC = () => {
                       }}
                     >
                       <Form className="grid grid-cols-1 gap-4">
-                        <Input type="text" label="* Name:" name="name" />
+                        <Input type="text" label="* Name:" name="name" placeholder="Name..." />
                         <PhoneNumberInput
                           label="* Phone number:"
                           name="phoneNumber"
+                          placeholder="Phone number..."
                         />
                         <PlaceAutoCompleteCombobox
                           label="* Address"
                           name="address"
+                          placeholder="Address..."
                         />
                         <Input
                           type="text"
                           label="Additional address"
                           name="additionalAddress"
+                          placeholder="Additional address..."
                         />
                         <div className="px-auto mt-4 flex w-full justify-center gap-4">
                           {updateUserMutation.isLoading ? (
