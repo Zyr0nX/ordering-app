@@ -17,7 +17,6 @@ import ManageShipperHeader from "~/components/ui/ManageShipperHeader";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { prisma } from "~/server/db";
 import { api } from "~/utils/api";
 
 export const getServerSideProps = async (
@@ -66,8 +65,20 @@ const ManageShipperRequestsBody: React.FC = () => {
   const utils = api.useContext();
   const [isRejectOpen, setIsRejectOpen] = useState(false);
 
-  const completeOrderMutation = api.order.shipperCompleteOrder.useMutation();
-  const handleComplete = () => {
+  const completeOrderMutation = api.order.shipperCompleteOrder.useMutation({
+    onSuccess: async () => {
+      await utils.order.getShipperInProgressOrders.cancel();
+    },
+    onSettled: async () => {
+      await utils.order.getShipperInProgressOrders.invalidate();
+    },
+  });
+  const handleComplete = async () => {
+    await toast.promise(completeOrderMutation.mutateAsync(), {
+      loading: "Completing order...",
+      success: "Order completed",
+      error: "Failed to complete order",
+    });
     completeOrderMutation.mutate();
   };
 
@@ -150,6 +161,7 @@ const ManageShipperRequestsBody: React.FC = () => {
                         type="button"
                         className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white disabled:bg-gray-300"
                         disabled={inProgressOrder.status !== "DELIVERING"}
+                        onClick={() => void handleComplete()}
                       >
                         Complete
                       </button>

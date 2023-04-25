@@ -16,7 +16,6 @@ import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/utils/api";
 
-
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
@@ -61,7 +60,7 @@ const AdminHeader: React.FC = () => {
   const { data: stat } = api.admin.getStats.useQuery(undefined, {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
   });
   return (
     <div className="relative flex items-center justify-center bg-gradient-to-r from-viparyasDarkBlue/80 to-viparyasTeal/80 pb-24 pt-16 text-white md:pb-32 md:pt-8">
@@ -77,11 +76,15 @@ const AdminHeader: React.FC = () => {
         </p>
         <div className="flex">
           <div className="w-[50vw] text-center">
-            <p className="text-5xl font-bold md:text-8xl">{stat?.totalOrdersThisMonth}</p>
+            <p className="text-5xl font-bold md:text-8xl">
+              {stat?.totalOrdersThisMonth}
+            </p>
             <p className="font-thin md:text-4xl">Completed Order</p>
           </div>
           <div className="w-[50vw] text-center">
-            <p className="text-5xl font-bold md:text-8xl">${stat?.totalRevenueThisMonth}</p>
+            <p className="text-5xl font-bold md:text-8xl">
+              ${stat?.totalRevenueThisMonth}
+            </p>
             <p className="font-thin md:text-4xl">Total Income</p>
           </div>
         </div>
@@ -99,12 +102,20 @@ const AdminBody: React.FC = () => {
   return (
     <div className="mx-2 grid grid-cols-2 gap-4 md:mx-12">
       <MainButton
-        text={stat?.totalRestaurants ? `Restaurants (${stat?.totalRestaurants})` : "Restaurants"}
+        text={
+          stat?.totalRestaurants
+            ? `Restaurants (${stat?.totalRestaurants})`
+            : "Restaurants"
+        }
         icon={<RestaurantIcon className="md:h-24 md:w-24" />}
         href="/manage/admin/restaurants"
       />
       <MainButton
-        text={stat?.totalShippers ? `Shippers (${stat?.totalRestaurants})` : "Shippers"}
+        text={
+          stat?.totalShippers
+            ? `Shippers (${stat?.totalRestaurants})`
+            : "Shippers"
+        }
         icon={<ShipperIcon className="md:h-24 md:w-24" />}
         href="/manage/admin/shippers"
       />
@@ -114,7 +125,9 @@ const AdminBody: React.FC = () => {
         href="/manage/admin/users"
       />
       <MainButton
-        text={stat?.totalRequests ? `Requests (${stat?.totalRequests})` : "Requests"}
+        text={
+          stat?.totalRequests ? `Requests (${stat?.totalRequests})` : "Requests"
+        }
         icon={<RequestIcon className="md:h-24 md:w-24" />}
         href="/manage/admin/requests"
       />

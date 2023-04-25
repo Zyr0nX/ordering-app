@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
-
+import {
+  createTRPCRouter,
+  publicProcedure,
+  restaurantProtectedProcedure,
+} from "~/server/api/trpc";
 
 export const foodRouter = createTRPCRouter({
   getByRestaurantId: publicProcedure

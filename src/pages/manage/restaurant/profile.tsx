@@ -44,7 +44,7 @@ export const getServerSideProps = async (
   await Promise.all([
     helpers.restaurant.getInfomation.prefetch(),
     helpers.cuisine.getAll.prefetch(),
-  ])
+  ]);
 
   return {
     props: {

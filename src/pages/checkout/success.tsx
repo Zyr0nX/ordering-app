@@ -8,7 +8,6 @@ import { nodemailer } from "~/server/email";
 import { stripe } from "~/server/stripe";
 import haversine from "~/utils/haversine";
 
-
 const Success: NextPage = () => {
   return null;
 };
@@ -287,18 +286,18 @@ export const getServerSideProps = async (
     });
 
     await prisma.order.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          shipperId: nearestShipper.id,
-          status:
-            orderPresent?.status === "READY_FOR_PICKUP"
-              ? "DELIVERING"
-              : undefined,
-        },
-      });
-      await clearIntervalAsync(intervalId);
+      where: {
+        id: order.id,
+      },
+      data: {
+        shipperId: nearestShipper.id,
+        status:
+          orderPresent?.status === "READY_FOR_PICKUP"
+            ? "DELIVERING"
+            : undefined,
+      },
+    });
+    await clearIntervalAsync(intervalId);
   }, 10000);
 
   return {

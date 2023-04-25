@@ -352,7 +352,12 @@ const ShippingAddress: React.FC = () => {
                       }}
                     >
                       <Form className="grid grid-cols-1 gap-4">
-                        <Input type="text" label="* Name:" name="name" placeholder="Name..." />
+                        <Input
+                          type="text"
+                          label="* Name:"
+                          name="name"
+                          placeholder="Name..."
+                        />
                         <PhoneNumberInput
                           label="* Phone number:"
                           name="phoneNumber"

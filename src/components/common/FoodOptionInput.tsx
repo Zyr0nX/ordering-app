@@ -3,7 +3,6 @@ import { createId } from "@paralleldrive/cuid2";
 import { useField } from "formik";
 import React, { useEffect, useRef } from "react";
 
-
 interface FoodCategory {
   id: string;
   name: string;
@@ -21,7 +20,7 @@ interface FoodOptionInputProps {
 }
 
 const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
-  const [field,, helpers] = useField<FoodCategory[]>(name);
+  const [field, , helpers] = useField<FoodCategory[]>(name);
   const handleFoodOptionNameChange = (
     index: number,
     optionIndex: number,

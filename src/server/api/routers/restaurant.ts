@@ -2,8 +2,12 @@ import { type GeocodeResult } from "@googlemaps/google-maps-services-js";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
-import { createTRPCRouter, publicProcedure, protectedProcedure, restaurantProtectedProcedure } from "~/server/api/trpc";
-
+import {
+  createTRPCRouter,
+  publicProcedure,
+  protectedProcedure,
+  restaurantProtectedProcedure,
+} from "~/server/api/trpc";
 
 export const restaurantRouter = createTRPCRouter({
   registration: protectedProcedure

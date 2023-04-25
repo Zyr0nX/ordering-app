@@ -1,6 +1,4 @@
 import MainButton from "../common/MainButton";
-import BookIcon from "../icons/BookIcon";
-import CancelOrderIcon from "../icons/CancelOrderIcon";
 import CompleteIcon from "../icons/CompleteIcon";
 import InProgressIcon from "../icons/InProgressIcon";
 import SettingsIcon from "../icons/SettingsIcon";

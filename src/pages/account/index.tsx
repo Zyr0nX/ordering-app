@@ -10,7 +10,9 @@ import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
 import { getServerAuthSession } from "~/server/auth";
 
-export const getServerSideProps = async (context:  GetServerSidePropsContext) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getServerAuthSession(context);
   if (!session) {
     return {
@@ -23,7 +25,7 @@ export const getServerSideProps = async (context:  GetServerSidePropsContext) =>
   return {
     props: {},
   };
-}
+};
 
 const Index: NextPage = () => {
   return (

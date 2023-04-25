@@ -10,7 +10,7 @@ interface CommonInputProps extends HtmlHTMLAttributes<HTMLInputElement> {
 
 const Input: React.FC<CommonInputProps> = ({ label, name, id, ...props }) => {
   const [field, meta] = useField<string>(name);
-  const { onChange: _onChange, ...rest } = field;
+  const { onChange, ...rest } = field;
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between">
