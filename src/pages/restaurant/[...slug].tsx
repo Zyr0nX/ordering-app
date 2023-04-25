@@ -189,7 +189,7 @@ const RestaurantDetailHeader: React.FC = () => {
         </div>
         <div className="mt-4 md:mx-32 md:mt-2">
           <h1 className="text-2xl font-bold md:text-5xl">{restaurant.name}</h1>
-          {distance && (
+          {!(distance === null || distance === undefined) && (
             <p className="mt-2 text-sm md:text-2xl">
               ${Math.max(Math.round(distance * 1.2), 5)} - $
               {Math.max(Math.round(distance * 1.5), 6)} Delivery Fee

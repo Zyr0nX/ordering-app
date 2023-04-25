@@ -142,6 +142,9 @@ export const mapsRouter = createTRPCRouter({
       );
 
       if (cached) {
+        if (cached === "ZERO_RESULTS") {
+          return null;
+        }
         return cached as number;
       }
 
@@ -162,6 +165,15 @@ export const mapsRouter = createTRPCRouter({
           key: env.GOOGLE_MAPS_API_KEY,
         },
       });
+
+      if (distanceMatrix.data.rows[0]?.elements[0]?.status === "ZERO_RESULTS") {
+        await redis.set(
+          `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`,
+          "ZERO_RESULTS",
+          { ex: 60 * 60 * 24 * 365 }
+        );
+        return null;
+      }
 
       await redis.set(
         `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`,

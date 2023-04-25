@@ -233,7 +233,7 @@ const HomeHeader: React.FC = () => {
         </p>
         <div className="flex h-12 w-full items-center rounded-xl bg-white/40">
           <div className="p-3">
-            <SearchIcon />
+            <SearchIcon className="fill-white" />
           </div>
           <input
             type="text"

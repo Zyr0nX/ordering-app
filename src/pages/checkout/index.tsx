@@ -531,6 +531,7 @@ const Receipt: React.FC = () => {
               maximumFractionDigits: 2,
             })}`}
             onClick={() => void handleCheckout()}
+            disabled={!shippingFee || !cart.cartItem[0]}
           ></CommonButton>
         )}
       </div>
