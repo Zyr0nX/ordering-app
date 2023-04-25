@@ -69,4 +69,44 @@ export const shipperRouter = createTRPCRouter({
         },
       });
     }),
+  getInfomation: shipperProtectedProcedure.query(async ({ ctx }) => {
+    const shipper = await ctx.prisma.shipper.findUnique({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      include: {
+        shipperLocation: true,
+      },
+    });
+    if (!shipper) {
+      throw new Error("Shipper not found");
+    }
+    return shipper;
+  }),
+  update: shipperProtectedProcedure
+    .input(
+      z.object({
+        firstName: z.string(),
+        lastName: z.string(),
+        dateOfBirth: z.date(),
+        identificationNumber: z.string(),
+        licensePlate: z.string(),
+        phoneNumber: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.shipper.update({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        data: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          dateOfBirth: input.dateOfBirth,
+          identificationNumber: input.identificationNumber,
+          licensePlate: input.licensePlate,
+          phoneNumber: input.phoneNumber,
+        },
+      });
+    }),
 });

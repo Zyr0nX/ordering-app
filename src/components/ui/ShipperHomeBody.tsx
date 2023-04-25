@@ -18,22 +18,12 @@ const ShipperHomeBody = () => {
         <MainButton
           text="Completed Orders"
           icon={<CompleteIcon className="md:h-24 md:w-24" />}
-          href="/admin/users"
+          href="/manage/shipper/history"
         />
         <MainButton
-          text="Cancelled Orders"
-          icon={<CancelOrderIcon className="md:h-24 md:w-24" />}
-          href="/admin/requests"
-        />
-        <MainButton
-          text="Edit Menu"
-          icon={<BookIcon className="md:h-24 md:w-24" />}
-          href="/admin/requests"
-        />
-        <MainButton
-          text="Settings"
+          text="Profile"
           icon={<SettingsIcon className="md:h-24 md:w-24" />}
-          href="/admin/categories"
+          href="/manage/shipper/profile"
         />
       </div>
     </>
