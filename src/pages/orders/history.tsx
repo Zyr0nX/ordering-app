@@ -89,8 +89,8 @@ const GuestOrderHistoryBody: React.FC = () => {
                   />
                 )}
                 <div className="relative flex justify-between p-4">
-                  <div className="flex w-fit justify-center rounded-xl bg-white/40 px-2 py-1 font-medium text-virparyasMainBlue">
-                    {order.createdAt.toLocaleString([], {
+                  <div className="flex w-fit justify-center rounded-xl bg-white/40 px-2 py-1 font-medium text-black">
+                    {order.createdAt.toLocaleString("en-US", {
                       year: "numeric",
                       month: "numeric",
                       day: "numeric",

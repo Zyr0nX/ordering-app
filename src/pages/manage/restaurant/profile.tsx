@@ -41,7 +41,10 @@ export const getServerSideProps = async (
       },
     };
   }
-  await helpers.restaurant.getInfomation.prefetch();
+  await Promise.all([
+    helpers.restaurant.getInfomation.prefetch(),
+    helpers.cuisine.getAll.prefetch(),
+  ])
 
   return {
     props: {
@@ -135,6 +138,7 @@ const RestaurantAccountInformation = () => {
             restaurantName?: string;
             address?: string;
             cuisine?: string;
+            image?: string;
           } = {};
           if (!z.string().nonempty().safeParse(values.firstName).success) {
             errors.firstName = "First name is required";
@@ -164,6 +168,15 @@ const RestaurantAccountInformation = () => {
           }
           if (!isValidPhoneNumber(values.phoneNumber)) {
             errors.phoneNumber = "Invalid phone number";
+          }
+          if (!z.string().url().safeParse(values.image).success) {
+            errors.image = "Invalid image url";
+          }
+          if (
+            new TextEncoder().encode(values.image || undefined).length >=
+            4 * 1024 * 1024
+          ) {
+            errors.image = "Image size is too large";
           }
           return errors;
         }}

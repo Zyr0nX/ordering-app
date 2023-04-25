@@ -75,7 +75,7 @@ const CuisineListbox: React.FC<CuisineListboxProps> = ({
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
               >
-                <Listbox.Options className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
+                <Listbox.Options className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-md bg-white shadow-lg focus:outline-none">
                   {cuisines.map((cuisine) => (
                     <Listbox.Option
                       key={cuisine.id}
