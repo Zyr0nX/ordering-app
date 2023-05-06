@@ -4,6 +4,7 @@ import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
 
+
 const baseUrl =
   env.NODE_ENV === "development" ? "http://localhost:3000" : env.SITE_URL;
 
@@ -93,44 +94,68 @@ export const stripeRouter = createTRPCRouter({
 
       let distance: number | undefined;
 
-      const cached = await ctx.redis.get(
-        `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`
-      );
-      if (cached) {
-        distance = cached as number;
+      if (
+        user.latitude === restaurant.latitude &&
+        user.longitude === restaurant.longitude
+      ) {
+        distance = 0;
       } else {
-        const distanceMatrix = await ctx.maps.distancematrix({
-          params: {
-            origins: [
-              {
-                lat: restaurant.latitude,
-                lng: restaurant.longitude,
-              },
-            ],
-            destinations: [
-              {
-                lat: user.latitude,
-                lng: user.longitude,
-              },
-            ],
-            key: env.GOOGLE_MAPS_API_KEY,
-          },
-        });
+        const cached = await ctx.redis.get(
+          `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`
+        );
 
-        if (distanceMatrix.data.status !== "OK") {
+        if (cached === "ZERO_RESULTS") {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Could not calculate distance",
           });
         }
 
-        await ctx.redis.set(
-          `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`,
-          distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
-          { ex: 60 * 60 * 24 * 365 }
-        );
+        if (cached) {
+          distance = cached as number;
+        } else {
+          const distanceMatrix = await ctx.maps.distancematrix({
+            params: {
+              origins: [
+                {
+                  lat: restaurant.latitude,
+                  lng: restaurant.longitude,
+                },
+              ],
+              destinations: [
+                {
+                  lat: user.latitude,
+                  lng: user.longitude,
+                },
+              ],
+              key: env.GOOGLE_MAPS_API_KEY,
+            },
+          });
 
-        distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
+          if (
+            distanceMatrix.data.rows[0]?.elements[0]?.status ===
+              "ZERO_RESULTS" ||
+            distanceMatrix.data.status !== "OK"
+          ) {
+            await ctx.redis.set(
+              `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`,
+              "ZERO_RESULTS",
+              { ex: 60 * 60 * 24 * 365 }
+            );
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Could not calculate distance",
+            });
+          }
+
+          await ctx.redis.set(
+            `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`,
+            distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
+            { ex: 60 * 60 * 24 * 365 }
+          );
+
+          distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
+        }
       }
 
       if (!distance) {

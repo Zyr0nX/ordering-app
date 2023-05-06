@@ -89,9 +89,19 @@ export const mapsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (
+        input.origins.lat === input.destinations.lat &&
+        input.origins.lng === input.destinations.lng
+      ) {
+        return 0;
+      }
       const cached = await redis.get(
         `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`
       );
+
+      if (cached === "ZERO_RESULTS") {
+        return null;
+      }
 
       if (cached) {
         return cached as number;
@@ -115,6 +125,15 @@ export const mapsRouter = createTRPCRouter({
         },
       });
 
+      if (distanceMatrix.data.rows[0]?.elements[0]?.status === "ZERO_RESULTS") {
+        await redis.set(
+          `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`,
+          "ZERO_RESULTS",
+          { ex: 60 * 60 * 24 * 365 }
+        );
+        return null;
+      }
+
       await redis.set(
         `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`,
         distanceMatrix.data.rows[0]?.elements[0]?.distance.value,
@@ -137,9 +156,20 @@ export const mapsRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      if (
+        input.origins.lat === input.destinations.lat &&
+        input.origins.lng === input.destinations.lng
+      ) {
+        return 0;
+      }
+
       const cached = await redis.get(
         `distanceMatrix?origins=[${input.origins.lat},${input.origins.lng}],&destinations=[${input.destinations.lat},${input.destinations.lng}]}]`
       );
+
+      if (cached === "ZERO_RESULTS") {
+        return null;
+      }
 
       if (cached) {
         if (cached === "ZERO_RESULTS") {
