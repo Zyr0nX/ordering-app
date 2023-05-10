@@ -329,20 +329,12 @@ const UserAdminCard: React.FC<{
                           {editUserMutation.isLoading ? (
                             <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
                           ) : (
-                            <>
-                              <button
-                                type="button"
-                                className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
-                              >
-                                Discard
-                              </button>
-                              <button
-                                type="submit"
-                                className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white"
-                              >
-                                Confirm
-                              </button>
-                            </>
+                            <button
+                              type="submit"
+                              className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white"
+                            >
+                              Confirm
+                            </button>
                           )}
                         </div>
                       </Form>

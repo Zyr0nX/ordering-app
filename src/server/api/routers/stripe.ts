@@ -4,7 +4,6 @@ import { env } from "~/env.mjs";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { getOrCreateStripeCustomerIdForUser } from "~/server/stripe/stripe-webhook-handlers";
 
-
 const baseUrl =
   env.NODE_ENV === "development" ? "http://localhost:3000" : env.SITE_URL;
 
@@ -135,7 +134,8 @@ export const stripeRouter = createTRPCRouter({
           if (
             distanceMatrix.data.rows[0]?.elements[0]?.status ===
               "ZERO_RESULTS" ||
-            distanceMatrix.data.status !== "OK"
+            distanceMatrix.data.status !== "OK" ||
+            !distanceMatrix.data.rows[0]?.elements[0]?.distance.value
           ) {
             await ctx.redis.set(
               `distanceMatrix?origins=[${restaurant.latitude},${restaurant.longitude}],&destinations=[${user.latitude},${user.longitude}]}]`,
@@ -156,13 +156,6 @@ export const stripeRouter = createTRPCRouter({
 
           distance = distanceMatrix.data.rows[0]?.elements[0]?.distance.value;
         }
-      }
-
-      if (!distance) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Could not calculate distance",
-        });
       }
 
       const checkoutSession = await stripe.checkout.sessions.create({
@@ -218,8 +211,11 @@ export const stripeRouter = createTRPCRouter({
         cancel_url: `${baseUrl}/checkout?id=${input.restaurantId}`,
       });
 
-      if (!checkoutSession) {
-        throw new Error("Could not create checkout session");
+      if (!checkoutSession || !checkoutSession.url) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not create checkout session",
+        });
       }
 
       return { checkoutUrl: checkoutSession.url };
@@ -240,7 +236,10 @@ export const stripeRouter = createTRPCRouter({
         }
       );
       if (!checkoutSession) {
-        throw new Error("Could not find checkout session");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Checkout session does not exist",
+        });
       }
       return checkoutSession;
     }),

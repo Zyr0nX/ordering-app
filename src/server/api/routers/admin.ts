@@ -266,7 +266,10 @@ export const adminRouter = createTRPCRouter({
         );
 
         if (!geocode.data.results[0]) {
-          throw new Error("Invalid address");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid address",
+          });
         }
 
         geocodeResult = geocode.data.results[0];

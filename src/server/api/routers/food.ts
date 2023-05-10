@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -69,10 +70,16 @@ export const foodRouter = createTRPCRouter({
         },
       });
       if (!food) {
-        throw new Error("Food not found");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Food not found",
+        });
       }
       if (food.restaurant.userId !== ctx.session.user.id) {
-        throw new Error("You are not the owner of this food");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to update this food",
+        });
       }
       if (input.image) {
         await ctx.prisma.food.update({

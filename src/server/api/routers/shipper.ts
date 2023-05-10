@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -79,7 +80,10 @@ export const shipperRouter = createTRPCRouter({
       },
     });
     if (!shipper) {
-      throw new Error("Shipper not found");
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Shipper not found",
+      });
     }
     return shipper;
   }),

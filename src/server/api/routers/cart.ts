@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -16,7 +17,10 @@ export const cartRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       if (input.quantity <= 0) {
-        throw new Error("Quantity must be greater than 0");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Quantity must be greater than 0",
+        });
       }
 
       const [food, isFoodOptionValid, cartItems] = await Promise.all([
@@ -50,11 +54,17 @@ export const cartRouter = createTRPCRouter({
       ]);
 
       if (isFoodOptionValid.length !== input.foodOptionids.length) {
-        throw new Error("Invalid food option");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Food option is not valid",
+        });
       }
 
       if (!food) {
-        throw new Error("Food not found");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Food not found",
+        });
       }
 
       const existCartItem = cartItems.find((item) => {
@@ -67,7 +77,10 @@ export const cartRouter = createTRPCRouter({
 
       if (existCartItem) {
         if (food.quantity < existCartItem.quantity + input.quantity) {
-          throw new Error("Quantity is not enough");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Quantity is not enough",
+          });
         }
         await ctx.prisma.cartItem.update({
           where: {
@@ -81,7 +94,10 @@ export const cartRouter = createTRPCRouter({
         });
       } else {
         if (food.quantity < input.quantity) {
-          throw new Error("Quantity is not enough");
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Quantity is not enough",
+          });
         }
         await ctx.prisma.cartItem.create({
           data: {
@@ -119,11 +135,17 @@ export const cartRouter = createTRPCRouter({
       });
 
       if (!cartItem) {
-        throw new Error("Cart item not found");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Cart item not found",
+        });
       }
 
       if (cartItem.food.quantity < input.quantity) {
-        throw new Error("Quantity is not enough");
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Quantity is not enough",
+        });
       }
 
       await ctx.prisma.cartItem.update({
