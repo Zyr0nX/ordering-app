@@ -83,7 +83,7 @@ const AdminHeader: React.FC = () => {
           </div>
           <div className="w-[50vw] text-center">
             <p className="text-5xl font-bold md:text-8xl">
-              ${stat?.totalRevenueThisMonth}
+              ${stat?.totalRevenueThisMonth.toFixed(2)}
             </p>
             <p className="font-thin md:text-4xl">Total Income</p>
           </div>

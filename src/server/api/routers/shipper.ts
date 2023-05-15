@@ -113,4 +113,45 @@ export const shipperRouter = createTRPCRouter({
         },
       });
     }),
+  getStats: shipperProtectedProcedure.query(async ({ ctx }) => {
+    const [totalRevenue, totalOrders, status] = await Promise.all([
+      ctx.prisma.order.findMany({
+        where: {
+          status: "DELIVERED",
+          shipperId: ctx.session.user.id,
+        },
+        select: {
+          shippingFee: true,
+          orderFood: {
+            select: {
+              price: true,
+              quantity: true,
+            },
+          },
+        },
+      }), // total revenue
+      ctx.prisma.order.count({
+        where: {
+          shipperId: ctx.session.user.id,
+          status: "DELIVERED",
+        },
+      }),
+      ctx.prisma.shipper.findUnique({
+        where: {
+          userId: ctx.session.user.id,
+        },
+        select: {
+          approved: true,
+        },
+      }),
+    ]);
+    return {
+      totalRevenue: totalRevenue.reduce(
+        (acc, order) => acc + order.shippingFee,
+        0
+      ),
+      totalOrders,
+      status: status?.approved !== "DISABLED",
+    };
+  }),
 });

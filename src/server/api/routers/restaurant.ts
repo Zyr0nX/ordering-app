@@ -263,4 +263,41 @@ export const restaurantRouter = createTRPCRouter({
     });
     return restaurant;
   }),
+  getStats: restaurantProtectedProcedure.query(async ({ ctx }) => {
+    const [totalRevenue, totalOrders] = await Promise.all([
+      ctx.prisma.order.findMany({
+        where: {
+          status: "DELIVERED" || "REJECTED_BY_SHIPPER" || "DELIVERING",
+          restaurantId: ctx.session.user.id,
+        },
+        select: {
+          shippingFee: true,
+          orderFood: {
+            select: {
+              price: true,
+              quantity: true,
+            },
+          },
+        },
+      }), // total revenue
+      ctx.prisma.order.count({
+        where: {
+          restaurantId: ctx.session.user.id,
+          status: "DELIVERED" || "REJECTED_BY_SHIPPER" || "DELIVERING",
+        },
+      }),
+    ]);
+    return {
+      totalRevenue: totalRevenue.reduce(
+        (acc, order) =>
+          acc +
+          order.orderFood.reduce(
+            (acc, orderFood) => acc + orderFood.price * orderFood.quantity,
+            0
+          ),
+        0
+      ),
+      totalOrders,
+    };
+  }),
 });
