@@ -99,7 +99,9 @@ const PlaceAutoCompleteCombobox: React.FC<PlaceAutoCompleteComboboxProps> = ({
         {
           loading: "Getting your current address...",
           success: "Got your current address!",
-          error: "Failed to get your current address.",
+          error:
+            reverseGeocodeMutation.error?.message ||
+            "Failed to get your current address.",
         }
       );
     } else {

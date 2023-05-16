@@ -280,20 +280,47 @@ export const orderRouter = createTRPCRouter({
       return order;
     }
   ),
-  shipperCompleteOrder: shipperProtectedProcedure.mutation(async ({ ctx }) => {
-    const order = await ctx.prisma.order.updateMany({
-      where: {
-        shipperId: ctx.session.user.id,
-        status: {
-          in: "DELIVERING",
+  shipperCompleteOrder: shipperProtectedProcedure
+    .input(
+      z.object({
+        orderId: z.number().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.orderId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Missing orderId",
+        });
+      }
+      const order = await ctx.prisma.order.findUnique({
+        where: {
+          id: input.orderId,
         },
-      },
-      data: {
-        status: "DELIVERED",
-      },
-    });
-    return order;
-  }),
+        select: {
+          shipper: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+      if (!order || order.shipper?.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not the shipper of this order",
+        });
+      }
+
+      await ctx.prisma.order.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          status: "DELIVERED",
+        },
+      });
+    }),
   shipperRejectOrder: shipperProtectedProcedure
     .input(
       z.object({
@@ -384,9 +411,10 @@ export const orderRouter = createTRPCRouter({
 
         const onlineShippers = await ctx.prisma.shipper.findMany({
           where: {
+            approved: "APPROVED",
             shipperLocation: {
               updatedAt: {
-                gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+                gte: new Date(new Date().getTime() - 1000 * 60),
               },
             },
             user: {

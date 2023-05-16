@@ -424,7 +424,7 @@ const FavoriteRestaurantCard: React.FC<{
       {
         loading: "Unfavoriting...",
         success: "Unfavorited!",
-        error: "Failed to unfavorite",
+        error: unfavotiteMutation.error?.message || "Failed to unfavorite",
       }
     );
   };
@@ -552,7 +552,7 @@ const RestaurantCard: React.FC<{
       {
         loading: "Favoriting...",
         success: "Favorited!",
-        error: "Failed to favorite",
+        error: favoriteMutation.error?.message || "Failed to favorite",
       }
     );
   };
@@ -572,7 +572,7 @@ const RestaurantCard: React.FC<{
       {
         loading: "Unfavoriting...",
         success: "Unfavorited!",
-        error: "Failed to unfavorite",
+        error: unfavotiteMutation.error?.message || "Failed to unfavorite",
       }
     );
   };

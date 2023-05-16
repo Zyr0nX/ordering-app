@@ -226,9 +226,10 @@ export const getServerSideProps = async (
 
     const onlineShippers = await prisma.shipper.findMany({
       where: {
+        approved: "APPROVED",
         shipperLocation: {
           updatedAt: {
-            gte: new Date(new Date().getTime() - 1000 * 60 * 5),
+            gte: new Date(new Date().getTime() - 1000 * 60),
           },
         },
         order: {

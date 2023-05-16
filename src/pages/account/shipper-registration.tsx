@@ -126,7 +126,8 @@ const ShipperRegistrationForm: React.FC = () => {
             {
               loading: "Registering...",
               success: "Registration successful!",
-              error: "Registration failed!",
+              error:
+                registrationMutation.error?.message || "Registration failed!",
             }
           );
         }}

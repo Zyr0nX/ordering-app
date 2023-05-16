@@ -107,7 +107,8 @@ const ShipperAccountInformation = () => {
             {
               loading: "Registering...",
               success: "Registration successful!",
-              error: "Registration failed!",
+              error:
+                updateShipperMutation.error?.message || "Registration failed!",
             }
           );
         }}

@@ -114,6 +114,20 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
+      const restaurant = await ctx.prisma.restaurant.findUnique({
+        where: {
+          id: input.restaurantId,
+        },
+        select: {
+          approved: true,
+        },
+      });
+      if (!restaurant || restaurant.approved !== "APPROVED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid restaurant",
+        });
+      }
       return await ctx.prisma.user.findUnique({
         where: {
           id: ctx.session.user.id,

@@ -319,7 +319,9 @@ const ShippingAddress: React.FC = () => {
                           {
                             loading: "Updating...",
                             success: "Updated",
-                            error: "Failed to update",
+                            error:
+                              updateUserMutation.error?.message ||
+                              "Failed to update",
                           }
                         );
                       }}
@@ -432,7 +434,8 @@ const Receipt: React.FC = () => {
       {
         loading: "Creating checkout link...",
         success: "Checkout link created! Redirecting...",
-        error: "Failed to create checkout link",
+        error:
+          stripeMutation.error?.message || "Failed to create checkout link",
       }
     );
   };

@@ -62,6 +62,7 @@ const ManageShipperRequestsBody: React.FC = () => {
     api.order.getShipperInProgressOrders.useQuery(undefined, {
       refetchInterval: 5000,
     });
+  console.log(inProgressOrder);
   const utils = api.useContext();
   const [isRejectOpen, setIsRejectOpen] = useState(false);
 
@@ -74,12 +75,15 @@ const ManageShipperRequestsBody: React.FC = () => {
     },
   });
   const handleComplete = async () => {
-    await toast.promise(completeOrderMutation.mutateAsync(), {
-      loading: "Completing order...",
-      success: "Order completed",
-      error: "Failed to complete order",
-    });
-    completeOrderMutation.mutate();
+    await toast.promise(
+      completeOrderMutation.mutateAsync({ orderId: inProgressOrder?.id }),
+      {
+        loading: "Completing order...",
+        success: "Order completed",
+        error:
+          completeOrderMutation.error?.message || "Failed to complete order",
+      }
+    );
   };
 
   const rejectOrderMutation = api.order.shipperRejectOrder.useMutation();
@@ -153,7 +157,7 @@ const ManageShipperRequestsBody: React.FC = () => {
                       <button
                         type="button"
                         className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
-                        onClick={() => void setIsRejectOpen(true)}
+                        onClick={() => setIsRejectOpen(true)}
                       >
                         Reject
                       </button>

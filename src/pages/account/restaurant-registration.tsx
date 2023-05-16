@@ -119,7 +119,8 @@ const RestaurantRegistrationForm: React.FC = () => {
             {
               loading: "Registering...",
               success: "Registered successfully! Redirecting...",
-              error: "Failed to register",
+              error:
+                registrationMutation.error?.message || "Failed to register",
             }
           );
         }}

@@ -299,7 +299,7 @@ const FoodCard: React.FC<{
       {
         loading: "Adding to cart...",
         success: "Added to cart!",
-        error: "Failed to add to cart",
+        error: addToCartMutation.error?.message || "Failed to add to cart",
       }
     );
     resetState();

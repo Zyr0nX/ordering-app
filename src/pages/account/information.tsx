@@ -99,7 +99,7 @@ const GuestAccountInformation = () => {
             {
               loading: "Updating...",
               success: "Updated successfully! Redirecting...",
-              error: "Failed to update",
+              error: updateUserMutation.error?.message || "Failed to update",
             }
           );
         }}
@@ -153,12 +153,12 @@ const GuestAccountInformation = () => {
             {updateUserMutation.isLoading ? (
               <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
             ) : (
-                <button
-                  type="submit"
-                  className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white"
-                >
-                  Confirm
-                </button>
+              <button
+                type="submit"
+                className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white"
+              >
+                Confirm
+              </button>
             )}
           </div>
         </Form>

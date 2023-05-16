@@ -70,10 +70,10 @@ export const stripeRouter = createTRPCRouter({
         });
       }
 
-      if (!restaurant) {
+      if (!restaurant || restaurant.approved !== "APPROVED") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Restaurant does not exist",
+          message: "Restaurant is not approved",
         });
       }
 

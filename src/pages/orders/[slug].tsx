@@ -293,7 +293,7 @@ const Rating = () => {
       {
         loading: "Submitting...",
         success: "Submitted!",
-        error: "Error",
+        error: ratingMutation.error?.message || "Error",
       }
     );
     setIsOpen(false);

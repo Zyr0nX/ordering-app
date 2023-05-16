@@ -189,6 +189,11 @@ export const cartRouter = createTRPCRouter({
     const cart = ctx.prisma.cartItem.findMany({
       where: {
         userId: ctx.session.user.id || "",
+        food: {
+          restaurant: {
+            approved: "APPROVED",
+          },
+        },
       },
       include: {
         food: {

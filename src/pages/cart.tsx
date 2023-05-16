@@ -299,7 +299,7 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
       {
         loading: "Updating...",
         success: "Updated!",
-        error: "Error updating",
+        error: updateItemQuantityMutation.error?.message || "Error updating",
       }
     );
     setIsLoading(false);
@@ -347,7 +347,7 @@ const ItemCart: React.FC<ItemCartProps> = ({ cartItem, setIsLoading }) => {
       {
         loading: "Removing...",
         success: "Removed!",
-        error: "Error removing",
+        error: removeItemMutation.error?.message || "Error removing",
       }
     );
     setIsLoading(false);
