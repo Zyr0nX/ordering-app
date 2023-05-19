@@ -8,7 +8,7 @@ import {
 
 const ratelimit = new Ratelimit({
   redis: redis,
-  limiter: Ratelimit.cachedFixedWindow(10, "10 s"),
+  limiter: Ratelimit.tokenBucket(5, "10 s", 10),
   ephemeralCache: new Map(),
   analytics: true,
 });

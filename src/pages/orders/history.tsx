@@ -84,7 +84,7 @@ const GuestOrderHistoryBody: React.FC = () => {
                     src={order.restaurant.image}
                     fill
                     alt="Restaurant Image"
-                    className="object-cover brightness-50"
+                    className="object-cover brightness-75"
                     priority
                   />
                 )}

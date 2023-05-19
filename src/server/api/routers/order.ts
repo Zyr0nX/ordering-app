@@ -359,7 +359,7 @@ export const orderRouter = createTRPCRouter({
           message: "Order not found",
         });
       }
-      if (ctx.session?.user.id !== order.shipper?.userId) {
+      if (ctx.session.user.id !== order.shipper?.userId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "You are not authorized to reject this order",
