@@ -249,7 +249,7 @@ const AddFood: React.FC = () => {
                         return errors;
                       }}
                     >
-                      <Form className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8">
+                      <Form className="grid grid-cols-1 gap-4">
                         <Input
                           label="* Name:"
                           name="name"
