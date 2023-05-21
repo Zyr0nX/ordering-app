@@ -16,6 +16,7 @@ import FoodOptionInput from "~/components/common/FoodOptionInput";
 import ImageUpload from "~/components/common/ImageUpload";
 import Loading from "~/components/common/Loading";
 import BluePencil from "~/components/icons/BluePencil";
+import RedCross from "~/components/icons/RedCross";
 import Restaurant from "~/components/layouts/Restaurant";
 import ManageRestaurantHeader from "~/components/ui/ManageRestaurantHeader";
 import { appRouter } from "~/server/api/root";
@@ -248,7 +249,7 @@ const AddFood: React.FC = () => {
                         return errors;
                       }}
                     >
-                      <Form className="grid grid-cols-1 gap-4">
+                      <Form className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8">
                         <Input
                           label="* Name:"
                           name="name"
@@ -305,9 +306,42 @@ const AddFood: React.FC = () => {
 const FoodList: React.FC<{
   food: RouterOutputs["food"]["getMenu"][number];
 }> = ({ food }) => {
+  const utils = api.useContext();
   const [isOpen, setIsOpen] = useState(false);
 
-  const updateFoodMutation = api.food.update.useMutation();
+  const updateFoodMutation = api.food.update.useMutation({
+    onMutate: async () => {
+      await utils.food.getMenu.cancel();
+    },
+    onSuccess: async () => {
+      setIsOpen(false);
+      await utils.food.getMenu.invalidate();
+    },
+  });
+  const deleteFoodMutation = api.food.delete.useMutation({
+    onMutate: async () => {
+      await utils.food.getMenu.cancel();
+    },
+    onSuccess: async () => {
+      setIsOpen(false);
+      await utils.food.getMenu.invalidate();
+    },
+  });
+
+  const handleDelete = async () => {
+    if (confirm("Do you want to delete this food?")) {
+      await toast.promise(
+        deleteFoodMutation.mutateAsync({
+          id: food.id,
+        }),
+        {
+          loading: "Deleting food...",
+          success: "Food deleted!",
+          error: deleteFoodMutation.error?.message || "Failed to delete food",
+        }
+      );
+    }
+  };
 
   return (
     <>
@@ -328,9 +362,9 @@ const FoodList: React.FC<{
             <button type="button" onClick={() => setIsOpen(true)}>
               <BluePencil className="md:h-10 md:w-10" />
             </button>
-            {/* <button type="button" onClick={handleReject}>
+            <button type="button" onClick={() => void handleDelete()}>
               <RedCross className="md:h-10 md:w-10" />
-            </button> */}
+            </button>
           </div>
         </div>
       </div>

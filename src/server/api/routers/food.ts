@@ -146,6 +146,43 @@ export const foodRouter = createTRPCRouter({
         },
       });
     }),
+  delete: restaurantProtectedProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const food = await ctx.prisma.food.findUnique({
+        where: {
+          id: input.id,
+        },
+        select: {
+          restaurant: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+      if (!food) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Food not found",
+        });
+      }
+      if (food.restaurant.userId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are not authorized to delete this food",
+        });
+      }
+      await ctx.prisma.food.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
   create: restaurantProtectedProcedure
     .input(
       z.object({
@@ -177,7 +214,7 @@ export const foodRouter = createTRPCRouter({
           quantity: input.quantity,
           restaurant: {
             connect: {
-              userId: ctx.session?.user.id || "",
+              userId: ctx.session.user.id || "",
             },
           },
           foodOption: {
