@@ -159,7 +159,7 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
   if (!field.value) return null;
 
   return (
-    <>
+    <div>
       {field.value.map((foodCategory, index) => (
         <div className="relative flex flex-col gap-2" key={foodCategory.id}>
           <div className="flex flex-col">
@@ -220,7 +220,7 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
       <button type="button" className="font-medium" onClick={addFoodCategory}>
         Add customization +
       </button>
-    </>
+    </div>
   );
 };
 
