@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import superjson from "superjson";
 import { create } from "zustand";
 import Checkbox from "~/components/common/Checkbox";
@@ -349,27 +350,32 @@ const FoodCard: React.FC<{
             <p className="mt-1 text-sm md:text-2xl">${food.price.toString()}</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 bg-white p-4 md:grid-cols-2 md:gap-16 md:px-16 md:py-8">
-          {food.foodOption.map((option) => (
-            <div key={option.id} className="text-virparyasMainBlue">
-              <p className="mb-2 text-lg font-bold">{option.name}</p>
-              <div className="flex flex-col gap-2">
-                {option.foodOptionItem.map((item) => (
-                  <Fragment key={item.id}>
-                    <div className="flex justify-between">
-                      <Checkbox
-                        label={item.name}
-                        handleChange={() => handleFoodOptionItem(item)}
-                      />
-                      <p>${item.price.toFixed(2)}</p>
-                    </div>
-                    <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
-                  </Fragment>
-                ))}
+        <ResponsiveMasonry
+          columnsCountBreakPoints={{ 0: 1, 767: 2 }}
+          className="bg-white p-4 md:px-16 md:py-8"
+        >
+          <Masonry gutter={"2rem"}>
+            {food.foodOption.map((option) => (
+              <div key={option.id} className="text-virparyasMainBlue">
+                <p className="mb-2 text-lg font-bold">{option.name}</p>
+                <div className="flex flex-col gap-2">
+                  {option.foodOptionItem.map((item) => (
+                    <Fragment key={item.id}>
+                      <div className="flex justify-between">
+                        <Checkbox
+                          label={item.name}
+                          handleChange={() => handleFoodOptionItem(item)}
+                        />
+                        <p>${item.price.toFixed(2)}</p>
+                      </div>
+                      <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
+                    </Fragment>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </Masonry>
+        </ResponsiveMasonry>
         <div className="flex justify-center bg-white px-8 pb-4">
           {addToCartMutation.isLoading ? (
             <Loading className="h-12 w-12 animate-spin fill-virparyasMainBlue text-gray-200" />

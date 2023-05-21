@@ -86,7 +86,7 @@ model Restaurant {
   userId            String     @unique
   food              Food[]
   cuisine           Cuisine    @relation(fields: [cuisineId], references: [id])
-  image             String?
+  image             String?    @db.Text
   user              User       @relation(fields: [userId], references: [id])
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
@@ -108,9 +108,9 @@ model Cuisine {
 model Food {
   id           String       @id @default(cuid())
   name         String
-  description  String?
+  description  String?      @db.Text
   price        Float        @db.Float
-  image        String
+  image        String       @db.Text
   restaurantId String
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   createdAt    DateTime     @default(now())
@@ -156,7 +156,7 @@ model Shipper {
   identificationNumber String
   phoneNumber          String
   licensePlate         String
-  image                String?
+  image                String?          @db.Text
   approved             Approve          @default(PENDING)
   userId               String           @unique
   user                 User             @relation(fields: [userId], references: [id])

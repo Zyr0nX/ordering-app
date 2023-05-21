@@ -89,8 +89,17 @@ const ManageRestaurantMenuBody = () => {
 };
 
 const AddFood: React.FC = () => {
+  const utils = api.useContext();
   const [isOpen, setIsOpen] = useState(false);
-  const addFoodMutation = api.food.create.useMutation();
+  const addFoodMutation = api.food.create.useMutation({
+    onMutate: async () => {
+      await utils.food.getMenu.cancel();
+    },
+    onSuccess: async () => {
+      setIsOpen(false);
+      await utils.food.getMenu.invalidate();
+    },
+  });
   return (
     <>
       <button className="font-medium" onClick={() => setIsOpen(true)}>
@@ -192,6 +201,52 @@ const AddFood: React.FC = () => {
                           }
                         );
                       }}
+                      validate={(values) => {
+                        const errors: {
+                          name?: string;
+                          price?: string;
+                          quantity?: string;
+                          image?: string;
+                        } = {};
+                        if (
+                          !z.string().nonempty().safeParse(values.name).success
+                        ) {
+                          errors.name = "Name is required";
+                        }
+                        if (
+                          !z.string().max(191).safeParse(values.name).success
+                        ) {
+                          errors.name = "Name is too long";
+                        }
+                        if (!values.price) {
+                          errors.price = "Price is required";
+                        }
+                        if (
+                          !z.number().positive().safeParse(Number(values.price))
+                            .success
+                        ) {
+                          errors.price = "Price is required";
+                        }
+                        if (
+                          !z
+                            .number()
+                            .positive()
+                            .safeParse(Number(values.quantity)).success
+                        ) {
+                          errors.quantity = "Quantity is required";
+                        }
+                        if (!z.string().url().safeParse(values.image).success) {
+                          errors.image = "Invalid image url";
+                        }
+                        if (
+                          new TextEncoder().encode(values.image || undefined)
+                            .length >=
+                          4 * 1024 * 1024
+                        ) {
+                          errors.image = "Image size is too large";
+                        }
+                        return errors;
+                      }}
                     >
                       <Form className="grid grid-cols-1 gap-4">
                         <Input
@@ -263,7 +318,10 @@ const FoodList: React.FC<{
               {food.name}
             </p>
             <p className="text-xs font-light md:mb-2 md:text-base">
-              {food.price}
+              {food.price.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+              })}
             </p>
           </div>
           <div className="flex gap-2">

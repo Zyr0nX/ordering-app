@@ -85,9 +85,7 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
       if (
         foodCategory.options.length > 0 &&
         (foodCategory.options[foodCategory.options.length - 1] as FoodOption)
-          .name !== "" &&
-        (foodCategory.options[foodCategory.options.length - 1] as FoodOption)
-          .price !== 0
+          .name !== ""
       ) {
         const newFoodCategories = [...field.value];
         const foodCategoryToUpdate = newFoodCategories[index] as FoodCategory;
