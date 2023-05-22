@@ -235,7 +235,7 @@ export const getServerSideProps = async (
         order: {
           every: {
             status: {
-              in: ["DELIVERED"],
+              in: ["DELIVERED", "REJECTED_BY_SHIPPER"],
             },
           },
         },

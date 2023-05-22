@@ -149,6 +149,7 @@ export const orderRouter = createTRPCRouter({
             data: {
               status: "REJECTED_BY_RESTAURANT",
               restaurantCancelReason: input.reason,
+              shipperId: null,
             },
           }),
           ctx.nodemailer.sendMail({
@@ -171,6 +172,7 @@ export const orderRouter = createTRPCRouter({
           data: {
             status: "REJECTED_BY_RESTAURANT",
             restaurantCancelReason: input.reason,
+            shipperId: null,
           },
         }),
         ctx.stripe.refunds.create({
@@ -425,7 +427,7 @@ export const orderRouter = createTRPCRouter({
             order: {
               every: {
                 status: {
-                  in: ["DELIVERED"],
+                  in: ["DELIVERED", "REJECTED_BY_SHIPPER"],
                 },
               },
             },
