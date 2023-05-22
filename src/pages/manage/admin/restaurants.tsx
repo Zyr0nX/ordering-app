@@ -21,6 +21,7 @@ import PhoneNumberInput from "~/components/common/PhoneNumberInput";
 import PlaceAutoCompleteCombobox from "~/components/common/PlaceAutoCompleteCombobox";
 import TextArea from "~/components/common/TextArea";
 import BluePencil from "~/components/icons/BluePencil";
+import GreenCheckmark from "~/components/icons/GreenCheckmark";
 import RedCross from "~/components/icons/RedCross";
 import SearchIcon from "~/components/icons/SearchIcon";
 import SleepIcon from "~/components/icons/SleepIcon";
@@ -48,7 +49,7 @@ export const getServerSideProps = async (
   }
 
   await Promise.all([
-    helpers.admin.getApprovedRestaurants.prefetch(),
+    helpers.admin.getRestaurants.prefetch(),
     helpers.cuisine.getAll.prefetch(),
   ]);
 
@@ -75,7 +76,7 @@ const Restaurants: NextPage<
 const AdminRestaurantsBody: React.FC = () => {
   const [search, setSearch] = useState("");
 
-  const { data: restaurantsData } = api.admin.getApprovedRestaurants.useQuery(
+  const { data: restaurantsData } = api.admin.getRestaurants.useQuery(
     undefined,
     {
       refetchInterval: 5000,
@@ -130,22 +131,37 @@ const AdminRestaurantsBody: React.FC = () => {
 };
 
 const RestaurantAdminCard: React.FC<{
-  restaurant: RouterOutputs["admin"]["getApprovedRestaurants"][number];
+  restaurant: RouterOutputs["admin"]["getRestaurants"][number];
 }> = ({ restaurant }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
   const editRestaurantMutation = api.admin.editRestaurant.useMutation({
     onMutate: async () => {
-      await utils.admin.getApprovedRestaurants.cancel();
+      await utils.admin.getRestaurants.cancel();
     },
     onSettled: async () => {
-      await utils.admin.getApprovedRestaurants.invalidate();
+      await utils.admin.getRestaurants.invalidate();
       setIsEditOpen(false);
     },
   });
 
   const disableRestaurantMutation = api.admin.disableRestaurant.useMutation();
+  const reactivateRestaurantMutation =
+    api.admin.reactivateRestaurant.useMutation();
+
+  const reactivate = async () => {
+    await toast.promise(
+      reactivateRestaurantMutation.mutateAsync({ restaurantId: restaurant.id }),
+      {
+        loading: "Reactivating restaurant...",
+        success: "Restaurant reactivated",
+        error:
+          reactivateRestaurantMutation.error?.message ||
+          "Failed to reactivate restaurant",
+      }
+    );
+  };
 
   return (
     <>
@@ -167,13 +183,29 @@ const RestaurantAdminCard: React.FC<{
             >
               <BluePencil className="md:h-10 md:w-10" />
             </button>
-            <button
-              type="button"
-              className="relative z-10"
-              onClick={() => setIsRejectOpen(true)}
-            >
-              <RedCross className="md:h-10 md:w-10" />
-            </button>
+            {restaurant.approved !== "APPROVED" ? (
+              <>
+                {reactivateRestaurantMutation.isLoading ? (
+                  <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                ) : (
+                  <button
+                    type="button"
+                    className="relative z-10"
+                    onClick={() => void reactivate()}
+                  >
+                    <GreenCheckmark className="md:h-10 md:w-10" />
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className="relative z-10"
+                onClick={() => setIsRejectOpen(true)}
+              >
+                <RedCross className="md:h-10 md:w-10" />
+              </button>
+            )}
           </div>
         </div>
       </div>

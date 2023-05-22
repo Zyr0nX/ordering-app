@@ -178,6 +178,38 @@ export const adminRouter = createTRPCRouter({
         text: `Your restaurant has been disabled for the following reason: ${input.reason}`,
       });
     }),
+  reactivateRestaurant: adminProtectedProcedure
+    .input(
+      z.object({
+        restaurantId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const restaurant = await ctx.prisma.restaurant.update({
+        where: {
+          id: input.restaurantId,
+        },
+        data: {
+          approved: "APPROVED",
+        },
+        select: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      });
+      if (!restaurant.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: restaurant.user.email,
+        subject: "Your restaurant has been reactivated",
+        text: `Your restaurant has been reactivated`,
+      });
+    }),
   getPendingRestaurantRequests: adminProtectedProcedure.query(
     async ({ ctx }) => {
       return await ctx.prisma.restaurant.findMany({
@@ -199,10 +231,12 @@ export const adminRouter = createTRPCRouter({
       });
     }
   ),
-  getApprovedRestaurants: adminProtectedProcedure.query(async ({ ctx }) => {
+  getRestaurants: adminProtectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.restaurant.findMany({
       where: {
-        approved: "APPROVED",
+        approved: {
+          in: ["APPROVED", "DISABLED"],
+        },
       },
       select: {
         id: true,
@@ -215,6 +249,7 @@ export const adminRouter = createTRPCRouter({
         phoneNumber: true,
         image: true,
         cuisineId: true,
+        approved: true,
         user: {
           select: {
             email: true,
@@ -311,10 +346,12 @@ export const adminRouter = createTRPCRouter({
         },
       });
     }),
-  getApprovedShippers: adminProtectedProcedure.query(async ({ ctx }) => {
+  getShippers: adminProtectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.shipper.findMany({
       where: {
-        approved: "APPROVED",
+        approved: {
+          in: ["APPROVED", "DISABLED"],
+        },
       },
       select: {
         id: true,
@@ -325,6 +362,7 @@ export const adminRouter = createTRPCRouter({
         phoneNumber: true,
         image: true,
         dateOfBirth: true,
+        approved: true,
         user: {
           select: {
             email: true,
@@ -414,6 +452,35 @@ export const adminRouter = createTRPCRouter({
         text: `Your shipper account has been disabled for the following reason: ${input.reason}`,
       });
     }),
+  reactivateShipper: adminProtectedProcedure
+    .input(
+      z.object({
+        shipperId: z.string().cuid(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const shipper = await ctx.prisma.shipper.update({
+        where: {
+          id: input.shipperId,
+        },
+        data: {
+          approved: "APPROVED",
+        },
+        include: {
+          user: true,
+        },
+      });
+      if (!shipper.user.email) {
+        return;
+      }
+      await ctx.nodemailer.sendMail({
+        from: env.EMAIL_FROM,
+        to: shipper.user.email,
+        subject: "Your shipper account has been reactivated",
+        text: `Your shipper account has been reactivated`,
+      });
+    }),
+
   getUsers: adminProtectedProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.user.findMany();
   }),

@@ -21,6 +21,7 @@ import Loading from "~/components/common/Loading";
 import PhoneNumberInput from "~/components/common/PhoneNumberInput";
 import TextArea from "~/components/common/TextArea";
 import BluePencil from "~/components/icons/BluePencil";
+import GreenCheckmark from "~/components/icons/GreenCheckmark";
 import RedCross from "~/components/icons/RedCross";
 import SearchIcon from "~/components/icons/SearchIcon";
 import SleepIcon from "~/components/icons/SleepIcon";
@@ -48,7 +49,7 @@ export const getServerSideProps = async (
   }
 
   await Promise.all([
-    helpers.admin.getApprovedShippers.prefetch(),
+    helpers.admin.getShippers.prefetch(),
     helpers.cuisine.getAll.prefetch(),
   ]);
 
@@ -75,12 +76,9 @@ const Shippers: NextPage<
 const AdminShippersBody: React.FC = () => {
   const [search, setSearch] = useState("");
 
-  const { data: shippersData } = api.admin.getApprovedShippers.useQuery(
-    undefined,
-    {
-      refetchInterval: 5000,
-    }
-  );
+  const { data: shippersData } = api.admin.getShippers.useQuery(undefined, {
+    refetchInterval: 5000,
+  });
 
   if (!shippersData) return null;
 
@@ -127,22 +125,51 @@ const AdminShippersBody: React.FC = () => {
 };
 
 const ShipperAdminCard: React.FC<{
-  shipper: RouterOutputs["admin"]["getApprovedShippers"][number];
+  shipper: RouterOutputs["admin"]["getShippers"][number];
 }> = ({ shipper }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const utils = api.useContext();
   const editShipperMutation = api.admin.editShipper.useMutation({
     onMutate: async () => {
-      await utils.admin.getApprovedShippers.cancel();
+      await utils.admin.getShippers.cancel();
     },
     onSettled: async () => {
-      await utils.admin.getApprovedShippers.invalidate();
+      await utils.admin.getShippers.invalidate();
       setIsEditOpen(false);
     },
   });
 
-  const disableShipperMutation = api.admin.disableShipper.useMutation();
+  const disableShipperMutation = api.admin.disableShipper.useMutation({
+    onMutate: async () => {
+      await utils.admin.getShippers.cancel();
+    },
+    onSettled: async () => {
+      await utils.admin.getShippers.invalidate();
+      setIsRejectOpen(false);
+    },
+  });
+  const reactivateShipperMutation = api.admin.reactivateShipper.useMutation({
+    onMutate: async () => {
+      await utils.admin.getShippers.cancel();
+    },
+    onSettled: async () => {
+      await utils.admin.getShippers.invalidate();
+    },
+  });
+
+  const reactivate = async () => {
+    await toast.promise(
+      reactivateShipperMutation.mutateAsync({ shipperId: shipper.id }),
+      {
+        loading: "Reactivating shipper...",
+        success: "Shipper reactivated",
+        error:
+          reactivateShipperMutation.error?.message ||
+          "Failed to reactivate shipper",
+      }
+    );
+  };
 
   return (
     <>
@@ -157,6 +184,29 @@ const ShipperAdminCard: React.FC<{
             </p>
           </div>
           <div className="flex">
+            {shipper.approved !== "APPROVED" ? (
+              <>
+                {reactivateShipperMutation.isLoading ? (
+                  <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                ) : (
+                  <button
+                    type="button"
+                    className="relative z-10"
+                    onClick={() => void reactivate()}
+                  >
+                    <GreenCheckmark className="md:h-10 md:w-10" />
+                  </button>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                className="relative z-10"
+                onClick={() => setIsRejectOpen(true)}
+              >
+                <RedCross className="md:h-10 md:w-10" />
+              </button>
+            )}
             <button
               type="button"
               className="relative z-10 mr-2"
