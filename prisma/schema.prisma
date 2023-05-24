@@ -181,9 +181,10 @@ model ShipperLocation {
 model FoodOption {
   id             String           @id @default(cuid())
   name           String
+  min            Int
+  max            Int
   foodId         String
   food           Food             @relation(fields: [foodId], references: [id], onDelete: Cascade)
-  maxOption      Int
   foodOptionItem FoodOptionItem[]
 
   @@index([foodId])

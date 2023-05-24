@@ -7,6 +7,8 @@ interface FoodCategory {
   id: string;
   name: string;
   options: FoodOption[];
+  min: number;
+  max: number;
 }
 
 interface FoodOption {
@@ -57,12 +59,38 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
     helpers.setValue(newFoodCategories);
   };
 
+  const handleFoodCategoryMinChange = (index: number, value: number) => {
+    const newFoodCategories = [...field.value];
+    if (value < 0) {
+      return;
+    }
+    if (value > (newFoodCategories[index] as FoodCategory).max) {
+      return;
+    }
+    (newFoodCategories[index] as FoodCategory).min = value;
+    helpers.setValue(newFoodCategories);
+  };
+
+  const handleFoodCategoryMaxChange = (index: number, value: number) => {
+    const newFoodCategories = [...field.value];
+    if (value < 0) {
+      return;
+    }
+    if (value < (newFoodCategories[index] as FoodCategory).min) {
+      return;
+    }
+    (newFoodCategories[index] as FoodCategory).max = value;
+    helpers.setValue(newFoodCategories);
+  };
+
   const addFoodCategory = () =>
     helpers.setValue([
       ...field.value,
       {
         id: createId(),
         name: "",
+        min: 0,
+        max: 999,
         options: [
           {
             id: createId(),
@@ -177,6 +205,29 @@ const FoodOptionInput: React.FC<FoodOptionInputProps> = ({ name }) => {
                   }
                 />
               </div>
+              <div className="flex shrink-0 gap-2">
+                <input
+                  type="number"
+                  id="min"
+                  className="h-10 w-20 rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                  placeholder="Min..."
+                  value={Number(foodCategory.min).toString()}
+                  onChange={(e) =>
+                    handleFoodCategoryMinChange(index, Number(e.target.value))
+                  }
+                />
+                <input
+                  type="number"
+                  id="max"
+                  className="h-10 w-20 rounded-xl px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-virparyasMainBlue"
+                  placeholder="Max..."
+                  value={Number(foodCategory.max).toString()}
+                  onChange={(e) =>
+                    handleFoodCategoryMaxChange(index, Number(e.target.value))
+                  }
+                />
+              </div>
+
               <button type="button" className="rounded-xl bg-virparyasRed p-2">
                 <TrashCanIcon
                   className="h-6 w-6 fill-white"

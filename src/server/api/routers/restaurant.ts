@@ -190,6 +190,8 @@ export const restaurantRouter = createTRPCRouter({
                 select: {
                   id: true,
                   name: true,
+                  min: true,
+                  max: true,
                   foodOptionItem: {
                     select: {
                       id: true,

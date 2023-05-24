@@ -46,6 +46,8 @@ export const foodRouter = createTRPCRouter({
         foodOptions: z.array(
           z.object({
             name: z.string(),
+            min: z.number(),
+            max: z.number(),
             options: z.array(
               z.object({
                 name: z.string(),
@@ -103,7 +105,8 @@ export const foodRouter = createTRPCRouter({
               deleteMany: {},
               create: input.foodOptions.map((category) => ({
                 name: category.name,
-                maxOption: 1,
+                min: category.min,
+                max: category.max,
                 foodOptionItem: {
                   create: category.options.map((option) => ({
                     name: option.name,
@@ -134,7 +137,8 @@ export const foodRouter = createTRPCRouter({
             deleteMany: {},
             create: input.foodOptions.map((category) => ({
               name: category.name,
-              maxOption: 1,
+              min: category.min,
+              max: category.max,
               foodOptionItem: {
                 create: category.options.map((option) => ({
                   name: option.name,
@@ -194,6 +198,8 @@ export const foodRouter = createTRPCRouter({
         foodOptions: z.array(
           z.object({
             name: z.string(),
+            min: z.number(),
+            max: z.number(),
             options: z.array(
               z.object({
                 name: z.string(),
@@ -220,7 +226,8 @@ export const foodRouter = createTRPCRouter({
           foodOption: {
             create: input.foodOptions.map((category) => ({
               name: category.name,
-              maxOption: 1,
+              min: category.min,
+              max: category.max,
               foodOptionItem: {
                 create: category.options.map((option) => ({
                   name: option.name,

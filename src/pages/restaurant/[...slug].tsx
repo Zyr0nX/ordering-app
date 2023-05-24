@@ -256,12 +256,32 @@ const FoodCard: React.FC<{
 }> = ({ food }) => {
   const user = useRestaurantDetailStore((state) => state.user);
 
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  //disable button if there's at least one category that doesn't have min of 0
+  useEffect(() => {
+    if (food.foodOption.some((option) => option.min > 0)) {
+      setIsButtonDisabled(true);
+    }
+  }, [food.foodOption]);
+
   const [listFoodOptionItem, setListFoodOptionItem] = useState<
     Pick<
       NonNullable<inferProcedureOutput<AppRouter["restaurant"]["get"]>>,
       "food"
     >["food"][number]["foodOption"][number]["foodOptionItem"]
   >([]);
+
+  //enable button if all category reaches min
+  useEffect(() => {
+    if (
+      food.foodOption.every((option) =>
+        option.foodOptionItem.some((item) => listFoodOptionItem.includes(item))
+      )
+    ) {
+      setIsButtonDisabled(false);
+    }
+  }, [food.foodOption, listFoodOptionItem]);
 
   const [totalPrice, setTotalPrice] = useState(food.price);
 
@@ -283,8 +303,9 @@ const FoodCard: React.FC<{
   const resetState = () => {
     setTimeout(() => {
       setTotalPrice(food.price);
+      setListFoodOptionItem([]);
     }, 300);
-    setListFoodOptionItem([]);
+
     setIsOpen(false);
   };
 
@@ -356,23 +377,12 @@ const FoodCard: React.FC<{
         >
           <Masonry gutter={"2rem"}>
             {food.foodOption.map((option) => (
-              <div key={option.id} className="text-virparyasMainBlue">
-                <p className="mb-2 text-lg font-bold">{option.name}</p>
-                <div className="flex flex-col gap-2">
-                  {option.foodOptionItem.map((item) => (
-                    <Fragment key={item.id}>
-                      <div className="flex justify-between">
-                        <Checkbox
-                          label={item.name}
-                          handleChange={() => handleFoodOptionItem(item)}
-                        />
-                        <p>${item.price.toFixed(2)}</p>
-                      </div>
-                      <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
-                    </Fragment>
-                  ))}
-                </div>
-              </div>
+              <FoodOption
+                key={option.id}
+                option={option}
+                listFoodOptionItem={listFoodOptionItem}
+                handleFoodOptionItem={handleFoodOptionItem}
+              />
             ))}
           </Masonry>
         </ResponsiveMasonry>
@@ -390,6 +400,7 @@ const FoodCard: React.FC<{
             <CommonButton
               text={`Add to Cart - $${totalPrice.toFixed(2)}`}
               onClick={() => void AddToCart()}
+              disabled={isButtonDisabled}
             />
           )}
         </div>
@@ -399,3 +410,64 @@ const FoodCard: React.FC<{
 };
 
 export default RestarantDetail;
+
+interface NewFunctionProps {
+  option: {
+    foodOptionItem: {
+      id: string;
+      name: string;
+      price: number;
+    }[];
+    id: string;
+    name: string;
+    min: number;
+    max: number;
+  };
+  listFoodOptionItem: {
+    id: string;
+    name: string;
+    price: number;
+  }[];
+  handleFoodOptionItem: (
+    item: Pick<
+      NonNullable<inferProcedureOutput<AppRouter["restaurant"]["get"]>>,
+      "food"
+    >["food"][number]["foodOption"][number]["foodOptionItem"][number]
+  ) => void;
+}
+
+const FoodOption: React.FC<NewFunctionProps> = ({
+  option,
+  handleFoodOptionItem,
+  listFoodOptionItem,
+}) => {
+  const [isCategoryDisabled, setIsCategoryDisabled] = useState<boolean>();
+
+  //disable category if the number of selected items is greater than or equal to the max
+  useEffect(() => {
+    setIsCategoryDisabled(
+      option.foodOptionItem.filter((item) => listFoodOptionItem.includes(item))
+        .length >= option.max
+    );
+  }, [listFoodOptionItem, option.foodOptionItem, option.max]);
+  return (
+    <div key={option.id} className="text-virparyasMainBlue">
+      <p className="mb-2 text-lg font-bold">{option.name}</p>
+      <div className="flex flex-col gap-2">
+        {option.foodOptionItem.map((item) => (
+          <Fragment key={item.id}>
+            <div className="flex justify-between">
+              <Checkbox
+                label={item.name}
+                handleChange={() => handleFoodOptionItem(item)}
+                disable={isCategoryDisabled}
+              />
+              <p>${item.price.toFixed(2)}</p>
+            </div>
+            <div className="h-0.5 w-full bg-virparyasBackground last:hidden"></div>
+          </Fragment>
+        ))}
+      </div>
+    </div>
+  );
+};

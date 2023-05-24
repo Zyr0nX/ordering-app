@@ -151,6 +151,8 @@ const AddFood: React.FC = () => {
                           {
                             id: createId(),
                             name: "",
+                            min: 0,
+                            max: 999,
                             options: [
                               {
                                 id: createId(),
@@ -179,6 +181,8 @@ const AddFood: React.FC = () => {
                               .map((foodOption) => ({
                                 id: foodOption.id,
                                 name: foodOption.name,
+                                min: foodOption.min,
+                                max: foodOption.max,
                                 options: foodOption.options
                                   .filter((foodOptionItem) => {
                                     if (foodOptionItem.name) {
@@ -412,6 +416,8 @@ const FoodList: React.FC<{
                         foodOptions: food.foodOption.map((foodOption) => ({
                           id: foodOption.id,
                           name: foodOption.name,
+                          min: foodOption.min,
+                          max: foodOption.max,
                           options: foodOption.foodOptionItem.map(
                             (foodOptionItem) => ({
                               id: foodOptionItem.id,
@@ -440,6 +446,8 @@ const FoodList: React.FC<{
                               .map((foodOption) => ({
                                 id: foodOption.id,
                                 name: foodOption.name,
+                                min: foodOption.min,
+                                max: foodOption.max,
                                 options: foodOption.options
                                   .filter((foodOptionItem) => {
                                     if (foodOptionItem.name) {
