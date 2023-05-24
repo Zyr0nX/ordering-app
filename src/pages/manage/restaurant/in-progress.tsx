@@ -15,6 +15,7 @@ import TextArea from "~/components/common/TextArea";
 import GreenCheckmark from "~/components/icons/GreenCheckmark";
 import InfoIcon from "~/components/icons/InfoIcon";
 import RedCross from "~/components/icons/RedCross";
+import SleepIcon from "~/components/icons/SleepIcon";
 import TruckIcon from "~/components/icons/TruckIcon";
 import Restaurant from "~/components/layouts/Restaurant";
 import ManageRestaurantHeader from "~/components/ui/ManageRestaurantHeader";
@@ -73,9 +74,22 @@ const ManageRestaurantRequestsBody: React.FC = () => {
     <div className="m-4 text-virparyasMainBlue">
       <div className="relative mt-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {ordersData.map((order) => (
-            <RestaurantPendingOrder order={order} key={order.id} />
-          ))}
+          {ordersData.length === 0 ? (
+            <div className="grow">
+              <div className="mx-auto mt-12 flex flex-col items-center gap-4 rounded-2xl bg-white p-8 md:w-96 md:p-12">
+                <SleepIcon />
+                <p className="text-center text-xl font-bold">
+                  Waiting for orders...
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {ordersData.map((order) => (
+                <RestaurantPendingOrder order={order} key={order.id} />
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>
