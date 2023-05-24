@@ -192,8 +192,8 @@ const RestaurantDetailHeader: React.FC = () => {
           <h1 className="text-2xl font-bold md:text-5xl">{restaurant.name}</h1>
           {!(distance === null || distance === undefined) && (
             <p className="mt-2 text-sm md:text-2xl">
-              ${Math.max(Math.round(distance * 1.2), 5)} - $
-              {Math.max(Math.round(distance * 1.5), 6)} Delivery Fee
+              ${Math.max(Math.round(distance * 1.2 * 2), 5)} - $
+              {Math.max(Math.round(distance * 1.5 * 2), 6)} Delivery Fee
             </p>
           )}
 
@@ -272,14 +272,20 @@ const FoodCard: React.FC<{
     >["food"][number]["foodOption"][number]["foodOptionItem"]
   >([]);
 
-  //enable button if all category reaches min
+  //all categories have a min number of items. if that number is reach, enable button
   useEffect(() => {
     if (
-      food.foodOption.every((option) =>
-        option.foodOptionItem.some((item) => listFoodOptionItem.includes(item))
-      )
+      food.foodOption.every((option) => {
+        //get the length of the list of food option item that is in the food option
+        const listFoodOptionItemInOption = listFoodOptionItem.filter((item) =>
+          option.foodOptionItem.includes(item)
+        ).length;
+        return listFoodOptionItemInOption >= option.min;
+      })
     ) {
       setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
     }
   }, [food.foodOption, listFoodOptionItem]);
 
@@ -452,7 +458,25 @@ const FoodOption: React.FC<NewFunctionProps> = ({
   }, [listFoodOptionItem, option.foodOptionItem, option.max]);
   return (
     <div key={option.id} className="text-virparyasMainBlue">
-      <p className="mb-2 text-lg font-bold">{option.name}</p>
+      <p className="mb-2 text-lg font-bold">
+        {option.name}
+        <br />
+        <span className="text-xs font-light">
+          {option.min === 0 && option.max === 0
+            ? "This category is unavailable"
+            : option.min === option.max
+            ? `Choose ${option.min} option(s)`
+            : option.min > 0 && option.max >= option.foodOptionItem.length
+            ? `Choose at least ${option.min} option(s)`
+            : option.min > 0 && option.max < option.foodOptionItem.length
+            ? `Choose between ${option.min} and ${option.max} option(s)`
+            : option.min <= 0 && option.max < option.foodOptionItem.length
+            ? `Choose up to ${option.max} option(s)`
+            : option.min <= 0 && option.max >= option.foodOptionItem.length
+            ? ""
+            : ""}
+        </span>
+      </p>
       <div className="flex flex-col gap-2">
         {option.foodOptionItem.map((item) => (
           <Fragment key={item.id}>

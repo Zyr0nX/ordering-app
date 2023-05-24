@@ -235,7 +235,11 @@ export const getServerSideProps = async (
         order: {
           every: {
             status: {
-              in: ["DELIVERED", "REJECTED_BY_SHIPPER"],
+              in: [
+                "DELIVERED",
+                "REJECTED_BY_SHIPPER",
+                "REJECTED_BY_RESTAURANT",
+              ],
             },
           },
         },
@@ -277,14 +281,39 @@ export const getServerSideProps = async (
       return prev;
     });
 
-    const orderPresent = await prisma.order.findUnique({
-      where: {
-        id: order.id,
-      },
-      select: {
-        status: true,
-      },
-    });
+    const [orderPresent, shipperPresent] = await Promise.all([
+      prisma.order.findUnique({
+        where: {
+          id: order.id,
+        },
+        select: {
+          status: true,
+        },
+      }),
+      prisma.shipper.findUnique({
+        where: {
+          id: nearestShipper.id,
+        },
+        select: {
+          order: {
+            select: {
+              status: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    if (
+      !shipperPresent?.order?.every(
+        (order) =>
+          order.status === "DELIVERED" ||
+          order.status === "REJECTED_BY_SHIPPER" ||
+          order.status === "REJECTED_BY_RESTAURANT"
+      )
+    ) {
+      return;
+    }
 
     await prisma.order.update({
       where: {

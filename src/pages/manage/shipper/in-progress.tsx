@@ -107,7 +107,7 @@ const ManageShipperRequestsBody: React.FC = () => {
                   </p>
                   <p>
                     <span className="font-semibold">Address: </span>
-                    {inProgressOrder.restaurant.address}
+                    {inProgressOrder.restaurantAddress}
                   </p>
                   {inProgressOrder.restaurant.additionalAddress && (
                     <p>
@@ -129,23 +129,23 @@ const ManageShipperRequestsBody: React.FC = () => {
                   <p className="text-xl font-semibold">Customer Info</p>
                   <p>
                     <span className="font-semibold">Name: </span>
-                    {inProgressOrder.restaurant.name}
+                    {inProgressOrder.user.name}
                   </p>
                   <p>
                     <span className="font-semibold">Address: </span>
-                    {inProgressOrder.restaurant.address}
+                    {inProgressOrder.userAddress}
                   </p>
-                  {inProgressOrder.restaurant.additionalAddress && (
+                  {inProgressOrder.user.additionalAddress && (
                     <p>
                       <span className="font-semibold">
                         Additional address:{" "}
                       </span>
-                      {inProgressOrder.restaurant.additionalAddress}
+                      {inProgressOrder.user.additionalAddress}
                     </p>
                   )}
                   <p>
                     <span className="font-semibold">Phone number: </span>
-                    {inProgressOrder.restaurant.phoneNumber}
+                    {inProgressOrder.user.phoneNumber}
                   </p>
                 </div>
 

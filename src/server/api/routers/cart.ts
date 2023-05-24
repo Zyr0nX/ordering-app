@@ -52,7 +52,6 @@ export const cartRouter = createTRPCRouter({
           },
         }),
       ]);
-
       if (isFoodOptionValid.length !== input.foodOptionids.length) {
         throw new TRPCError({
           code: "BAD_REQUEST",

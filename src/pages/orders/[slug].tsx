@@ -199,8 +199,16 @@ const OrderBody: React.FC = () => {
                 hour12: false,
               })}
             </p>
-            <p>{order.restaurant.name}</p>
-            <p>{order.restaurantAddress}</p>
+            <p>Restaurant: {order.restaurant.name}</p>
+            <p>Address: {order.restaurantAddress}</p>
+            {order.shipper ? (
+              <p>
+                Shipper:{" "}
+                {`${order.shipper.firstName} ${order.shipper.lastName}`}
+              </p>
+            ) : (
+              <p>Shipper: Finding shipper...</p>
+            )}
           </div>
           <div className="h-0.5 bg-virparyasSeparator" />
           <ul className="ml-4 flex list-decimal flex-col gap-2">

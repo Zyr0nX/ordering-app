@@ -117,7 +117,7 @@ const Checkout: NextPage<
   useEffect(() => {
     if (distance !== null && distance !== undefined) {
       useCheckoutStore.setState({
-        shippingFee: Math.max(Math.round(distance / 500) / 2, 5),
+        shippingFee: Math.max(Math.round(distance / 500), 5),
       });
     }
   }, [distance]);

@@ -59,6 +59,15 @@ export const foodRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      //if min > max, throw error
+      for (const category of input.foodOptions) {
+        if (category.min > category.max) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Min cannot be greater than max",
+          });
+        }
+      }
       const food = await ctx.prisma.food.findUnique({
         where: {
           id: input.id,
@@ -211,6 +220,15 @@ export const foodRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      //if min > max, throw error
+      for (const category of input.foodOptions) {
+        if (category.min > category.max) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Min cannot be greater than max",
+          });
+        }
+      }
       await ctx.prisma.food.create({
         data: {
           name: input.name,

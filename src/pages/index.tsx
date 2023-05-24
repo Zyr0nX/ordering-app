@@ -458,7 +458,9 @@ const FavoriteRestaurantCard: React.FC<{
                     restaurant.longitude,
                     user.latitude,
                     user.longitude
-                  ) * 1.2
+                  ) *
+                    1.2 *
+                    2
                 ),
                 5
               )}{" "}
@@ -470,7 +472,9 @@ const FavoriteRestaurantCard: React.FC<{
                     restaurant.longitude,
                     user.latitude,
                     user.longitude
-                  ) * 1.5
+                  ) *
+                    1.5 *
+                    2
                 ),
                 6
               )}{" "}
@@ -606,7 +610,9 @@ const RestaurantCard: React.FC<{
                     restaurant.longitude,
                     user.latitude,
                     user.longitude
-                  ) * 1.2
+                  ) *
+                    1.2 *
+                    2
                 ),
                 5
               )}{" "}
@@ -618,7 +624,9 @@ const RestaurantCard: React.FC<{
                     restaurant.longitude,
                     user.latitude,
                     user.longitude
-                  ) * 1.5
+                  ) *
+                    1.5 *
+                    2
                 ),
                 6
               )}{" "}

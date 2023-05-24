@@ -201,7 +201,7 @@ export const stripeRouter = createTRPCRouter({
               display_name: "Shipping fee",
               type: "fixed_amount",
               fixed_amount: {
-                amount: Math.max(Math.round(distance / 500) / 2, 5) * 100,
+                amount: Math.max(Math.round(distance / 500), 5) * 100,
                 currency: "usd",
               },
             },

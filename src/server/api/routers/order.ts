@@ -427,7 +427,11 @@ export const orderRouter = createTRPCRouter({
             order: {
               every: {
                 status: {
-                  in: ["DELIVERED", "REJECTED_BY_SHIPPER"],
+                  in: [
+                    "DELIVERED",
+                    "REJECTED_BY_SHIPPER",
+                    "REJECTED_BY_RESTAURANT",
+                  ],
                 },
               },
             },
