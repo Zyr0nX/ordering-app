@@ -277,6 +277,11 @@ export const orderRouter = createTRPCRouter({
           user: true,
           orderFood: true,
           restaurant: true,
+          shipper: {
+            select: {
+              shipperLocation: true,
+            },
+          },
         },
       });
       return order;
@@ -622,6 +627,7 @@ export const orderRouter = createTRPCRouter({
           id: input.orderId,
         },
         select: {
+          id: true,
           orderFood: {
             select: {
               id: true,
@@ -640,6 +646,12 @@ export const orderRouter = createTRPCRouter({
             select: {
               firstName: true,
               lastName: true,
+              shipperLocation: {
+                select: {
+                  latitude: true,
+                  longitude: true,
+                },
+              },
             },
           },
           userId: true,
@@ -649,6 +661,10 @@ export const orderRouter = createTRPCRouter({
           restaurantRating: true,
           shipperRating: true,
           createdAt: true,
+          userLatitude: true,
+          userLongitude: true,
+          restaurantLatitude: true,
+          restaurantLongitude: true,
         },
       });
       if (!order) {

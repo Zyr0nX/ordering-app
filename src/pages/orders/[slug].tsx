@@ -1,4 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import {
   type InferGetServerSidePropsType,
@@ -7,7 +8,7 @@ import {
 } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import Loading from "~/components/common/Loading";
@@ -15,10 +16,11 @@ import EmptyStarIcon from "~/components/icons/EmptyStarIcon";
 import FullStarIcon from "~/components/icons/FullStarIcon";
 import Guest from "~/components/layouts/Guest";
 import GuestCommonHeader from "~/components/ui/GuestCommonHeader";
+import { env } from "~/env.mjs";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/utils/api";
+import { type RouterOutputs, api } from "~/utils/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -80,9 +82,29 @@ const OrderBody: React.FC = () => {
   const router = useRouter();
   const { slug: orderId } = router.query;
 
-  const { data: order } = api.order.getOrderByUser.useQuery({
-    orderId: Number((orderId as string).replace("VP-", "")),
-  });
+  const [orderCompleted, setOrderCompleted] = useState(false);
+
+  const { data: order } = api.order.getOrderByUser.useQuery(
+    {
+      orderId: Number((orderId as string).replace("VP-", "")),
+    },
+    {
+      refetchInterval: 5000,
+      enabled: !orderCompleted,
+    }
+  );
+
+  console.log(order);
+
+  useEffect(() => {
+    if (
+      order?.status === "DELIVERED" ||
+      order?.status === "REJECTED_BY_RESTAURANT" ||
+      order?.status === "REJECTED_BY_SHIPPER"
+    ) {
+      setOrderCompleted(true);
+    }
+  }, [order?.status]);
   if (!order) return null;
   const itemsPrice = order.orderFood?.reduce(
     (acc, cur) => acc + cur.price * cur.quantity,
@@ -262,39 +284,38 @@ const OrderBody: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="relative top-32 flex flex-col gap-4 md:col-start-2 md:row-start-1">
-        {order.status === "DELIVERED" && <Rating />}
+      <div className="relative flex flex-col gap-4 md:top-32 md:col-start-2 md:row-start-1">
+        {order.status === "DELIVERED" && <Rating order={order} />}
         <Link
           href="/"
           className=" flex h-fit w-full items-center justify-center rounded-xl bg-virparyasMainBlue p-3 font-bold text-white"
         >
           Continue Shopping
         </Link>
+        {!orderCompleted && <Maps order={order} />}
       </div>
     </div>
   );
 };
 
-const Rating = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-  const { slug: orderId } = router.query;
+interface RatingProps {
+  order: RouterOutputs["order"]["getOrderByUser"];
+}
 
-  const { data: order } = api.order.getOrderByUser.useQuery({
-    orderId: Number((orderId as string).replace("VP-", "")),
-  });
+const Rating: React.FC<RatingProps> = ({ order }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const ratingMutation = api.order.rateOrder.useMutation();
 
   const [restaurantRating, setRestaurantRating] = useState(
-    order?.restaurantRating || 0
+    order.restaurantRating || 0
   );
   const [shipperRating, setShipperRating] = useState(order?.shipperRating || 0);
   if (!order || !order.shipper) return null;
   const handleSubmit = async () => {
     await toast.promise(
       ratingMutation.mutateAsync({
-        orderId: Number((orderId as string).replace("VP-", "")),
+        orderId: order.id,
         restaurantRating,
         shipperRating,
       }),
@@ -425,6 +446,58 @@ const Rating = () => {
         </Dialog>
       </Transition>
     </>
+  );
+};
+
+interface MapsProps {
+  order: RouterOutputs["order"]["getOrderByUser"];
+}
+
+const Maps: React.FC<MapsProps> = ({ order }) => {
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+  });
+  console.log(order.shipper);
+  return isLoaded ? (
+    <GoogleMap
+      mapContainerStyle={{
+        width: "100%",
+        height: "20rem",
+      }}
+      center={{
+        lat: (order.restaurantLatitude + order.userLatitude) / 2,
+        lng: (order.restaurantLongitude + order.userLongitude) / 2,
+      }}
+      zoom={12.5}
+    >
+      <Marker
+        position={{
+          lat: order.restaurantLatitude,
+          lng: order.restaurantLongitude,
+        }}
+        icon={"/restaurant.png"}
+        opacity={1}
+      ></Marker>
+      <Marker
+        position={{
+          lat: order.userLatitude,
+          lng: order.userLongitude,
+        }}
+        icon={"/user.png"}
+      ></Marker>
+      {order.shipper?.shipperLocation && (
+        <Marker
+          position={{
+            lat: order.shipper.shipperLocation.latitude,
+            lng: order.shipper.shipperLocation.longitude,
+          }}
+          icon={"/food-delivery.png"}
+        ></Marker>
+      )}
+    </GoogleMap>
+  ) : (
+    <></>
   );
 };
 

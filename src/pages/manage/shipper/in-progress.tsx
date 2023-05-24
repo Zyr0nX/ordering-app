@@ -1,4 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { Form, Formik } from "formik";
 import {
@@ -6,18 +7,20 @@ import {
   type InferGetServerSidePropsType,
   type NextPage,
 } from "next";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import SuperJSON from "superjson";
 import { z } from "zod";
 import Loading from "~/components/common/Loading";
 import TextArea from "~/components/common/TextArea";
+import SleepIcon from "~/components/icons/SleepIcon";
 import Shipper from "~/components/layouts/Shipper";
 import ManageShipperHeader from "~/components/ui/ManageShipperHeader";
+import { env } from "~/env.mjs";
 import { appRouter } from "~/server/api/root";
 import { createInnerTRPCContext } from "~/server/api/trpc";
 import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -90,88 +93,91 @@ const ManageShipperRequestsBody: React.FC = () => {
 
   return (
     <>
-      <div className="m-4 mx-auto max-w-lg text-virparyasMainBlue">
+      <div className="m-4 text-virparyasMainBlue md:mx-20">
         <div className="mt-4">
           {inProgressOrder ? (
             <>
-              <div className="flex flex-col gap-4 rounded-2xl bg-white p-6">
-                <p className="text-2xl font-bold">
-                  Order: VP-{inProgressOrder.id}
-                </p>
-                <div className="h-0.5 bg-virparyasSeparator"></div>
-                <div>
-                  <p className="text-xl font-semibold">Restaurant Info</p>
-                  <p>
-                    <span className="font-semibold">Name: </span>
-                    {inProgressOrder.restaurant.name}
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div className="flex flex-col gap-4 rounded-2xl bg-white p-6">
+                  <p className="text-2xl font-bold">
+                    Order: VP-{inProgressOrder.id}
                   </p>
-                  <p>
-                    <span className="font-semibold">Address: </span>
-                    {inProgressOrder.restaurantAddress}
-                  </p>
-                  {inProgressOrder.restaurant.additionalAddress && (
+                  <div className="h-0.5 bg-virparyasSeparator"></div>
+                  <div>
+                    <p className="text-xl font-semibold">Restaurant Info</p>
                     <p>
-                      <span className="font-semibold">
-                        Additional address:{" "}
-                      </span>
-                      {inProgressOrder.restaurant.additionalAddress}
+                      <span className="font-semibold">Name: </span>
+                      {inProgressOrder.restaurant.name}
                     </p>
-                  )}
-                  <p>
-                    <span className="font-semibold">Phone number: </span>
-                    {inProgressOrder.restaurant.phoneNumber}
-                  </p>
-                </div>
-
-                <div className="h-0.5 bg-virparyasSeparator"></div>
-
-                <div>
-                  <p className="text-xl font-semibold">Customer Info</p>
-                  <p>
-                    <span className="font-semibold">Name: </span>
-                    {inProgressOrder.user.name}
-                  </p>
-                  <p>
-                    <span className="font-semibold">Address: </span>
-                    {inProgressOrder.userAddress}
-                  </p>
-                  {inProgressOrder.user.additionalAddress && (
                     <p>
-                      <span className="font-semibold">
-                        Additional address:{" "}
-                      </span>
-                      {inProgressOrder.user.additionalAddress}
+                      <span className="font-semibold">Address: </span>
+                      {inProgressOrder.restaurantAddress}
                     </p>
-                  )}
-                  <p>
-                    <span className="font-semibold">Phone number: </span>
-                    {inProgressOrder.user.phoneNumber}
-                  </p>
-                </div>
+                    {inProgressOrder.restaurant.additionalAddress && (
+                      <p>
+                        <span className="font-semibold">
+                          Additional address:{" "}
+                        </span>
+                        {inProgressOrder.restaurant.additionalAddress}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-semibold">Phone number: </span>
+                      {inProgressOrder.restaurant.phoneNumber}
+                    </p>
+                  </div>
 
-                <div className="px-auto mt-4 flex w-full justify-center gap-4">
-                  {completeOrderMutation.isLoading ? (
-                    <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
-                        onClick={() => setIsRejectOpen(true)}
-                      >
-                        Reject
-                      </button>
-                      <button
-                        type="button"
-                        className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white disabled:bg-gray-300"
-                        disabled={inProgressOrder.status !== "DELIVERING"}
-                        onClick={() => void handleComplete()}
-                      >
-                        Complete
-                      </button>
-                    </>
-                  )}
+                  <div className="h-0.5 bg-virparyasSeparator"></div>
+
+                  <div>
+                    <p className="text-xl font-semibold">Customer Info</p>
+                    <p>
+                      <span className="font-semibold">Name: </span>
+                      {inProgressOrder.user.name}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Address: </span>
+                      {inProgressOrder.userAddress}
+                    </p>
+                    {inProgressOrder.user.additionalAddress && (
+                      <p>
+                        <span className="font-semibold">
+                          Additional address:{" "}
+                        </span>
+                        {inProgressOrder.user.additionalAddress}
+                      </p>
+                    )}
+                    <p>
+                      <span className="font-semibold">Phone number: </span>
+                      {inProgressOrder.user.phoneNumber}
+                    </p>
+                  </div>
+
+                  <div className="px-auto mt-4 flex w-full justify-center gap-4">
+                    {completeOrderMutation.isLoading ? (
+                      <Loading className="h-10 w-10 animate-spin fill-virparyasMainBlue text-gray-200" />
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="w-36 rounded-xl bg-virparyasRed px-10 py-2 font-medium text-white"
+                          onClick={() => setIsRejectOpen(true)}
+                        >
+                          Reject
+                        </button>
+                        <button
+                          type="button"
+                          className="w-36 rounded-xl bg-virparyasGreen px-10 py-2 font-medium text-white disabled:bg-gray-300"
+                          disabled={inProgressOrder.status !== "DELIVERING"}
+                          onClick={() => void handleComplete()}
+                        >
+                          Complete
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
+                <Maps order={inProgressOrder} />
               </div>
               <Transition appear show={isRejectOpen} as={Fragment}>
                 <Dialog
@@ -283,11 +289,77 @@ const ManageShipperRequestsBody: React.FC = () => {
               </Transition>
             </>
           ) : (
-            <></>
+            <div className="grow">
+              <div className="mx-auto mt-12 flex flex-col items-center gap-4 rounded-2xl bg-white p-8 md:w-96 md:p-12">
+                <SleepIcon />
+                <p className="text-center text-xl font-bold">
+                  Waiting for job...
+                </p>
+              </div>
+            </div>
           )}
         </div>
       </div>
     </>
+  );
+};
+
+interface MapsProps {
+  order: NonNullable<RouterOutputs["order"]["getShipperInProgressOrders"]>;
+}
+
+const Maps: React.FC<MapsProps> = ({ order }) => {
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+  });
+  const center = useMemo(
+    () => ({
+      lat: (order.restaurantLatitude + order.userLatitude) / 2,
+      lng: (order.restaurantLongitude + order.userLongitude) / 2,
+    }),
+    [
+      order.restaurantLatitude,
+      order.restaurantLongitude,
+      order.userLatitude,
+      order.userLongitude,
+    ]
+  );
+  return isLoaded ? (
+    <GoogleMap
+      mapContainerStyle={{
+        width: "100%",
+        height: "20rem",
+      }}
+      center={center}
+      zoom={12.5}
+    >
+      <Marker
+        position={{
+          lat: order.restaurantLatitude,
+          lng: order.restaurantLongitude,
+        }}
+        icon={"/restaurant.png"}
+      ></Marker>
+      <Marker
+        position={{
+          lat: order.userLatitude,
+          lng: order.userLongitude,
+        }}
+        icon={"/user.png"}
+      ></Marker>
+      {order.shipper?.shipperLocation && (
+        <Marker
+          position={{
+            lat: order.shipper.shipperLocation.latitude,
+            lng: order.shipper.shipperLocation.longitude,
+          }}
+          icon={"/food-delivery.png"}
+        ></Marker>
+      )}
+    </GoogleMap>
+  ) : (
+    <></>
   );
 };
 
