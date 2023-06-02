@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.29",
-    "@headlessui/react": "^1.7.14",
+    "@headlessui/react": "^1.7.15",
     "@headlessui/tailwindcss": "^0.1.2",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@paralleldrive/cuid2": "^2.2.0",
