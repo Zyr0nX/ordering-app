@@ -165,10 +165,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.39.0.tgz#58b536bcc843f4cd1e02a7e6171da5c040f4d44b"
   integrity sha512-kf9RB0Fg7NZfap83B3QOqOGg9QmD9yBudqQXzzOtn3i4y7ZUXe5ONeW34Gwi+TxhH4mvj72R1Zc300KUMa9Bng==
 
-"@googlemaps/google-maps-services-js@^3.3.29":
-  version "3.3.29"
-  resolved "https://registry.yarnpkg.com/@googlemaps/google-maps-services-js/-/google-maps-services-js-3.3.29.tgz#ace540f9adf01ca01f6b3d2a19a6d02b9e2b9be4"
-  integrity sha512-tFev5JZDo/9n5jKJi/AAhXlebLd+iup3IQybptbJfp8lgQL9pjyVNT2ci65T+GC+AeDzL+Hh189kFM8gJAHNMw==
+"@googlemaps/google-maps-services-js@^3.3.32":
+  version "3.3.32"
+  resolved "https://registry.yarnpkg.com/@googlemaps/google-maps-services-js/-/google-maps-services-js-3.3.32.tgz#f73f2d04ace6dd17aa48e7e7bb772971c9de817b"
+  integrity sha512-ywI1XFdNy9Iq0BaRgA/SKgdDNc6f+mvfVQtrfQjCtO4wuDH6bfCBeiW5DnxpO0NxwNqNCl/2dr5oFaO4fYrdWA==
   dependencies:
     "@googlemaps/url-signature" "^1.0.4"
     agentkeepalive "^4.1.0"
