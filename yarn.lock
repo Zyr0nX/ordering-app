@@ -464,10 +464,10 @@
     javascript-natural-sort "0.7.1"
     lodash "^4.17.21"
 
-"@trpc/client@^10.0.0":
-  version "10.21.1"
-  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.21.1.tgz#1cc86ffddaabd7368b43b50070f2ca98bbfc460d"
-  integrity sha512-oZgPbghs9y2frTCA9mZPSAlVknV9stCTKYO5nsvRr0aX+oaA0URoXJTKZTSpLZxLfuwWgxBj4iTiCWWWmaVelw==
+"@trpc/client@^10.33.0":
+  version "10.33.0"
+  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.33.0.tgz#621df1a1d3a07c6532531b20fbee5198c440720a"
+  integrity sha512-gHKe/5MEdoi1HEF7gsviFdHC7IyVRYjS39C0uXYHlM9rJ9It+KQpz8+wu9XkORte/lbBCScOGOPLNqb5IvSF/g==
 
 "@trpc/next@^10.0.0":
   version "10.21.1"
