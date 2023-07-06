@@ -2547,10 +2547,10 @@ next-auth@^4.18.3:
     preact-render-to-string "^5.1.19"
     uuid "^8.3.2"
 
-next-superjson-plugin@^0.5.6:
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/next-superjson-plugin/-/next-superjson-plugin-0.5.7.tgz#9d0b3a32946f85af7423e835d7396f18e1b30507"
-  integrity sha512-bkF49B/Pcf0GCh10vXL+hjBodC404FgzEsl3wtrjwqvTkoWDnqBOgP2KqWR9sF1tz4MSMlo872Q4Srl/2XRFWw==
+next-superjson-plugin@^0.5.9:
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/next-superjson-plugin/-/next-superjson-plugin-0.5.9.tgz#2b4dc19799d205d33e5c648a7e48a2cef79b3052"
+  integrity sha512-xEU+SvrSDk8PGAQ2TrJM/OhkZBcWjWWqSjpUtlxTAI9ovTjKBxxQumcFt7oXzoBLJsRtq0BWTHrcnzL/9izXPQ==
   dependencies:
     hoist-non-react-statics "^3.3.2"
 
