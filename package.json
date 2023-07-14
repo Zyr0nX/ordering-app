@@ -45,7 +45,7 @@
     "react-hot-toast": "^2.4.1",
     "react-responsive-masonry": "^2.1.7",
     "set-interval-async": "^3.0.3",
-    "stripe": "^12.3.0",
+    "stripe": "^12.13.0",
     "superjson": "^1.12.3",
     "use-debounce": "^9.0.3",
     "zod": "^3.18.0",
