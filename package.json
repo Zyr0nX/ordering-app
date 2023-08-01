@@ -15,7 +15,7 @@
     "stripe": "stripe listen --forward-to localhost:3000/api/stripe-webhook --latest"
   },
   "dependencies": {
-    "@googlemaps/google-maps-services-js": "^3.3.29",
+    "@googlemaps/google-maps-services-js": "^3.3.35",
     "@headlessui/react": "^1.7.14",
     "@headlessui/tailwindcss": "^0.1.2",
     "@next-auth/prisma-adapter": "^1.0.5",
