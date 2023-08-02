@@ -31,7 +31,7 @@
     "@vercel/analytics": "^1.0.1",
     "cloudinary": "^1.36.4",
     "dayjs": "^1.11.7",
-    "formik": "^2.2.9",
+    "formik": "^2.4.3",
     "fuzzysort": "^2.0.4",
     "libphonenumber-js": "^1.10.26",
     "micro": "^10.0.1",
